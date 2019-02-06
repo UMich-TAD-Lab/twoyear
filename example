@@ -1,0 +1,66 @@
+---
+title: "Example"
+author: "Julianna Calabrese"
+date: "February 6, 2019"
+output: html_document
+---
+
+## Load in library
+
+```{r include=FALSE}
+library(foreign)
+library(car)
+library(gvlma)
+library(ggplot2)
+library(ggrepel)
+library(moments)
+library(MASS)
+library(Hmisc)
+library(kableExtra)
+library(tidyr)
+library(dplyr)
+library(plyr)
+library(openxlsx)
+library(data.table)
+library(xlsx)
+library(summarytools)
+```
+
+## Load in data
+
+```{r}
+scared <- read.csv("C:/Users/jrcala/Downloads/data.csv") #Ideally, put the data file somewhere safer than Downloads
+```
+
+## Remove empty rows
+
+```{r}
+scared <- scared[!is.na(scared$scared1_1_2yr),]
+```
+
+Outline:
+
+Data cleaning:
+* Reverse code items
+* Assign "88" to any missing values
+* Assign class types to items
+* Calculate subscales if needed
+* Misc
+
+Statistics for just twoyear data:
+* Sum
+* Mean
+* Median
+* Std dev
+* Std error
+* Min/max/range
+* IQR stuff
+* Kurtosis
+* Skewness
+
+I'll add how to compare the Wave 15 and 2yr data later. 
+
+```{r, results='asis'}
+summarytools::descr(scared, style = "rmarkdown")
+```
+
