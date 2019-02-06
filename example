@@ -3,6 +3,8 @@ title: "Example"
 author: "Julianna Calabrese"
 date: "February 6, 2019"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Load in library
@@ -30,7 +32,7 @@ Here is a pdf about the SCARED for reference: https://sspediatricassociates.com/
 
 ## Load in data
 
-Ideally, you should put your dataset somewhere safer than Downloads, like maybe Desktop or Documents. Replace scared with whatever you want to call your dataset, e.g. data or nameofmeasure. 
+Change the below syntax to fit your computer. Ideally, you should put your dataset somewhere safer than Downloads, like maybe Desktop or Documents. Replace scared with whatever you want to call your dataset, e.g. data or nameofmeasure. 
 
 ```{r}
 scared <- read.csv("C:/Users/jrcala/Downloads/data.csv")
@@ -38,7 +40,9 @@ scared <- read.csv("C:/Users/jrcala/Downloads/data.csv")
 
 ## Remove empty rows
 
-Replace scared with whatever you want to call your dataset. Replace scared1_1_2yr with whatever the first item of the dataset. The syntax removes all rows where there is NA for the first item, so theoretically, this should remove everyone who hasn't completed the Qualtrics survey first. This isn't perfect, since some people may have just happened to skip the first item, but this will do for preliminary statistics.
+Replace scared with whatever you want to call your dataset and replace scared1_1_2yr with whatever the first item of the dataset. The syntax removes all rows where there is NA for the first item, so theoretically, this should remove everyone who hasn't completed the Qualtrics survey first. This isn't perfect, since some people may have just happened to skip the first item, but this will do for preliminary statistics. 
+
+The logic is: newdata <- olddata(IsNotNA(data$item),] ... so if you wanted, you keep the original 237-but-mostly-NA dataset as well as a whittled down version by naming the newdata something like scared_small. 
 
 ```{r}
 scared <- scared[!is.na(scared$scared1_1_2yr),]
@@ -49,10 +53,6 @@ scared <- scared[!is.na(scared$scared1_1_2yr),]
 Some items may need to be reverse-coded, but to my knowledge, SCARED has no items that need to be coded, but this is what you would do if you wanted to. Please note that the SCARED uses a scale of 1, 2, 3. 
 
 ```{r}
-reverse_key <- c(1 = 3, 3 = 1)
-
-scared$scared1_1_2yr_recode <- car::recode(scared$scared1_1_2yr, '1' = 3, '3' = 1, .missing="NA")
-
 scared$scared1_1_2yr_recode <- car::recode(scared$scared1_1_2yr, "1 = 3; 3 = 1")
 
 print(scared$scared1_1_2yr)
@@ -78,6 +78,7 @@ rm(panic_disorder_dummy)
 Whoever is doing the SCARED dataset should do the other subscales here.
 
 Things for just twoyear data:
+
 * Sum
 * Mean
 * Median
@@ -89,7 +90,7 @@ Things for just twoyear data:
 * Skewness
 
 ```{r, results='asis'}
-summarytools::descr(scared, style = "rmarkdown")
-# Use ?descr to find out more about this function
+summarytools::descr(scared, style = "rmarkdown", na.rm=TRUE)
 ```
 
+Use ?descr to find out more about this function. It's an easy way to get a lot of statistics in a nice table. 
