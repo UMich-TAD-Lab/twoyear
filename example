@@ -8,15 +8,10 @@ output: html_document
 ## Load in library
 
 ```{r include=FALSE}
-library(foreign)
 library(car)
-library(gvlma)
 library(ggplot2)
-library(ggrepel)
-library(moments)
 library(MASS)
 library(Hmisc)
-library(kableExtra)
 library(tidyr)
 library(dplyr)
 library(plyr)
@@ -24,43 +19,77 @@ library(openxlsx)
 library(data.table)
 library(xlsx)
 library(summarytools)
+library(psych)
 ```
+
+First, you should down your survey data from Redcap in the form of a csv file. I'll put instructions for how to do that somewhere on the Github readme. 
+
+Here is a pdf about the SCARED for reference: https://sspediatricassociates.com/Forms-and-Policies/Forms/Behavioral,-Mental-Health-Assessment-Forms/SCARED-form-Parent-and-Child-version.aspx
+
+# Pre-Analysis Cleaning
 
 ## Load in data
 
+Ideally, you should put your dataset somewhere safer than Downloads, like maybe Desktop or Documents. Replace scared with whatever you want to call your dataset, e.g. data or nameofmeasure. 
+
 ```{r}
-scared <- read.csv("C:/Users/jrcala/Downloads/data.csv") #Ideally, put the data file somewhere safer than Downloads
+scared <- read.csv("C:/Users/jrcala/Downloads/data.csv")
 ```
 
 ## Remove empty rows
+
+Replace scared with whatever you want to call your dataset. Replace scared1_1_2yr with whatever the first item of the dataset. The syntax removes all rows where there is NA for the first item, so theoretically, this should remove everyone who hasn't completed the Qualtrics survey first. This isn't perfect, since some people may have just happened to skip the first item, but this will do for preliminary statistics.
 
 ```{r}
 scared <- scared[!is.na(scared$scared1_1_2yr),]
 ```
 
-Outline:
+## Reverse coding
 
-Data cleaning:
-* Reverse code items
-* Assign "88" to any missing values
-* Assign class types to items
-* Calculate subscales if needed
-* Misc
+Some items may need to be reverse-coded, but to my knowledge, SCARED has no items that need to be coded, but this is what you would do if you wanted to. Please note that the SCARED uses a scale of 1, 2, 3. 
 
-Statistics for just twoyear data:
+```{r}
+reverse_key <- c(1 = 3, 3 = 1)
+
+scared$scared1_1_2yr_recode <- car::recode(scared$scared1_1_2yr, '1' = 3, '3' = 1, .missing="NA")
+
+scared$scared1_1_2yr_recode <- car::recode(scared$scared1_1_2yr, "1 = 3; 3 = 1")
+
+print(scared$scared1_1_2yr)
+print(scared$scared1_1_2yr_recode)
+
+#Now let's remove the made-up recode variable
+
+scared$scared1_1_2yr_recode <- NULL
+```
+
+## Calculate subscales
+
+Below I calculate the Panic Disorder subscale. I'll round up all the items of that specific subscale, add them together, make an item which represents the sum of the  subscale, and put it back in the dataset.
+
+```{r}
+panic_disorder_dummy <- cbind(scared$scared1_1_2yr, scared$scared1_6_2yr, scared$scared2_9_2yr, scared$scared2_12_2yr, scared$scared3_15_2yr, scared$scared3_18_2yr, scared$scared4_19_2yr, scared$scared4_22_2yr, scared$scared4_24_2yr, scared$scared5_27_2yr, scared$scared5_30_2yr, scared$scared6_34_2yr, scared$scared6_28_2yr)
+
+scared$panic_disorder <- rowSums(panic_disorder_dummy, na.rm=FALSE)
+
+rm(panic_disorder_dummy)
+```
+
+Whoever is doing the SCARED dataset should do the other subscales here.
+
+Things for just twoyear data:
 * Sum
 * Mean
 * Median
 * Std dev
 * Std error
 * Min/max/range
-* IQR stuff
+* IQR
 * Kurtosis
 * Skewness
 
-I'll add how to compare the Wave 15 and 2yr data later. 
-
 ```{r, results='asis'}
 summarytools::descr(scared, style = "rmarkdown")
+# Use ?descr to find out more about this function
 ```
 
