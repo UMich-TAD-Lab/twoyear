@@ -18,8 +18,10 @@
 3. Click on your measure's folder
 4. In your measure's folder, click on the folder called "Cleaned Data"
 5. Find the original .sav data file, *copy it*, and paste *the copy* to your Desktop
+
        a. Do not touch any files ending in .sps or .spv
        b. _**Be very careful to NOT mess with the original .sav data file in ANY way!**_
+
 6. On your Desktop, open the copy of the .sav file in SPSS (not the Output file, ignore that)
 7. Click File --> Export --> CVS Data
 8. Save the csv file to your Desktop
