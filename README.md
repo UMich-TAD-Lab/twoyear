@@ -3,7 +3,7 @@
 ## Current Assignments -
 
 | Measure  | Undergrad | Status |
-| ------------- | ------------- |
+| --- | --- | --- |
 | APQ Child | Paulina | [ ] |
 | ALES Child | none | [ ] |
 | CTQ Child | Alexa | [ ] |
