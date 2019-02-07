@@ -1,5 +1,19 @@
 # Descriptive statistics for the Two-Year Follow-Up
 
+## Current Assignments -
+
+| Measure  | Undergrad | Status |
+| ------------- | ------------- |
+| APQ Child | Paulina | [ ] |
+| ALES Child | none | [ ] |
+| CTQ Child | Alexa | [ ] |
+| MFQ Child | Nisha | [ ] |
+| NQ Child | none | [ ] |
+| SCARED Child | Diane | [ ] |
+| SRD Child | none | [ ] |
+| SUB Child | none | [ ] |
+
+
 ## How to download two-year data from Redcap
 
 1. Log into Redcap and go to FF Wave 15
