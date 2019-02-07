@@ -1,10 +1,10 @@
 # Descriptive statistics for the Two-Year Follow-Up
 
-## Current Assignments -
+## Current Assignments
 
 | Measure  | Undergrad | Status |
 | --- | --- | --- |
-| APQ Child | Paulina | [ ] |
+| APQ Child | Paulina | [ ] done?</li></ul> |
 | ALES Child | none | [ ] |
 | CTQ Child | Alexa | [ ] |
 | MFQ Child | Nisha | [ ] |
