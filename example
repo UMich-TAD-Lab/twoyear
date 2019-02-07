@@ -22,7 +22,7 @@ library(summarytools)
 library(psych)
 ```
 
-First, you should down your survey data from Redcap in the form of a csv file. Instructions are on the Github read me. 
+First, you should download your survey data from Redcap in the form of a csv file. Instructions are on the Github read me. 
 
 Here is a pdf about the SCARED for reference: https://sspediatricassociates.com/Forms-and-Policies/Forms/Behavioral,-Mental-Health-Assessment-Forms/SCARED-form-Parent-and-Child-version.aspx
 
