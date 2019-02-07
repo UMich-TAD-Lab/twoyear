@@ -1,6 +1,6 @@
 # Descriptive statistics for the Two-Year Follow-Up
 
-## How to download data from Redcap
+## How to download two-year data from Redcap
 
 1. Log into Redcap and go to FF Wave 15
 2. Click on "Data Exports, Reports, and Stats" in the lefthand menu
