@@ -1,4 +1,4 @@
-# Descriptive statistics for the Two-Year Follow-Up. 
+# Descriptive statistics for the Two-Year Follow-Up
 
 ## How to download data from Redcap
 
