@@ -4,7 +4,7 @@ author: "Julianna Calabrese"
 date: "February 6, 2019"
 output: html_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ## Load in library
@@ -15,11 +15,9 @@ library(ggplot2)
 library(MASS)
 library(Hmisc)
 library(tidyr)
+library(tidyverse)
 library(dplyr)
 library(plyr)
-library(openxlsx)
-library(data.table)
-library(xlsx)
 library(summarytools)
 library(psych)
 ```
@@ -61,6 +59,28 @@ print(scared$scared1_1_2yr_recode)
 #Now let's remove the made-up recode variable
 
 scared$scared1_1_2yr_recode <- NULL
+```
+
+## Make a sum and a mean variable
+
+The below syntax creates two variables and adds them back to the dataset: the mean of all the items and the sum of all the items.
+
+```{r}
+names(scared) #This prints the dataset's variables names so, which makes it so I don't totally have to write out each individual variable name
+
+scared_vars <- c("scared1_1_2yr", "scared1_2_2yr", "scared1_3_2yr", "scared1_4_2yr", "scared1_5_2yr", "scared1_6_2yr", "scared2_7_2yr", "scared2_8_2yr", "scared2_9_2yr", "scared2_10_2yr", "scared2_11_2yr", "scared2_12_2yr", "scared3_13_2yr", "scared3_14_2yr", "scared3_15_2yr", "scared3_16_2yr", "scared3_17_2yr", "scared3_18_2yr", "scared4_19_2yr", "scared4_20_2yr", "scared4_21_2yr", "scared4_22_2yr", "scared4_23_2yr", "scared4_24_2yr", "scared5_25_2yr", "scared5_26_2yr", "scared5_27_2yr", "scared5_28_2yr", "scared5_29_2yr", "scared5_30_2yr", "scared6_31_2yr", "scared6_32_2yr", "scared6_33_2yr", "scared6_34_2yr", "scared6_35_2yr", "scared6_36_2yr", "scared6_37_2yr", "scared6_38_2yr")
+```
+
+```{r}
+scared %>% 
+  group_by(id) %>% 
+  summarise(scared_total_mean = mean(scared_vars))
+
+names(scared)
+```
+
+```{r}
+#scared$scared_total_sum <- 
 ```
 
 ## Calculate subscales
