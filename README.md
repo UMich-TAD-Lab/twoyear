@@ -20,7 +20,7 @@
 5. Find the original .sav data file, *copy it*, and paste *the copy* to your Desktop
 
        Do not touch any files ending in .sps or .spv
-       _**Be very careful to NOT mess with the original .sav data file in ANY way!**_
+       **Be very careful to NOT mess with the original .sav data file in ANY way!**
 
 6. On your Desktop, open the copy of the .sav file in SPSS (not the Output file, ignore that)
 7. Click File --> Export --> CVS Data
