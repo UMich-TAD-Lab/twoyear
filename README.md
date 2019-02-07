@@ -4,14 +4,14 @@
 
 | Measure  | Undergrad | Status |
 | --- | --- | --- |
-| APQ Child | Paulina |<ul><li> [x] item1</li><li>|
-| ALES Child | none | - [ ] |
-| CTQ Child | Alexa | - [ ] |
-| MFQ Child | Nisha | - [ ] |
-| NQ Child | none | - [ ] |
-| SCARED Child | Diane | - [ ] |
-| SRD Child | none | - [ ] |
-| SUB Child | none | - [ ] |
+| APQ Child | Paulina |<ul><li> [ ] item1</li><li>|
+| ALES Child | none | [ ] |
+| CTQ Child | Alexa | [ ] |
+| MFQ Child | Nisha | [ ] |
+| NQ Child | none | [ ] |
+| SCARED Child | Diane | [ ] |
+| SRD Child | none | [ ] |
+| SUB Child | none | [ ] |
 
 
 ## How to download two-year data from Redcap
