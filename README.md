@@ -4,7 +4,7 @@
 
 | Measure  | Undergrad | Status |
 | --- | --- | --- |
-| APQ Child | Paulina | # [checkbox:unchecked]|
+| APQ Child | Paulina | <ul><li>[x] item1</li><li>[ ] item2</li></ul>|
 | ALES Child | none | [ ] |
 | CTQ Child | Alexa | [ ] |
 | MFQ Child | Nisha | [ ] |
