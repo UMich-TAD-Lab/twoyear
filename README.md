@@ -30,7 +30,7 @@
 
 7. Click on the Excel icon to download the raw data
 
-8. Put the data file somewhere safe (e.g. Desktop, Documents) and rename it (e.g. "data", "measure")
+8. Put the data file somewhere safe (e.g. Desktop, Documents) and rename it (e.g. "data_2yr", "nameofmeasure_2yr")
 
 ## How to get the original Wave 15 data
 
