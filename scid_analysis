@@ -3,6 +3,8 @@ title: "Analyzing the SCID for Dr. Monk"
 author: "Julianna Calabrese"
 date: "February 13, 2019"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -34,7 +36,7 @@ library(tibble)
 
 ## Load in data
 
-```{r}
+```{r include=FALSE}
 agora <- read.csv(file='C:/Users/jrcala/Desktop/scid/agora.csv')
 gad <- read.csv(file='C:/Users/jrcala/Desktop/scid/gad.csv')
 mania <- read.csv(file='C:/Users/jrcala/Desktop/scid/mania.csv')
@@ -49,12 +51,12 @@ suds <- read.csv(file='C:/Users/jrcala/Desktop/scid/suds.csv')
 parentdemo <- read.csv(file='C:/Users/jrcala/Desktop/scid/parentdemo.csv')
 ```
 
-```{r}
+```{r include=FALSE}
 data <- Reduce(function(x,y) merge(x = x, y = y, by = "id"), 
        list(agora, gad, mania, mdd, ocd, panic, pdd, ptsd, social, specific, suds))
 ```
 
-```{r}
+```{r include=FALSE}
 rm(agora)
 rm(gad)
 rm(mania)
@@ -68,19 +70,19 @@ rm(specific)
 rm(suds)
 ```
 
-```{r}
+```{r include=FALSE}
 data[data=="88"] <- NA
 data[data=="-99"] <- NA
 data[data=="77"] <- NA
 ```
 
-```{r}
+```{r include=FALSE}
 #names(data) <- substring(names(data),7,99)
 #data <- sub("*.s3cid", "", data)
 names(data) <- gsub(pattern = "s3cid_*", replacement = "", x = names(data))
 ```
 
-```{r}
+```{r include=FALSE}
 data <- merge(data, parentdemo, by="id")
 rm(parentdemo)
 ```
@@ -105,7 +107,7 @@ Parent Demo reference:
 77 Refused
 88 Missing
 
-```{r}
+```{r include=FALSE}
 write.csv(data, file="C:/Users/jrcala/Desktop/scid/data.csv")
 ```
 
@@ -131,9 +133,12 @@ table(data$dx_mde_current)
 
 ```{r}
 perc <- function(x, n){ 100*length((which(x == n))) / length(x) }
+count <- function(x, n){ length((which(x == n))) }
 ```
 
-```{r }
+https://www.theanalysisfactor.com/r-tutorial-count/
+
+```{r  include=FALSE}
 agora4_now_perc <- perc(data$dx_agora4_current, 1)
 agora5_now_perc <- perc(data$dx_agora5_current, 1)
 agnos_now_perc <- perc(data$dx_agnos_current, 1)
@@ -186,23 +191,76 @@ sub3_dsm5_now_perc <- perc(data$dx_sub3_dsm5_current, 1)
 sub3_nos_now_perc <- perc(data$dx_sub3_nos_current, 1)
 ```
 
-```{r}
+```{r  include=FALSE}
+agora4_now_count <- count(data$dx_agora4_current, 1)
+agora5_now_count <- count(data$dx_agora5_current, 1)
+agnos_now_count <- count(data$dx_agnos_current, 1)
+
+gad_now_count <- count(data$dx_gad_current, 1)
+ganos_now_count <- count(data$dx_ganos_current, 1)
+
+manic_now_count <- count(data$dx_manic_current, 1)
+hyp_now_count <- count(data$manic_hypdx_current, 1)
+manic_hyp_now_count <- count(data$manic_hypdx_current, 1)
+mannos_now_count <- count(data$dx_mannos_current, 1)
+
+mdd_now_count <- count(data$dx_mde_current, 1)
+mdnos_now_count <- count(data$dx_mdnos_current, 1)
+
+ocd4_now_count <- count(data$dx_ocd4_current, 1)
+ocd5_now_count <- count(data$dx_ocd5_current, 1)
+ocnos_now_count <- count(data$dx_ocnos_current, 1)
+
+panic_now_count <- count(data$dx_panic_current, 1)
+panicd_now_count <- count(data$dx_panicd_current, 1)
+pannos_now_count <- count(data$dx_pannos_current, 1)
+pandnos_now_count <- count(data$dx_pandnos_current, 1)
+
+dys_now_count <- count(data$dx_dys_current, 1)
+dysnos_now_count <- count(data$dx_dysnos_current, 1)
+
+ptsd4_now_count <- count(data$dx_ptsd4_current, 1)
+ptsd5_now_count <- count(data$dx_ptsd5_current, 1)
+ptnos_now_count <- count(data$dx_ptnos_current, 1)
+
+socialp4_now_count <- count(data$dx_socialp4_current, 1)
+socialp5_now_count <- count(data$dx_socialp5_current, 1)
+socnos_now_count <- count(data$dx_socnos_current, 1)
+
+phobia4_now_count <- count(data$dx_phobia4_current, 1)
+phobia5_now_count <- count(data$dx_phobia5_current, 1)
+phonos_now_count <- count(data$dx_phonos_current, 1)
+
+sub1_dsm4_now_count <- count(data$dx_sub1_dsm4_current, 1)
+sub1_dsm5_now_count <- count(data$dx_sub1_dsm5_current, 1)
+sub1_nos_now_count <- count(data$dx_sub1_nos_current, 1)
+
+sub2_dsm4_now_count <- count(data$dx_sub2_dsm4_current, 1)
+sub2_dsm5_now_count <- count(data$dx_sub2_dsm5_current, 1)
+sub2_nos_now_count <- count(data$dx_sub2_nos_current, 1)
+
+sub3_dsm4_now_count <- count(data$dx_sub3_dsm4_current, 1)
+sub3_dsm5_now_count <- count(data$dx_sub3_dsm5_current, 1)
+sub3_nos_now_count <- count(data$dx_sub3_nos_current, 1)
+```
+
+```{r include=FALSE}
 names_now <- t(data.frame("Agoraphobia DSM4", "Agoraphobia DSM5", "Agoraphobia NOS", "GAD", "GAD NOS", "Mania", "Hypomania", "Mania Hypomania", "Mania NOS", "MDD", "MDD NOS", "OCD DSM4", "OCD DSM5", "OCD NOS", "Panic Attacks", "Panic Disorder", "Panic Attacks NOS", "Panic Disorder NOS", "PDD", "PDD NOS", "PTSD DSM4", "PTSD DSM5", "PTSD NOS", "Social Phobia DSM4", "Social Phobia DSM5", "Social Phobia NOS", "Specific Phobia DSM4", "Specific Phobia DSM5", "Specific Phobia NOS", "Sub 1 DSM4", "Sub 1 DSM5", "Sub 1 NOS", "Sub 2 DSM4", "Sub 2 DSM5", "Sub 2 NOS", "Sub 3 DSM4", "Sub 3 DSM5", "Sub 3 NOS"))
-
 row.names(names_now) <- NULL
-
 names_now <- as.data.frame(names_now)
 
 data_now <- data.frame(agora4_now_perc, agora5_now_perc, agnos_now_perc, gad_now_perc, ganos_now_perc, manic_now_perc, hyp_now_perc, manic_hyp_now_perc, mannos_now_perc, mdd_now_perc, mdnos_now_perc, ocd4_now_perc, ocd5_now_perc, ocnos_now_perc, panic_now_perc, panicd_now_perc, pannos_now_perc, pandnos_now_perc, dys_now_perc, dysnos_now_perc, ptsd4_now_perc, ptsd5_now_perc, ptnos_now_perc, socialp4_now_perc, socialp5_now_perc, socnos_now_perc, phobia4_now_perc, phobia5_now_perc, phonos_now_perc, sub1_dsm4_now_perc, sub1_dsm5_now_perc, sub1_nos_now_perc, sub2_dsm4_now_perc, sub2_dsm5_now_perc, sub2_nos_now_perc, sub3_dsm4_now_perc, sub3_dsm5_now_perc, sub3_nos_now_perc)
-
 data_now <- t(data_now)
-
 row.names(data_now) <- NULL
-
 data_now <- as.data.frame(data_now)
+
+count_now <- data.frame(agora4_now_count, agora5_now_count, agnos_now_count, gad_now_count, ganos_now_count, manic_now_count, hyp_now_count, manic_hyp_now_count, mannos_now_count, mdd_now_count, mdnos_now_count, ocd4_now_count, ocd5_now_count, ocnos_now_count, panic_now_count, panicd_now_count, pannos_now_count, pandnos_now_count, dys_now_count, dysnos_now_count, ptsd4_now_count, ptsd5_now_count, ptnos_now_count, socialp4_now_count, socialp5_now_count, socnos_now_count, phobia4_now_count, phobia5_now_count, phonos_now_count, sub1_dsm4_now_count, sub1_dsm5_now_count, sub1_nos_now_count, sub2_dsm4_now_count, sub2_dsm5_now_count, sub2_nos_now_count, sub3_dsm4_now_count, sub3_dsm5_now_count, sub3_nos_now_count)
+count_now <- t(count_now)
+row.names(count_now) <- NULL
+count_now <- as.data.frame(count_now)
 ```
 
-```{r}
+```{r include=FALSE}
 rm(agora4_now_perc)
 rm(agora5_now_perc)
 rm(agnos_now_perc)
@@ -241,24 +299,64 @@ rm(sub2_nos_now_perc)
 rm(sub3_dsm4_now_perc)
 rm(sub3_dsm5_now_perc)
 rm(sub3_nos_now_perc)
+rm(agora4_now_count)
+rm(agora5_now_count)
+rm(agnos_now_count)
+rm(gad_now_count)
+rm(ganos_now_count)
+rm(manic_now_count)
+rm(hyp_now_count)
+rm(manic_hyp_now_count)
+rm(mannos_now_count)
+rm(mdd_now_count)
+rm(mdnos_now_count)
+rm(ocd4_now_count)
+rm(ocd5_now_count)
+rm(ocnos_now_count)
+rm(panic_now_count)
+rm(panicd_now_count)
+rm(pannos_now_count)
+rm(pandnos_now_count)
+rm(dys_now_count)
+rm(dysnos_now_count)
+rm(ptsd4_now_count)
+rm(ptsd5_now_count)
+rm(ptnos_now_count)
+rm(socialp4_now_count)
+rm(socialp5_now_count)
+rm(socnos_now_count)
+rm(phobia4_now_count)
+rm(phobia5_now_count)
+rm(phonos_now_count)
+rm(sub1_dsm4_now_count)
+rm(sub1_dsm5_now_count)
+rm(sub1_nos_now_count)
+rm(sub2_dsm4_now_count)
+rm(sub2_dsm5_now_count)
+rm(sub2_nos_now_count)
+rm(sub3_dsm4_now_count)
+rm(sub3_dsm5_now_count)
+rm(sub3_nos_now_count)
 ```
 
-```{r}
-df_now <- data.frame(names_now, data_now)
+```{r, results='asis'}
+df_now <- data.frame(names_now, data_now, count_now)
 names(df_now)[colnames(df_now)=="V1"] <- "Diagnosis"
 names(df_now)[colnames(df_now)=="V1.1"] <- "Percentage"
+names(df_now)[colnames(df_now)=="V1.2"] <- "Count"
 
 df_now %>%
-  kable() %>%
-  kable_styling()
+  kable("html",format.args = list(decimal.mark = ".", big.mark = ","),caption = "Wave15 Current Diagnoses") %>%
+  kable_styling((bootstrap_options = c("striped", "condensed")), full_width = F)
 
-rm(data_now)
-rm(names_now)
+#rm(data_now)
+#rm(names_now)
+#rm(count_now)
 ```
 
 ## Percentages for Past Dx
 
-```{r }
+```{r include=FALSE}
 agora4_past_perc <- perc(data$dx_agora4_past, 1)
 agora5_past_perc <- perc(data$dx_agora5_past, 1)
 agnos_past_perc <- perc(data$dx_agnos_past, 1)
@@ -311,23 +409,76 @@ sub3_dsm5_past_perc <- perc(data$dx_sub3_dsm5_past, 1)
 sub3_nos_past_perc <- perc(data$dx_sub3_nos_past, 1)
 ```
 
-```{r}
+```{r  include=FALSE}
+agora4_past_count <- count(data$dx_agora4_past, 1)
+agora5_past_count <- count(data$dx_agora5_past, 1)
+agnos_past_count <- count(data$dx_agnos_past, 1)
+
+gad_past_count <- count(data$dx_gad_past, 1)
+ganos_past_count <- count(data$dx_ganos_past, 1)
+
+manic_past_count <- count(data$dx_manic_past, 1)
+hyp_past_count <- count(data$manic_hypdx_past, 1)
+manic_hyp_past_count <- count(data$manic_hypdx_past, 1)
+mannos_past_count <- count(data$dx_mannos_past, 1)
+
+mdd_past_count <- count(data$dx_mde_past, 1)
+mdnos_past_count <- count(data$dx_mdnos_past, 1)
+
+ocd4_past_count <- count(data$dx_ocd4_past, 1)
+ocd5_past_count <- count(data$dx_ocd5_past, 1)
+ocnos_past_count <- count(data$dx_ocnos_past, 1)
+
+panic_past_count <- count(data$dx_panic_past, 1)
+panicd_past_count <- count(data$dx_panicd_past, 1)
+pannos_past_count <- count(data$dx_pannos_past, 1)
+pandnos_past_count <- count(data$dx_pandnos_past, 1)
+
+dys_past_count <- count(data$dx_dys_past, 1)
+dysnos_past_count <- count(data$dx_dysnos_past, 1)
+
+ptsd4_past_count <- count(data$dx_ptsd4_past, 1)
+ptsd5_past_count <- count(data$dx_ptsd5_past, 1)
+ptnos_past_count <- count(data$dx_ptnos_past, 1)
+
+socialp4_past_count <- count(data$dx_socialp4_past, 1)
+socialp5_past_count <- count(data$dx_socialp5_past, 1)
+socnos_past_count <- count(data$dx_socnos_past, 1)
+
+phobia4_past_count <- count(data$dx_phobia4_past, 1)
+phobia5_past_count <- count(data$dx_phobia5_past, 1)
+phonos_past_count <- count(data$dx_phonos_past, 1)
+
+sub1_dsm4_past_count <- count(data$dx_sub1_dsm4_past, 1)
+sub1_dsm5_past_count <- count(data$dx_sub1_dsm5_past, 1)
+sub1_nos_past_count <- count(data$dx_sub1_nos_past, 1)
+
+sub2_dsm4_past_count <- count(data$dx_sub2_dsm4_past, 1)
+sub2_dsm5_past_count <- count(data$dx_sub2_dsm5_past, 1)
+sub2_nos_past_count <- count(data$dx_sub2_nos_past, 1)
+
+sub3_dsm4_past_count <- count(data$dx_sub3_dsm4_past, 1)
+sub3_dsm5_past_count <- count(data$dx_sub3_dsm5_past, 1)
+sub3_nos_past_count <- count(data$dx_sub3_nos_past, 1)
+```
+
+```{r include=FALSE}
 names_past <- t(data.frame("Agoraphobia DSM4", "Agoraphobia DSM5", "Agoraphobia NOS", "GAD", "GAD NOS", "Mania", "Hypomania", "Mania Hypomania", "Mania NOS", "MDD", "MDD NOS", "OCD DSM4", "OCD DSM5", "OCD NOS", "Panic Attacks", "Panic Disorder", "Panic Attacks NOS", "Panic Disorder NOS", "PDD", "PDD NOS", "PTSD DSM4", "PTSD DSM5", "PTSD NOS", "Social Phobia DSM4", "Social Phobia DSM5", "Social Phobia NOS", "Specific Phobia DSM4", "Specific Phobia DSM5", "Specific Phobia NOS", "Sub 1 DSM4", "Sub 1 DSM5", "Sub 1 NOS", "Sub 2 DSM4", "Sub 2 DSM5", "Sub 2 NOS", "Sub 3 DSM4", "Sub 3 DSM5", "Sub 3 NOS"))
-
 row.names(names_past) <- NULL
-
 names_past <- as.data.frame(names_past)
 
 data_past <- data.frame(agora4_past_perc, agora5_past_perc, agnos_past_perc, gad_past_perc, ganos_past_perc, manic_past_perc, hyp_past_perc, manic_hyp_past_perc, mannos_past_perc, mdd_past_perc, mdnos_past_perc, ocd4_past_perc, ocd5_past_perc, ocnos_past_perc, panic_past_perc, panicd_past_perc, pannos_past_perc, pandnos_past_perc, dys_past_perc, dysnos_past_perc, ptsd4_past_perc, ptsd5_past_perc, ptnos_past_perc, socialp4_past_perc, socialp5_past_perc, socnos_past_perc, phobia4_past_perc, phobia5_past_perc, phonos_past_perc, sub1_dsm4_past_perc, sub1_dsm5_past_perc, sub1_nos_past_perc, sub2_dsm4_past_perc, sub2_dsm5_past_perc, sub2_nos_past_perc, sub3_dsm4_past_perc, sub3_dsm5_past_perc, sub3_nos_past_perc)
-
 data_past <- t(data_past)
-
 row.names(data_past) <- NULL
-
 data_past <- as.data.frame(data_past)
+
+count_past <- data.frame(agora4_past_count, agora5_past_count, agnos_past_count, gad_past_count, ganos_past_count, manic_past_count, hyp_past_count, manic_hyp_past_count, mannos_past_count, mdd_past_count, mdnos_past_count, ocd4_past_count, ocd5_past_count, ocnos_past_count, panic_past_count, panicd_past_count, pannos_past_count, pandnos_past_count, dys_past_count, dysnos_past_count, ptsd4_past_count, ptsd5_past_count, ptnos_past_count, socialp4_past_count, socialp5_past_count, socnos_past_count, phobia4_past_count, phobia5_past_count, phonos_past_count, sub1_dsm4_past_count, sub1_dsm5_past_count, sub1_nos_past_count, sub2_dsm4_past_count, sub2_dsm5_past_count, sub2_nos_past_count, sub3_dsm4_past_count, sub3_dsm5_past_count, sub3_nos_past_count)
+count_past <- t(count_past)
+row.names(count_past) <- NULL
+count_past <- as.data.frame(count_past)
 ```
 
-```{r}
+```{r include=FALSE}
 rm(agora4_past_perc)
 rm(agora5_past_perc)
 rm(agnos_past_perc)
@@ -366,14 +517,100 @@ rm(sub2_nos_past_perc)
 rm(sub3_dsm4_past_perc)
 rm(sub3_dsm5_past_perc)
 rm(sub3_nos_past_perc)
+rm(agora4_past_count)
+rm(agora5_past_count)
+rm(agnos_past_count)
+rm(gad_past_count)
+rm(ganos_past_count)
+rm(manic_past_count)
+rm(hyp_past_count)
+rm(manic_hyp_past_count)
+rm(mannos_past_count)
+rm(mdd_past_count)
+rm(mdnos_past_count)
+rm(ocd4_past_count)
+rm(ocd5_past_count)
+rm(ocnos_past_count)
+rm(panic_past_count)
+rm(panicd_past_count)
+rm(pannos_past_count)
+rm(pandnos_past_count)
+rm(dys_past_count)
+rm(dysnos_past_count)
+rm(ptsd4_past_count)
+rm(ptsd5_past_count)
+rm(ptnos_past_count)
+rm(socialp4_past_count)
+rm(socialp5_past_count)
+rm(socnos_past_count)
+rm(phobia4_past_count)
+rm(phobia5_past_count)
+rm(phonos_past_count)
+rm(sub1_dsm4_past_count)
+rm(sub1_dsm5_past_count)
+rm(sub1_nos_past_count)
+rm(sub2_dsm4_past_count)
+rm(sub2_dsm5_past_count)
+rm(sub2_nos_past_count)
+rm(sub3_dsm4_past_count)
+rm(sub3_dsm5_past_count)
+rm(sub3_nos_past_count)
+```
+
+```{r results='asis'}
+df_past <- data.frame(names_past, data_past, count_past)
+names(df_past)[colnames(df_past)=="V1"] <- "Diagnosis"
+names(df_past)[colnames(df_past)=="V1.1"] <- "Percentage"
+names(df_past)[colnames(df_past)=="V1.2"] <- "Count"
+
+df_past %>%
+  kable("html",format.args = list(decimal.mark = ".", big.mark = ","),caption = "Wave15 Past Diagnoses") %>%
+  kable_styling((bootstrap_options = c("striped", "condensed")), full_width = F)
+
+#rm(data_past)
+#rm(names_past)
+#rm(count_past)
+```
+
+## Only mothers (or not)
+
+```{r}
+data$mother <- ifelse(data$relation_prim == '3', 1, 0)
 ```
 
 ```{r}
-df_past <- data.frame(names_past, data_past)
-names(df_past)[colnames(df_past)=="V1"] <- "Diagnosis"
-names(df_past)[colnames(df_past)=="V1.1"] <- "Percentage"
-
-df_past %>%
-  kable() %>%
-  kable_styling()
+chisq_table <- table(data$mother, data$dx_agora4_current, data$dx_agora5_current, data$dx_agnos_current, data$dx_gad_current, data$dx_ganos_current, data$dx_manic_current, data$manic_hypdx_current, data$manic_hypdx_current, data$dx_mannos_current, data$dx_mde_current, data$dx_mdnos_current, data$dx_ocd4_current, data$dx_ocd5_current, data$dx_ocnos_current, data$dx_panic_current, data$dx_panicd_current, data$dx_pannos_current, data$dx_pandnos_current, data$dx_dys_current, data$dx_dysnos_current, data$dx_ptsd4_current, data$dx_ptsd5_current, data$dx_ptnos_current, data$dx_socialp4_current, data$dx_socialp5_current, data$dx_socnos_current, data$dx_phobia4_current, data$dx_phobia5_current, data$dx_phonos_current, data$dx_sub1_dsm4_current, data$dx_sub1_dsm5_current, data$dx_sub1_nos_current, data$dx_sub2_dsm4_current, data$dx_sub2_dsm5_current, data$dx_sub2_nos_current, data$dx_sub3_dsm4_current, data$dx_sub3_dsm5_current, data$dx_sub3_nos_current)
 ```
+
+```{r}
+table(data$mother)
+cor.test(data$mother, data$dx_mde_current, na.rm=TRUE)
+chisq.test(data$mother, data$dx_mde_current, na.rm=TRUE)
+
+chisq.test(chisq_table)
+```
+
+Logistic regression ... ?
+
+```{r}
+mod1 <- glm(dx_mde_current ~ relation_prim + p_age + p_sex, family=binomial(link='logit'),data=data)
+summary(mod1)
+anova(mod1, test="Chisq")
+```
+
+```{r}
+plot(data$dx_mde_current,data$relation_prim,xlab="there",ylab="here")
+g <- glm(data$dx_mde_current ~ data$relation_prim,family=binomial,data)
+curve(predict(g,data.frame(relation_prim=x),type="resp"),add=FALSE)
+```
+
+```{r}
+fit <- glm(dx_mde_current ~ relation_prim, data=data, family=binomial)
+newdat <- data.frame(relation_prim=seq(min(data$relation_prim), max(data$relation_prim),len=100))
+newdat$dx_mde_current = predict(fit, newdata=newdat, type="response")
+plot(dx_mde_current ~ relation_prim, data=data, col="red4")
+lines(dx_mde_current ~ relation_prim, newdat, col="green4", lwd=2)
+
+#????
+```
+
