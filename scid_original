@@ -1,0 +1,265 @@
+---
+title: "Analyzing the SCID for Dr. Monk"
+author: "Julianna Calabrese"
+date: "February 13, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(mosaic)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(psych)
+library(nlme)
+library(plyr)
+library(Hmisc)
+library(rmarkdown)
+library(psych)
+library(corrr)
+library(corrplot)
+library(reshape2)
+library(scales)
+library(sjPlot)
+library(car)
+library(knitr)
+library(kableExtra)
+library(summarytools)
+library(DT)
+library(qdapTools)
+library(data.table)
+library(tibble)
+```
+
+## Load in data
+
+```{r}
+agora <- read.csv(file='C:/Users/jrcala/Desktop/scid/agora.csv')
+gad <- read.csv(file='C:/Users/jrcala/Desktop/scid/gad.csv')
+mania <- read.csv(file='C:/Users/jrcala/Desktop/scid/mania.csv')
+mdd <- read.csv(file='C:/Users/jrcala/Desktop/scid/mdd.csv')
+ocd <- read.csv(file='C:/Users/jrcala/Desktop/scid/ocd.csv')
+panic <- read.csv(file='C:/Users/jrcala/Desktop/scid/panic.csv')
+pdd <- read.csv(file='C:/Users/jrcala/Desktop/scid/pdd.csv')
+ptsd <- read.csv(file='C:/Users/jrcala/Desktop/scid/ptsd.csv')
+social <- read.csv(file='C:/Users/jrcala/Desktop/scid/social.csv')
+specific <- read.csv(file='C:/Users/jrcala/Desktop/scid/specific.csv')
+suds <- read.csv(file='C:/Users/jrcala/Desktop/scid/suds.csv')
+parentdemo <- read.csv(file='C:/Users/jrcala/Desktop/scid/parentdemo.csv')
+```
+
+```{r}
+data <- Reduce(function(x,y) merge(x = x, y = y, by = "id"), 
+       list(agora, gad, mania, mdd, ocd, panic, pdd, ptsd, social, specific, suds))
+```
+
+```{r}
+rm(agora)
+rm(gad)
+rm(mania)
+rm(mdd)
+rm(ocd)
+rm(panic)
+rm(pdd)
+rm(ptsd)
+rm(social)
+rm(specific)
+rm(suds)
+```
+
+```{r}
+data[data=="88"] <- NA
+data[data=="-99"] <- NA
+data[data=="77"] <- NA
+```
+
+```{r}
+#names(data) <- substring(names(data),7,99)
+#data <- sub("*.s3cid", "", data)
+names(data) <- gsub(pattern = "s3cid_*", replacement = "", x = names(data))
+```
+
+```{r}
+data <- merge(data, parentdemo, by="id")
+rm(parentdemo)
+```
+
+Parent Demo reference:
+
+0 Adoptive Dad
+1 Adoptive Mom
+2 Bio Dad
+3 Bio Mom
+4 Grandpa
+5 Grandma
+6 Uncle
+7 Aunt
+8 Gay partner
+9 Lesbian partner
+10 Parents male/boyfriend
+11 Parents female/girlfriend
+12 Step Dad
+13 Step Mom
+14 Cousin
+77 Refused
+88 Missing
+
+```{r}
+write.csv(data, file="C:/Users/jrcala/Desktop/scid/data.csv")
+```
+
+## Percentages for Current Dx
+
+```{r include=FALSE}
+summary(data$dx_mde_current)
+table(data$dx_mde_current)
+
+# Why is there a random 7? Probably because someone was supposed to type 77. I'll change that specific cell to NA.
+
+which(data$dx_mde_current == "7") #Row 160
+which( colnames(data)=="dx_mde_current") #Column 217
+
+data[160, 217] = NA
+
+#Okay, back to data.
+
+summary(data$dx_mde_current)
+table(data$dx_mde_current)
+#mdd_now_percent <- 100 * length(which(data$dx_mde_current == "1"))/length(data$dx_mde_current)
+```
+
+```{r}
+perc <- function(x, n){ 100*length((which(x == n))) / length(x) }
+```
+
+```{r }
+agora4_now_perc <- perc(data$dx_agora4_current, 1)
+agora5_now_perc <- perc(data$dx_agora5_current, 1)
+agnos_now_perc <- perc(data$dx_agnos_current, 1)
+
+gad_now_perc <- perc(data$dx_gad_current, 1)
+ganos_now_perc <- perc(data$dx_ganos_current, 1)
+
+manic_now_perc <- perc(data$dx_manic_current, 1)
+hyp_now_perc <- perc(data$manic_hypdx_current, 1)
+manic_hyp_now_perc <- perc(data$manic_hypdx_current, 1)
+mannos_now_perc <- perc(data$dx_mannos_current, 1)
+
+mdd_now_perc <- perc(data$dx_mde_current, 1)
+mdnos_now_perc <- perc(data$dx_mdnos_current, 1)
+
+ocd4_now_perc <- perc(data$dx_ocd4_current, 1)
+ocd5_now_perc <- perc(data$dx_ocd5_current, 1)
+ocnos_now_perc <- perc(data$dx_ocnos_current, 1)
+
+panic_now_perc <- perc(data$dx_panic_current, 1)
+panicd_now_perc <- perc(data$dx_panicd_current, 1)
+pannos_now_perc <- perc(data$dx_pannos_current, 1)
+pandnos_now_perc <- perc(data$dx_pandnos_current, 1)
+
+dys_now_perc <- perc(data$dx_dys_current, 1)
+dysnos_now_perc <- perc(data$dx_dysnos_current, 1)
+
+ptsd4_now_perc <- perc(data$dx_ptsd4_current, 1)
+ptsd5_now_perc <- perc(data$dx_ptsd5_current, 1)
+ptnos_now_perc <- perc(data$dx_ptnos_current, 1)
+
+socialp4_now_perc <- perc(data$dx_socialp4_current, 1)
+socialp5_now_perc <- perc(data$dx_socialp5_current, 1)
+socnos_now_perc <- perc(data$dx_socnos_current, 1)
+
+phobia4_now_perc <- perc(data$dx_phobia4_current, 1)
+phobia5_now_perc <- perc(data$dx_phobia5_current, 1)
+phonos_now_perc <- perc(data$dx_phonos_current, 1)
+
+sub1_dsm4_now_perc <- perc(data$dx_sub1_dsm4_current, 1)
+sub1_dsm5_now_perc <- perc(data$dx_sub1_dsm5_current, 1)
+sub1_nos_now_perc <- perc(data$dx_sub1_nos_current, 1)
+
+sub2_dsm4_now_perc <- perc(data$dx_sub2_dsm4_current, 1)
+sub2_dsm5_now_perc <- perc(data$dx_sub2_dsm5_current, 1)
+sub2_nos_now_perc <- perc(data$dx_sub2_nos_current, 1)
+
+sub3_dsm4_now_perc <- perc(data$dx_sub3_dsm4_current, 1)
+sub3_dsm5_now_perc <- perc(data$dx_sub3_dsm5_current, 1)
+sub3_nos_now_perc <- perc(data$dx_sub3_nos_current, 1)
+```
+
+```{r}
+#names_now <- list("Agoraphobia DSM4", "Agoraphobia DSM5", "Agoraphobia NOS", "GAD", "GAD NOS", "Mania", "Hypomania", "Mania Hypomania", "Mania NOS", "MDD", "MDD NOS", "OCD DSM4", "OCD DSM5", "OCD NOS", "Panic Attacks", "Panic Disorder", "Panic Attacks NOS", "Panic Disorder NOS", "PDD", "PDD NOS", "PTSD DSM4", "PTSD DSM5", "PTSD NOS", "Social Phobia DSM4", "Social Phobia DSM5", "Social Phobia NOS", "Specific Phobia DSM4", "Specific Phobia DSM5", "Specific Phobia NOS", "Sub 1 DSM4", "Sub 1 DSM5", "Sub 1 NOS", "Sub 2 DSM4", "Sub 2 DSM5", "Sub 2 NOS", "Sub 3 DSM4", "Sub 3 DSM5", "Sub 3 NOS")
+
+names_now <- t(data.frame("Agoraphobia DSM4", "Agoraphobia DSM5", "Agoraphobia NOS", "GAD", "GAD NOS", "Mania", "Hypomania", "Mania Hypomania", "Mania NOS", "MDD", "MDD NOS", "OCD DSM4", "OCD DSM5", "OCD NOS", "Panic Attacks", "Panic Disorder", "Panic Attacks NOS", "Panic Disorder NOS", "PDD", "PDD NOS", "PTSD DSM4", "PTSD DSM5", "PTSD NOS", "Social Phobia DSM4", "Social Phobia DSM5", "Social Phobia NOS", "Specific Phobia DSM4", "Specific Phobia DSM5", "Specific Phobia NOS", "Sub 1 DSM4", "Sub 1 DSM5", "Sub 1 NOS", "Sub 2 DSM4", "Sub 2 DSM5", "Sub 2 NOS", "Sub 3 DSM4", "Sub 3 DSM5", "Sub 3 NOS"))
+
+row.names(names_now) <- NULL
+
+names_now <- as.data.frame(names_now)
+
+#vector_now <- c(agora4_now_perc, agora5_now_perc, agnos_now_perc, gad_now_perc, ganos_now_perc, manic_now_perc, hyp_now_perc, manic_hyp_now_perc, mannos_now_perc, mdd_now_perc, mdnos_now_perc, ocd4_now_perc, ocd5_now_perc, ocnos_now_perc, panic_now_perc, panicd_now_perc, pannos_now_perc, pandnos_now_perc, dys_now_perc, dysnos_now_perc, ptsd4_now_perc, ptsd5_now_perc, ptnos_now_perc, socialp4_now_perc, socialp5_now_perc, socnos_now_perc, phobia4_now_perc, phobia5_now_perc, phonos_now_perc, sub1_dsm4_now_perc, sub1_dsm5_now_perc, sub1_nos_now_perc, sub2_dsm4_now_perc, sub2_dsm5_now_perc, sub2_nos_now_perc, sub3_dsm4_now_perc, sub3_dsm5_now_perc, sub3_nos_now_perc)
+
+#list_now <- list(agora4_now_perc, agora5_now_perc, agnos_now_perc, gad_now_perc, ganos_now_perc, manic_now_perc, hyp_now_perc, manic_hyp_now_perc, mannos_now_perc, mdd_now_perc, mdnos_now_perc, ocd4_now_perc, ocd5_now_perc, ocnos_now_perc, panic_now_perc, panicd_now_perc, pannos_now_perc, pandnos_now_perc, dys_now_perc, dysnos_now_perc, ptsd4_now_perc, ptsd5_now_perc, ptnos_now_perc, socialp4_now_perc, socialp5_now_perc, socnos_now_perc, phobia4_now_perc, phobia5_now_perc, phonos_now_perc, sub1_dsm4_now_perc, sub1_dsm5_now_perc, sub1_nos_now_perc, sub2_dsm4_now_perc, sub2_dsm5_now_perc, sub2_nos_now_perc, sub3_dsm4_now_perc, sub3_dsm5_now_perc, sub3_nos_now_perc)
+
+#table_now <- table(agora4_now_perc, agora5_now_perc, agnos_now_perc, gad_now_perc, ganos_now_perc, manic_now_perc, hyp_now_perc, manic_hyp_now_perc, mannos_now_perc, mdd_now_perc, mdnos_now_perc, ocd4_now_perc, ocd5_now_perc, ocnos_now_perc, panic_now_perc, panicd_now_perc, pannos_now_perc, pandnos_now_perc, dys_now_perc, dysnos_now_perc, ptsd4_now_perc, ptsd5_now_perc, ptnos_now_perc, socialp4_now_perc, socialp5_now_perc, socnos_now_perc, phobia4_now_perc, phobia5_now_perc, phonos_now_perc, sub1_dsm4_now_perc, sub1_dsm5_now_perc, sub1_nos_now_perc, sub2_dsm4_now_perc, sub2_dsm5_now_perc, sub2_nos_now_perc, sub3_dsm4_now_perc, sub3_dsm5_now_perc, sub3_nos_now_perc)
+```
+
+```{r}
+rm(agora4_now_perc)
+rm(agora5_now_perc)
+rm(agnos_now_perc)
+rm(gad_now_perc)
+rm(ganos_now_perc)
+rm(manic_now_perc)
+rm(hyp_now_perc)
+rm(manic_hyp_now_perc)
+rm(mannos_now_perc)
+rm(mdd_now_perc)
+rm(mdnos_now_perc)
+rm(ocd4_now_perc)
+rm(ocd5_now_perc)
+rm(ocnos_now_perc)
+rm(panic_now_perc)
+rm(panicd_now_perc)
+rm(pannos_now_perc)
+rm(pandnos_now_perc)
+rm(dys_now_perc)
+rm(dysnos_now_perc)
+rm(ptsd4_now_perc)
+rm(ptsd5_now_perc)
+rm(ptnos_now_perc)
+rm(socialp4_now_perc)
+rm(socialp5_now_perc)
+rm(socnos_now_perc)
+rm(phobia4_now_perc)
+rm(phobia5_now_perc)
+rm(phonos_now_perc)
+rm(sub1_dsm4_now_perc)
+rm(sub1_dsm5_now_perc)
+rm(sub1_nos_now_perc)
+rm(sub2_dsm4_now_perc)
+rm(sub2_dsm5_now_perc)
+rm(sub2_nos_now_perc)
+rm(sub3_dsm4_now_perc)
+rm(sub3_dsm5_now_perc)
+rm(sub3_nos_now_perc)
+```
+
+```{r}
+df_now <- as.data.frame(table_now)
+df_now <- t(df_now)
+df_now$Freq <- NULL
+
+df_now2 <- join(df_now, names_now2)
+
+colnames(df_now) <- c("Diagnosis", "Percentage")
+kable(df_now)
+
+names(df_now)[1] <- "Diagnosis"
+names(df_now)[2] <- "Percentage"
+
+df_now %>%
+  kable() %>%
+  kable_styling()
+
+vec_now <- as.data.frame(vector_now)
+```
+
