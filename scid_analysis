@@ -1048,58 +1048,171 @@ rm(mom_now)
 rm(mom_now_count)
 ```
 
-## Bar Plot
+## Barplot for all PCGs for Current Diagnoses
 
-### subset data
-
-```{r}
-data1 <- data.frame(data$dx_agora4_current, data$dx_agora5_current, data$dx_agnos_current, data$dx_gad_current, data$dx_ganos_current, data$dx_manic_current, data$manic_hypdx_current, data$manic_hypdx_current, data$dx_mannos_current, data$dx_mde_current, data$dx_mdnos_current, data$dx_ocd4_current, data$dx_ocd5_current, data$dx_ocnos_current, data$dx_panic_current, data$dx_panicd_current, data$dx_pannos_current, data$dx_pandnos_current, data$dx_dys_current, data$dx_dysnos_current, data$dx_ptsd4_current, data$dx_ptsd5_current, data$dx_ptnos_current, data$dx_socialp4_current, data$dx_socialp5_current, data$dx_socnos_current, data$dx_phobia4_current, data$dx_phobia5_current, data$dx_phonos_current, data$dx_sub1_dsm4_current, data$dx_sub1_dsm5_current, data$dx_sub1_nos_current, data$dx_sub2_dsm4_current, data$dx_sub2_dsm5_current, data$dx_sub2_nos_current, data$dx_sub3_dsm4_current, data$dx_sub3_dsm5_current, data$dx_sub3_nos_current)
+```{r include=FALSE}
+data1 <- data.frame(data$dx_agora4_current, data$dx_agora5_current, data$dx_agnos_current, data$dx_gad_current, data$dx_ganos_current, data$dx_manic_current, data$manic_hypdx_current, data$dx_mannos_current, data$dx_mde_current, data$dx_mdnos_current, data$dx_ocd4_current, data$dx_ocd5_current, data$dx_ocnos_current, data$dx_panic_current, data$dx_panicd_current, data$dx_pannos_current, data$dx_pandnos_current, data$dx_dys_current, data$dx_dysnos_current, data$dx_ptsd4_current, data$dx_ptsd5_current, data$dx_ptnos_current, data$dx_socialp4_current, data$dx_socialp5_current, data$dx_socnos_current, data$dx_phobia4_current, data$dx_phobia5_current, data$dx_phonos_current, data$dx_sub1_dsm4_current, data$dx_sub1_dsm5_current, data$dx_sub1_nos_current, data$dx_sub2_dsm4_current, data$dx_sub2_dsm5_current, data$dx_sub2_nos_current, data$dx_sub3_dsm4_current, data$dx_sub3_dsm5_current, data$dx_sub3_nos_current)
 names(data1) <- substring(names(data1),6,99)
 ```
 
-## make all NAs into 0s and remove columns with only 0s
-
-```{r}
+```{r include=FALSE}
 data1[is.na(data1)] <- 0
 data1 <- data1[, colSums(data1 != 0) > 0]
 ```
 
-```{r}
-data2 <- data.frame(colSums(data1[1:26]))
+```{r include=FALSE}
+data2 <- data.frame(colSums(data1[1:25]))
+row.names(data2) <- NULL
 ```
 
-## Basic Plots
+```{r include=FALSE}
+data2_names <- t(data.frame("Agoraphobia DSM4", "Agoraphobia DSM5", "Agoraphobia NOS", "GAD", "GAD NOS", "Mania", "Mania-Hypomania", "MDD", "MDD NOS", "OCD DSM4", "OCD DSM5", "Panic Attacks", "Panic Disorder", "PDD", "PTSD DSM4", "PTSD DSM5", "Social Phobia DSM4", "Social Phobia DSM5", "Social Phobia NOS", "Specific Phobia DSM4", "Specific Phobia DSM5", "Specific Phobia NOS", "Sub1 DSM4", "Sub1 DSM5", "Sub1 NOS"))
+row.names(data2_names) <- NULL
+data2_names <- as.data.frame(data2_names)
+```
 
-```{r}
-#Remove columns where there are no 1's
-data1 <- data
-data[is.na(data)] <- 0
-data <- data[, colSums(data != 0) > 0]
-#names(data) <- substring(names(data),6,99)
-#write.csv(current_dx_data1, file="C:/Users/jrcala/Desktop/scid/current_dx_data1.csv")
-#data$id <- data1$id
-#data <- subset(data, select=c(27,1:26))
-write.csv(data2, file="C:/Users/jrcala/Desktop/scid/data.csv")
+```{r include=FALSE}
+data3 <- data.frame(data2, data2_names)
+names(data3)[colnames(data3)=="colSums.data1.1.25.."] <- "Total"
+names(data3)[colnames(data3)=="V1"] <- "Diagnosis"
+data3$Total <- as.numeric(data3$Total)
+```
+
+```{r }
+ggplot(data=data3, aes(x=Diagnosis, y=Total, fill="red")) + geom_bar(stat = 'identity', position = 'dodge') + theme(legend.position = "none") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ggtitle("Total Current Diagnoses for all PCGs")
+```
+
+```{r include=FALSE}
 rm(data1)
+rm(data2)
+rm(data3)
+rm(data2_names)
+```
+
+## Barplot for Current Dxs for Mothers vs. Non-Mothers
+
+```{r include=FALSE}
+data1 <- data.frame(data$id, data$mother,data$dx_agora4_current, data$dx_agora5_current, data$dx_agnos_current, data$dx_gad_current, data$dx_ganos_current, data$dx_manic_current, data$manic_hypdx_current, data$dx_mannos_current, data$dx_mde_current, data$dx_mdnos_current, data$dx_ocd4_current, data$dx_ocd5_current, data$dx_ocnos_current, data$dx_panic_current, data$dx_panicd_current, data$dx_pannos_current, data$dx_pandnos_current, data$dx_dys_current, data$dx_dysnos_current, data$dx_ptsd4_current, data$dx_ptsd5_current, data$dx_ptnos_current, data$dx_socialp4_current, data$dx_socialp5_current, data$dx_socnos_current, data$dx_phobia4_current, data$dx_phobia5_current, data$dx_phonos_current, data$dx_sub1_dsm4_current, data$dx_sub1_dsm5_current, data$dx_sub1_nos_current, data$dx_sub2_dsm4_current, data$dx_sub2_dsm5_current, data$dx_sub2_nos_current, data$dx_sub3_dsm4_current, data$dx_sub3_dsm5_current, data$dx_sub3_nos_current)
+names(data1) <- substring(names(data1),6,99)
+```
+
+```{r include=FALSE}
+data1[is.na(data1)] <- 0
+data1 <- data1[, colSums(data1 != 0) > 0]
+```
+
+```{r include=FALSE}
+data1$mother <- as.factor(data1$mother)
+data2 <- melt(data1, id.vars = c("id", "mother"))
+```
+
+```{r include=FALSE}
+labels <- c("Agoraphobia DSM4", "Agoraphobia DSM5", "Agoraphobia NOS", "GAD", "GAD NOS", "Mania", "Mania-Hypomania", "MDD", "MDD NOS", "OCD DSM4", "OCD DSM5", "Panic Attacks", "Panic Disorder", "PDD", "PTSD DSM4", "PTSD DSM5", "Social Phobia DSM4", "Social Phobia DSM5", "Social Phobia NOS", "Specific Phobia DSM4", "Specific Phobia DSM5", "Specific Phobia NOS", "Sub1 DSM4", "Sub1 DSM5", "Sub1 NOS")
+
+labels1 <- c("Non-Mothers", "Mothers")
 ```
 
 ```{r}
-current_dx_data <- data.frame(data$id, data$dx_agora4_current, data$dx_agora5_current, data$dx_agnos_current, data$dx_gad_current, data$dx_ganos_current, data$dx_manic_current, data$manic_hypdx_current, data$manic_hypdx_current, data$dx_mannos_current, data$dx_mde_current, data$dx_mdnos_current, data$dx_ocd4_current, data$dx_ocd5_current, data$dx_ocnos_current, data$dx_panic_current, data$dx_panicd_current, data$dx_pannos_current, data$dx_pandnos_current, data$dx_dys_current, data$dx_dysnos_current, data$dx_ptsd4_current, data$dx_ptsd5_current, data$dx_ptnos_current, data$dx_socialp4_current, data$dx_socialp5_current, data$dx_socnos_current, data$dx_phobia4_current, data$dx_phobia5_current, data$dx_phonos_current, data$dx_sub1_dsm4_current, data$dx_sub1_dsm5_current, data$dx_sub1_nos_current, data$dx_sub2_dsm4_current, data$dx_sub2_dsm5_current, data$dx_sub2_nos_current, data$dx_sub3_dsm4_current, data$dx_sub3_dsm5_current, data$dx_sub3_nos_current)
-names(current_dx_data) <- substring(names(current_dx_data),6,99)
-write.csv(current_dx_data, file="C:/Users/jrcala/Desktop/scid/current_dx_data.csv")
+ggplot(data2, aes(x = variable, y = value, fill=mother)) + geom_bar(stat='identity') + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_x_discrete(labels = labels) + ggtitle("SCID Current Dxs: Mothers vs. Non-Mothers") + scale_colour_manual(values=c("red", "blue")) + scale_fill_discrete(name="PCG Relationship", labels=labels1) + xlab("Diagnosis") + ylab("Total")
+```
+
+```{r include=FALSE}
+rm(data1)
+rm(data2)
+rm(labels)
+rm(labels1)
+```
+
+## Barplot for all Relationships for Current Dxs
+
+```{r include=FALSE}
+data1 <- data.frame(data$id, data$relation_prim,data$dx_agora4_current, data$dx_agora5_current, data$dx_agnos_current, data$dx_gad_current, data$dx_ganos_current, data$dx_manic_current, data$manic_hypdx_current, data$dx_mannos_current, data$dx_mde_current, data$dx_mdnos_current, data$dx_ocd4_current, data$dx_ocd5_current, data$dx_ocnos_current, data$dx_panic_current, data$dx_panicd_current, data$dx_pannos_current, data$dx_pandnos_current, data$dx_dys_current, data$dx_dysnos_current, data$dx_ptsd4_current, data$dx_ptsd5_current, data$dx_ptnos_current, data$dx_socialp4_current, data$dx_socialp5_current, data$dx_socnos_current, data$dx_phobia4_current, data$dx_phobia5_current, data$dx_phonos_current, data$dx_sub1_dsm4_current, data$dx_sub1_dsm5_current, data$dx_sub1_nos_current, data$dx_sub2_dsm4_current, data$dx_sub2_dsm5_current, data$dx_sub2_nos_current, data$dx_sub3_dsm4_current, data$dx_sub3_dsm5_current, data$dx_sub3_nos_current)
+names(data1) <- substring(names(data1),6,99)
+```
+
+```{r include=FALSE}
+data1$relation_prim <- car::recode(data1$relation_prim, "3 = 1; 2 = 2; 5 = 3; 7 = 4; 14 = 5; 1 = 6")
+
+#Bio Mom is 1
+#Bio Dad is 2
+#Grandma is 3
+#Aunt is 4
+#Cousin is 5
+#Adoptive Mom is 6
+```
+
+```{r include=FALSE}
+data1[is.na(data1)] <- 0
+data1 <- data1[, colSums(data1 != 0) > 0]
+```
+
+```{r include=FALSE}
+data1$relation_prim <- as.factor(data1$relation_prim)
+data2 <- melt(data1, id.vars = c("id", "relation_prim"))
+```
+
+```{r include=FALSE}
+labels <- c("Agoraphobia DSM4", "Agoraphobia DSM5", "Agoraphobia NOS", "GAD", "GAD NOS", "Mania", "Mania-Hypomania", "MDD", "MDD NOS", "OCD DSM4", "OCD DSM5", "Panic Attacks", "Panic Disorder", "PDD", "PTSD DSM4", "PTSD DSM5", "Social Phobia DSM4", "Social Phobia DSM5", "Social Phobia NOS", "Specific Phobia DSM4", "Specific Phobia DSM5", "Specific Phobia NOS", "Sub1 DSM4", "Sub1 DSM5", "Sub1 NOS")
+
+labels1 <- c("Bio Mom", "Bio Dad", "Grandma", "Aunt", "Cousin", "Adoptive Mom")
 ```
 
 ```{r}
-mm2 <- melt(as.data.frame.matrix(current_dx_data), id='id')
-#write.csv(mm, file="C:/Users/jrcala/Desktop/scid/mm.csv")
-ggplot(as.data.frame(mm2), aes(factor(variable)), y=value, fill = value) + geom_col(position = 'dodge')
+ggplot(data2, aes(x = variable, y = value, fill=relation_prim)) + geom_bar(stat='identity') + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_x_discrete(labels = labels) + scale_colour_manual(values=c("red", "orange", "yellow", "green", "blue")) + scale_fill_discrete(name="PCG Relationship", labels=labels1) + ggtitle("SCID Current Dxs and PCG Relationship to Child") + xlab("Diagnosis") + ylab("Total")
+```
+
+```{r include=FALSE}
+rm(data1)
+rm(data2)
+rm(labels)
+rm(labels1)
+```
+
+## Past SCID Dxs for different PCG Relationships
+
+```{r}
+data1 <- data.frame(data$id, data$relation_prim, data$dx_agora4_past, data$dx_agora5_past, data$dx_agnos_past, data$dx_gad_past, data$dx_ganos_past, data$dx_manic_past, data$dx_hyp_past, data$dx_mannos_past, data$dx_mde_past, data$dx_mdnos_past, data$dx_ocd4_past, data$dx_ocd5_past, data$dx_ocnos_past, data$dx_panicd_past, data$dx_panic_past, data$dx_pannos_past, data$dx_dys_past, data$dx_dysnos_past, data$dx_ptsd4_past, data$dx_ptsd5_past, data$dx_ptnos_past, data$dx_socialp4_past, data$dx_socialp5_past, data$dx_socnos_past, data$dx_phobia4_past, data$dx_phobia5_past, data$dx_phonos_past, data$dx_sub1_dsm4_past, data$dx_sub1_dsm5_past, data$dx_sub1_nos_past, data$dx_sub2_dsm4_past, data$dx_sub2_dsm5_past, data$dx_sub2_nos_past, data$dx_sub3_dsm4_past, data$dx_sub3_dsm5_past, data$dx_sub3_nos_past)
+names(data1) <- substring(names(data1),6,99)
+```
+
+```{r include=FALSE}
+data1$relation_prim <- car::recode(data1$relation_prim, "3 = 1; 2 = 2; 5 = 3; 7 = 4; 14 = 5; 1 = 6")
+
+#Bio Mom is 1
+#Bio Dad is 2
+#Grandma is 3
+#Aunt is 4
+#Cousin is 5
+#Adoptive Mom is 6
+```
+
+```{r include=FALSE}
+data1 <- as.data.frame(data1)
+data1[is.na(data1)] <- 0
+data1 <- data1[, colSums(data1 != 0) > 0]
+```
+
+```{r include=FALSE}
+data1$relation_prim <- as.factor(data1$relation_prim)
+data2 <- melt(data1, id.vars = c("id", "relation_prim"))
+```
+
+```{r include=FALSE}
+labels <- c("Agoraphobia DSM4", "Agoraphobia DSM5", "Agoraphobia NOS", "GAD", "GAD NOS", "Mania", "Hypomania", "Mania NOS", "MDD", "MDD NOS", "OCD DSM4", "OCD DSM5", "OCD NOS", "Panic Disorder", "Panic Attacks", "Panic Disorder NOS", "PDD", "PDD NOS", "PTSD DSM4", "PTSD DSM5", "PTSD NOS", "Social Phobia DSM4", "Social Phobia DSM5", "Social Phobia NOS", "Specific Phobia DSM4", "Specific Phobia DSM5", "Specific Phobia NOS", "Sub 1 DSM4", "Sub 1 DSM5", "Sub 1 NOS", "Sub 2 DSM4", "Sub 2 DSM5", "Sub 2 NOS", "Sub 3 DSM4", "Sub 3 DSM5", "Sub 3 NOS")
+
+labels1 <- c("Bio Mom", "Bio Dad", "Grandma", "Aunt", "Cousin", "Adoptive Mom")
 ```
 
 ```{r}
-ggplot(data = mm2, aes(x = variable, y = value)) + 
-       geom_histogram(stat = 'identity', position = 'dodge')
+ggplot(data2, aes(x = variable, y = value, fill=relation_prim)) + geom_bar(stat='identity') + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_x_discrete(labels = labels) + scale_colour_manual(values=c("red", "orange", "yellow", "green", "blue")) + scale_fill_discrete(name="PCG Relationship", labels=labels1) + ggtitle("SCID Past Dxs and PCG Relationship to Child") + xlab("Diagnosis") + ylab("Total")
 ```
 
+```{r include=FALSE}
+rm(data1)
+rm(data2)
+rm(labels)
+rm(labels1)
+```
 
 ## Correlations, T-Tests, and Maybe Logistic Regression
 
@@ -1159,28 +1272,5 @@ summary(mod1)
 mod1 <- glm(dx_mde_current ~ relation_prim + p_age + p_sex, family=binomial(link='logit'),data=data)
 summary(mod1)
 anova(mod1, test="Chisq")
-```
-
-## Dummy Coding relation_prim
-
-```{r}
-relation_prim_dummy <- psych::dummy.code(data$relation_prim)
-colnames(relation_prim_dummy) <- c("Adoptive_Mom", "Bio_Dad", "Bio_Mom", "Grandma", "Aunt", "Cousin")
-#relation_prim_dummy <- data.frame(relation_prim_dummy)
-data$relation_prim_dummy <- relation_prim_dummy
-```
-
-```{r}
-mod2 <- glm(dx_mde_current ~ relation_prim_dummy, family=binomial(link='logit'), control = list(maxit = 237), data=data)
-summary(mod2)
-```
-
-```{r}
-adoptive_moms <- data[ which(data$relation_prim=='1'), ]
-print(adoptive_moms$dx_mde_current)
-```
-
-```{r include=FALSE}
-#write.csv(data, file="C:/Users/jrcala/Desktop/scid/data.csv")
 ```
 
