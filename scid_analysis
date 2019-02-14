@@ -1,5 +1,5 @@
 ---
-title: "Analyzing the SCID for Dr. Monk"
+title: "Analyzing the Wave 15 SCID data for Dr. Monk"
 author: "Julianna Calabrese"
 date: "February 13, 2019"
 output: html_document
@@ -74,6 +74,10 @@ rm(suds)
 data[data=="88"] <- NA
 data[data=="-99"] <- NA
 data[data=="77"] <- NA
+
+which(data$dx_mde_current == "7") #Row 160
+which( colnames(data)=="dx_mde_current") #Column 217
+data[160, 217] = NA
 ```
 
 ```{r include=FALSE}
@@ -85,6 +89,7 @@ names(data) <- gsub(pattern = "s3cid_*", replacement = "", x = names(data))
 ```{r include=FALSE}
 data <- merge(data, parentdemo, by="id")
 rm(parentdemo)
+data$mother <- ifelse(data$relation_prim == '3', 1, 0)
 ```
 
 Parent Demo reference:
@@ -107,28 +112,14 @@ Parent Demo reference:
 77 Refused
 88 Missing
 
-```{r include=FALSE}
-write.csv(data, file="C:/Users/jrcala/Desktop/scid/data.csv")
+```{r}
+data$mother <- ifelse(data$relation_prim == '3', 1, 0)
+mothersonly <- data[ which(data$mother=='1'), ]
+notmothers <- data[ which(data$mother=='0'), ]
 ```
 
-## Percentages for Current Dx
-
-```{r Data Cleaning, include=FALSE}
-summary(data$dx_mde_current)
-table(data$dx_mde_current)
-
-# Why is there a random 7? Probably because someone was supposed to type 77. I'll change that specific cell to NA.
-
-which(data$dx_mde_current == "7") #Row 160
-which( colnames(data)=="dx_mde_current") #Column 217
-
-data[160, 217] = NA
-
-#Okay, back to data.
-
-summary(data$dx_mde_current)
-table(data$dx_mde_current)
-#mdd_now_percent <- 100 * length(which(data$dx_mde_current == "1"))/length(data$dx_mde_current)
+```{r include=FALSE}
+write.csv(data, file="C:/Users/jrcala/Desktop/scid/data.csv")
 ```
 
 ```{r}
@@ -137,6 +128,8 @@ count <- function(x, n){ length((which(x == n))) }
 ```
 
 https://www.theanalysisfactor.com/r-tutorial-count/
+
+## Percentages for Current Dx for all PCGs
 
 ```{r  include=FALSE}
 agora4_now_perc <- perc(data$dx_agora4_current, 1)
@@ -346,7 +339,7 @@ names(df_now)[colnames(df_now)=="V1.1"] <- "Percentage"
 names(df_now)[colnames(df_now)=="V1.2"] <- "Count"
 
 df_now %>%
-  kable("html",format.args = list(decimal.mark = ".", big.mark = ","),caption = "Wave15 Current Diagnoses") %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "Wave15 Current Diagnoses") %>%
   kable_styling((bootstrap_options = c("striped", "condensed")), full_width = F)
 
 #rm(data_now)
@@ -354,7 +347,7 @@ df_now %>%
 #rm(count_now)
 ```
 
-## Percentages for Past Dx
+## Percentages for Past Dx for all PCGs
 
 ```{r include=FALSE}
 agora4_past_perc <- perc(data$dx_agora4_past, 1)
@@ -564,7 +557,7 @@ names(df_past)[colnames(df_past)=="V1.1"] <- "Percentage"
 names(df_past)[colnames(df_past)=="V1.2"] <- "Count"
 
 df_past %>%
-  kable("html",format.args = list(decimal.mark = ".", big.mark = ","),caption = "Wave15 Past Diagnoses") %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "Wave15 Past Diagnoses") %>%
   kable_styling((bootstrap_options = c("striped", "condensed")), full_width = F)
 
 #rm(data_past)
@@ -572,21 +565,255 @@ df_past %>%
 #rm(count_past)
 ```
 
-## Only mothers (or not)
+## Current Dxs in Mothers vs. Not-Mothers
 
-```{r}
-data$mother <- ifelse(data$relation_prim == '3', 1, 0)
+```{r include=FALSE} 
+agora4_now_perc_mom <- perc(mothersonly$dx_agora4_current, 1)
+agora5_now_perc_mom <- perc(mothersonly$dx_agora5_current, 1)
+agnos_now_perc_mom <- perc(mothersonly$dx_agnos_current, 1)
+
+gad_now_perc_mom <- perc(mothersonly$dx_gad_current, 1)
+ganos_now_perc_mom <- perc(mothersonly$dx_ganos_current, 1)
+
+manic_now_perc_mom <- perc(mothersonly$dx_manic_current, 1)
+hyp_now_perc_mom <- perc(mothersonly$manic_hypdx_current, 1)
+manic_hyp_now_perc_mom <- perc(mothersonly$manic_hypdx_current, 1)
+mannos_now_perc_mom <- perc(mothersonly$dx_mannos_current, 1)
+
+mdd_now_perc_mom <- perc(mothersonly$dx_mde_current, 1)
+mdnos_now_perc_mom <- perc(mothersonly$dx_mdnos_current, 1)
+
+ocd4_now_perc_mom <- perc(mothersonly$dx_ocd4_current, 1)
+ocd5_now_perc_mom <- perc(mothersonly$dx_ocd5_current, 1)
+ocnos_now_perc_mom <- perc(mothersonly$dx_ocnos_current, 1)
+
+panic_now_perc_mom <- perc(mothersonly$dx_panic_current, 1)
+panicd_now_perc_mom <- perc(mothersonly$dx_panicd_current, 1)
+pannos_now_perc_mom <- perc(mothersonly$dx_pannos_current, 1)
+pandnos_now_perc_mom <- perc(mothersonly$dx_pandnos_current, 1)
+
+dys_now_perc_mom <- perc(mothersonly$dx_dys_current, 1)
+dysnos_now_perc_mom <- perc(mothersonly$dx_dysnos_current, 1)
+
+ptsd4_now_perc_mom <- perc(mothersonly$dx_ptsd4_current, 1)
+ptsd5_now_perc_mom <- perc(mothersonly$dx_ptsd5_current, 1)
+ptnos_now_perc_mom <- perc(mothersonly$dx_ptnos_current, 1)
+
+socialp4_now_perc_mom <- perc(mothersonly$dx_socialp4_current, 1)
+socialp5_now_perc_mom <- perc(mothersonly$dx_socialp5_current, 1)
+socnos_now_perc_mom <- perc(mothersonly$dx_socnos_current, 1)
+
+phobia4_now_perc_mom <- perc(mothersonly$dx_phobia4_current, 1)
+phobia5_now_perc_mom <- perc(mothersonly$dx_phobia5_current, 1)
+phonos_now_perc_mom <- perc(mothersonly$dx_phonos_current, 1)
+
+sub1_dsm4_now_perc_mom <- perc(mothersonly$dx_sub1_dsm4_current, 1)
+sub1_dsm5_now_perc_mom <- perc(mothersonly$dx_sub1_dsm5_current, 1)
+sub1_nos_now_perc_mom <- perc(mothersonly$dx_sub1_nos_current, 1)
+
+sub2_dsm4_now_perc_mom <- perc(mothersonly$dx_sub2_dsm4_current, 1)
+sub2_dsm5_now_perc_mom <- perc(mothersonly$dx_sub2_dsm5_current, 1)
+sub2_nos_now_perc_mom <- perc(mothersonly$dx_sub2_nos_current, 1)
+
+sub3_dsm4_now_perc_mom <- perc(mothersonly$dx_sub3_dsm4_current, 1)
+sub3_dsm5_now_perc_mom <- perc(mothersonly$dx_sub3_dsm5_current, 1)
+sub3_nos_now_perc_mom <- perc(mothersonly$dx_sub3_nos_current, 1)
+```
+
+```{r include=FALSE}
+agora4_now_perc_notmom <- perc(notmothers$dx_agora4_current, 1)
+agora5_now_perc_notmom <- perc(notmothers$dx_agora5_current, 1)
+agnos_now_perc_notmom <- perc(notmothers$dx_agnos_current, 1)
+
+gad_now_perc_notmom <- perc(notmothers$dx_gad_current, 1)
+ganos_now_perc_notmom <- perc(notmothers$dx_ganos_current, 1)
+
+manic_now_perc_notmom <- perc(notmothers$dx_manic_current, 1)
+hyp_now_perc_notmom <- perc(notmothers$manic_hypdx_current, 1)
+manic_hyp_now_perc_notmom <- perc(notmothers$manic_hypdx_current, 1)
+mannos_now_perc_notmom <- perc(notmothers$dx_mannos_current, 1)
+
+mdd_now_perc_notmom <- perc(notmothers$dx_mde_current, 1)
+mdnos_now_perc_notmom <- perc(notmothers$dx_mdnos_current, 1)
+
+ocd4_now_perc_notmom <- perc(notmothers$dx_ocd4_current, 1)
+ocd5_now_perc_notmom <- perc(notmothers$dx_ocd5_current, 1)
+ocnos_now_perc_notmom <- perc(notmothers$dx_ocnos_current, 1)
+
+panic_now_perc_notmom <- perc(notmothers$dx_panic_current, 1)
+panicd_now_perc_notmom <- perc(notmothers$dx_panicd_current, 1)
+pannos_now_perc_notmom <- perc(notmothers$dx_pannos_current, 1)
+pandnos_now_perc_notmom <- perc(notmothers$dx_pandnos_current, 1)
+
+dys_now_perc_notmom <- perc(notmothers$dx_dys_current, 1)
+dysnos_now_perc_notmom <- perc(notmothers$dx_dysnos_current, 1)
+
+ptsd4_now_perc_notmom <- perc(notmothers$dx_ptsd4_current, 1)
+ptsd5_now_perc_notmom <- perc(notmothers$dx_ptsd5_current, 1)
+ptnos_now_perc_notmom <- perc(notmothers$dx_ptnos_current, 1)
+
+socialp4_now_perc_notmom <- perc(notmothers$dx_socialp4_current, 1)
+socialp5_now_perc_notmom <- perc(notmothers$dx_socialp5_current, 1)
+socnos_now_perc_notmom <- perc(notmothers$dx_socnos_current, 1)
+
+phobia4_now_perc_notmom <- perc(notmothers$dx_phobia4_current, 1)
+phobia5_now_perc_notmom <- perc(notmothers$dx_phobia5_current, 1)
+phonos_now_perc_notmom <- perc(notmothers$dx_phonos_current, 1)
+
+sub1_dsm4_now_perc_notmom <- perc(notmothers$dx_sub1_dsm4_current, 1)
+sub1_dsm5_now_perc_notmom <- perc(notmothers$dx_sub1_dsm5_current, 1)
+sub1_nos_now_perc_notmom <- perc(notmothers$dx_sub1_nos_current, 1)
+
+sub2_dsm4_now_perc_notmom <- perc(notmothers$dx_sub2_dsm4_current, 1)
+sub2_dsm5_now_perc_notmom <- perc(notmothers$dx_sub2_dsm5_current, 1)
+sub2_nos_now_perc_notmom <- perc(notmothers$dx_sub2_nos_current, 1)
+
+sub3_dsm4_now_perc_notmom <- perc(notmothers$dx_sub3_dsm4_current, 1)
+sub3_dsm5_now_perc_notmom <- perc(notmothers$dx_sub3_dsm5_current, 1)
+sub3_nos_now_perc_notmom <- perc(notmothers$dx_sub3_nos_current, 1)
+```
+
+```{r include=FALSE}
+names_now <- t(data.frame("Agoraphobia DSM4", "Agoraphobia DSM5", "Agoraphobia NOS", "GAD", "GAD NOS", "Mania", "Hypomania", "Mania Hypomania", "Mania NOS", "MDD", "MDD NOS", "OCD DSM4", "OCD DSM5", "OCD NOS", "Panic Attacks", "Panic Disorder", "Panic Attacks NOS", "Panic Disorder NOS", "PDD", "PDD NOS", "PTSD DSM4", "PTSD DSM5", "PTSD NOS", "Social Phobia DSM4", "Social Phobia DSM5", "Social Phobia NOS", "Specific Phobia DSM4", "Specific Phobia DSM5", "Specific Phobia NOS", "Sub 1 DSM4", "Sub 1 DSM5", "Sub 1 NOS", "Sub 2 DSM4", "Sub 2 DSM5", "Sub 2 NOS", "Sub 3 DSM4", "Sub 3 DSM5", "Sub 3 NOS"))
+row.names(names_now) <- NULL
+names_now <- as.data.frame(names_now)
+
+mom_now <- data.frame(agora4_now_perc_mom, agora5_now_perc_mom, agnos_now_perc_mom, gad_now_perc_mom, ganos_now_perc_mom, manic_now_perc_mom, hyp_now_perc_mom, manic_hyp_now_perc_mom, mannos_now_perc_mom, mdd_now_perc_mom, mdnos_now_perc_mom, ocd4_now_perc_mom, ocd5_now_perc_mom, ocnos_now_perc_mom, panic_now_perc_mom, panicd_now_perc_mom, pannos_now_perc_mom, pandnos_now_perc_mom, dys_now_perc_mom, dysnos_now_perc_mom, ptsd4_now_perc_mom, ptsd5_now_perc_mom, ptnos_now_perc_mom, socialp4_now_perc_mom, socialp5_now_perc_mom, socnos_now_perc_mom, phobia4_now_perc_mom, phobia5_now_perc_mom, phonos_now_perc_mom, sub1_dsm4_now_perc_mom, sub1_dsm5_now_perc_mom, sub1_nos_now_perc_mom, sub2_dsm4_now_perc_mom, sub2_dsm5_now_perc_mom, sub2_nos_now_perc_mom, sub3_dsm4_now_perc_mom, sub3_dsm5_now_perc_mom, sub3_nos_now_perc_mom)
+mom_now <- t(mom_now)
+row.names(mom_now) <- NULL
+mom_now <- as.data.frame(mom_now)
+
+notmom_now <- data.frame(agora4_now_perc_notmom, agora5_now_perc_notmom, agnos_now_perc_notmom, gad_now_perc_notmom, ganos_now_perc_notmom, manic_now_perc_notmom, hyp_now_perc_notmom, manic_hyp_now_perc_notmom, mannos_now_perc_notmom, mdd_now_perc_notmom, mdnos_now_perc_notmom, ocd4_now_perc_notmom, ocd5_now_perc_notmom, ocnos_now_perc_notmom, panic_now_perc_notmom, panicd_now_perc_notmom, pannos_now_perc_notmom, pandnos_now_perc_notmom, dys_now_perc_notmom, dysnos_now_perc_notmom, ptsd4_now_perc_notmom, ptsd5_now_perc_notmom, ptnos_now_perc_notmom, socialp4_now_perc_notmom, socialp5_now_perc_notmom, socnos_now_perc_notmom, phobia4_now_perc_notmom, phobia5_now_perc_notmom, phonos_now_perc_notmom, sub1_dsm4_now_perc_notmom, sub1_dsm5_now_perc_notmom, sub1_nos_now_perc_notmom, sub2_dsm4_now_perc_notmom, sub2_dsm5_now_perc_notmom, sub2_nos_now_perc_notmom, sub3_dsm4_now_perc_notmom, sub3_dsm5_now_perc_notmom, sub3_nos_now_perc_notmom)
+notmom_now <- t(notmom_now)
+row.names(notmom_now) <- NULL
+notmom_now <- as.data.frame(notmom_now)
+```
+
+```{r include=FALSE}
+rm(agora4_now_perc_mom)
+rm(agora5_now_perc_mom)
+rm(agnos_now_perc_mom)
+rm(gad_now_perc_mom)
+rm(ganos_now_perc_mom)
+rm(manic_now_perc_mom)
+rm(hyp_now_perc_mom)
+rm(manic_hyp_now_perc_mom)
+rm(mannos_now_perc_mom)
+rm(mdd_now_perc_mom)
+rm(mdnos_now_perc_mom)
+rm(ocd4_now_perc_mom)
+rm(ocd5_now_perc_mom)
+rm(ocnos_now_perc_mom)
+rm(panic_now_perc_mom)
+rm(panicd_now_perc_mom)
+rm(pannos_now_perc_mom)
+rm(pandnos_now_perc_mom)
+rm(dys_now_perc_mom)
+rm(dysnos_now_perc_mom)
+rm(ptsd4_now_perc_mom)
+rm(ptsd5_now_perc_mom)
+rm(ptnos_now_perc_mom)
+rm(socialp4_now_perc_mom)
+rm(socialp5_now_perc_mom)
+rm(socnos_now_perc_mom)
+rm(phobia4_now_perc_mom)
+rm(phobia5_now_perc_mom)
+rm(phonos_now_perc_mom)
+rm(sub1_dsm4_now_perc_mom)
+rm(sub1_dsm5_now_perc_mom)
+rm(sub1_nos_now_perc_mom)
+rm(sub2_dsm4_now_perc_mom)
+rm(sub2_dsm5_now_perc_mom)
+rm(sub2_nos_now_perc_mom)
+rm(sub3_dsm4_now_perc_mom)
+rm(sub3_dsm5_now_perc_mom)
+rm(sub3_nos_now_perc_mom)
+rm(agora4_now_perc_notmom)
+rm(agora5_now_perc_notmom)
+rm(agnos_now_perc_notmom)
+rm(gad_now_perc_notmom)
+rm(ganos_now_perc_notmom)
+rm(manic_now_perc_notmom)
+rm(hyp_now_perc_notmom)
+rm(manic_hyp_now_perc_notmom)
+rm(mannos_now_perc_notmom)
+rm(mdd_now_perc_notmom)
+rm(mdnos_now_perc_notmom)
+rm(ocd4_now_perc_notmom)
+rm(ocd5_now_perc_notmom)
+rm(ocnos_now_perc_notmom)
+rm(panic_now_perc_notmom)
+rm(panicd_now_perc_notmom)
+rm(pannos_now_perc_notmom)
+rm(pandnos_now_perc_notmom)
+rm(dys_now_perc_notmom)
+rm(dysnos_now_perc_notmom)
+rm(ptsd4_now_perc_notmom)
+rm(ptsd5_now_perc_notmom)
+rm(ptnos_now_perc_notmom)
+rm(socialp4_now_perc_notmom)
+rm(socialp5_now_perc_notmom)
+rm(socnos_now_perc_notmom)
+rm(phobia4_now_perc_notmom)
+rm(phobia5_now_perc_notmom)
+rm(phonos_now_perc_notmom)
+rm(sub1_dsm4_now_perc_notmom)
+rm(sub1_dsm5_now_perc_notmom)
+rm(sub1_nos_now_perc_notmom)
+rm(sub2_dsm4_now_perc_notmom)
+rm(sub2_dsm5_now_perc_notmom)
+rm(sub2_nos_now_perc_notmom)
+rm(sub3_dsm4_now_perc_notmom)
+rm(sub3_dsm5_now_perc_notmom)
+rm(sub3_nos_now_perc_notmom)
 ```
 
 ```{r}
-chisq_table <- table(data$mother, data$dx_agora4_current, data$dx_agora5_current, data$dx_agnos_current, data$dx_gad_current, data$dx_ganos_current, data$dx_manic_current, data$manic_hypdx_current, data$manic_hypdx_current, data$dx_mannos_current, data$dx_mde_current, data$dx_mdnos_current, data$dx_ocd4_current, data$dx_ocd5_current, data$dx_ocnos_current, data$dx_panic_current, data$dx_panicd_current, data$dx_pannos_current, data$dx_pandnos_current, data$dx_dys_current, data$dx_dysnos_current, data$dx_ptsd4_current, data$dx_ptsd5_current, data$dx_ptnos_current, data$dx_socialp4_current, data$dx_socialp5_current, data$dx_socnos_current, data$dx_phobia4_current, data$dx_phobia5_current, data$dx_phonos_current, data$dx_sub1_dsm4_current, data$dx_sub1_dsm5_current, data$dx_sub1_nos_current, data$dx_sub2_dsm4_current, data$dx_sub2_dsm5_current, data$dx_sub2_nos_current, data$dx_sub3_dsm4_current, data$dx_sub3_dsm5_current, data$dx_sub3_nos_current)
+df_mom_now <- data.frame(names_now, mom_now)
+names(df_mom_now)[colnames(df_mom_now)=="V1"] <- "Diagnosis"
+names(df_mom_now)[colnames(df_mom_now)=="V1.1"] <- "Percentage"
+#names(df_mom_now)[colnames(df_mom_now)=="V1.2"] <- "Count"
+
+df_mom_now %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "Wave15 Past Diagnoses for Only Mothers") %>%
+  kable_styling((bootstrap_options = c("striped", "condensed")), full_width = F)
+```
+
+```{r}
+df_notmom_now <- data.frame(names_now, notmom_now)
+names(df_notmom_now)[colnames(df_notmom_now)=="V1"] <- "Diagnosis"
+names(df_notmom_now)[colnames(df_notmom_now)=="V1.1"] <- "Percentage"
+#names(df_notmom_now)[colnames(df_notmom_now)=="V1.2"] <- "Count"
+
+df_notmom_now %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "Wave15 Past Diagnoses for Not-Mothers") %>%
+  kable_styling((bootstrap_options = c("striped", "condensed")), full_width = F)
+```
+
+```{r}
+mom_data <- data.frame(df_mom_now$Diagnosis, df_mom_now$Percentage, df_notmom_now$Percentage)
+names(mom_data)[colnames(mom_data)=="df_mom_now.Diagnosis"] <- "Diagnosis"
+names(mom_data)[colnames(mom_data)=="df_mom_now.Percentage"] <- "Mothers Percentage"
+names(mom_data)[colnames(mom_data)=="df_notmom_now.Percentage"] <- "Not-Mothers Percentage"
+
+mom_data %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "Wave15 Past Diagnoses for Mothers vs. Not-Mothers") %>%
+  kable_styling((bootstrap_options = c("striped", "condensed")), full_width = F)
+```
+
+
+
+
+## Idk what below is
+
+```{r include=FALSE}
+#chisq_table <- table(data$mother, data$dx_agora4_current, data$dx_agora5_current, data$dx_agnos_current, data$dx_gad_current, data$dx_ganos_current, data$dx_manic_current, data$manic_hypdx_current, data$manic_hypdx_current, data$dx_mannos_current, data$dx_mde_current, data$dx_mdnos_current, data$dx_ocd4_current, data$dx_ocd5_current, data$dx_ocnos_current, data$dx_panic_current, data$dx_panicd_current, data$dx_pannos_current, data$dx_pandnos_current, data$dx_dys_current, data$dx_dysnos_current, data$dx_ptsd4_current, data$dx_ptsd5_current, data$dx_ptnos_current, data$dx_socialp4_current, data$dx_socialp5_current, data$dx_socnos_current, data$dx_phobia4_current, data$dx_phobia5_current, data$dx_phonos_current, data$dx_sub1_dsm4_current, data$dx_sub1_dsm5_current, data$dx_sub1_nos_current, data$dx_sub2_dsm4_current, data$dx_sub2_dsm5_current, data$dx_sub2_nos_current, data$dx_sub3_dsm4_current, data$dx_sub3_dsm5_current, data$dx_sub3_nos_current)
 ```
 
 ```{r}
 table(data$mother)
 cor.test(data$mother, data$dx_mde_current, na.rm=TRUE)
 chisq.test(data$mother, data$dx_mde_current, na.rm=TRUE)
-
 chisq.test(chisq_table)
 ```
 
@@ -596,6 +823,16 @@ Logistic regression ... ?
 mod1 <- glm(dx_mde_current ~ relation_prim + p_age + p_sex, family=binomial(link='logit'),data=data)
 summary(mod1)
 anova(mod1, test="Chisq")
+```
+
+```{r}
+summary(mod2 <- lm(dx_gad_current ~ relation_prim + p_age + p_sex, data=data))
+
+summary(mod3 <- lm(dx_ptsd5_current ~ relation_prim + p_age + p_sex,data=data))
+
+summary(mod4 <- lm(dx_ptsd5_current ~ relation_prim + p_age + p_sex + p_age:p_sex + p_age:relation_prim, data=data))
+
+summary(mod5 <- lm(dx_ptsd5_current ~ relation_prim, data=data))
 ```
 
 ```{r}
@@ -612,5 +849,32 @@ plot(dx_mde_current ~ relation_prim, data=data, col="red4")
 lines(dx_mde_current ~ relation_prim, newdat, col="green4", lwd=2)
 
 #????
+```
+
+```{r}
+t.test(mothersonly$dx_mde_current, notmothers$dx_mde_current)
+t.test(mothersonly$dx_gad_current, notmothers$dx_gad_current)
+t.test(mothersonly$dx_ptsd5_current, notmothers$dx_ptsd5_current)
+```
+
+```{r}
+mean(mothersonly$dx_ptsd5_current, na.rm=TRUE)
+mean(notmothers$dx_ptsd5_current, na.rm=TRUE)
+```
+
+Conclusion for PTSD5, the only PCGs that reported PTSD symtpoms were mothers. 
+
+```{r}
+count(mothersonly$dx_gad_current, 1)
+mean(notmothers$dx_gad_current, 1)
+```
+
+```{r}
+count(mothersonly$dx_mde_current, 1)
+mean(notmothers$dx_mde_current, 1)
+```
+
+```{r}
+
 ```
 
