@@ -211,7 +211,7 @@ rm(scared_original)
 
 ## Add demographic data
 
-There is a file called "demographic.csv" and it is located in the "Data Cleaning Protocol" on the Fragile Families server (it's at the very bottom). Copy it and paste the copy to your desktop. At the moment, this file only includes gender ("F" or "M") and age (as MM/DD/YYYY). Race, ethnicity, SES, and other variables might be added to demographic.csv later. 
+There is a file called "demographic.csv" and it is located in the "Data Cleaning Protocol" on the Fragile Families server (it's at the very bottom). Copy it and paste the copy to your desktop. As of 2/15/19, this file contains gender (F or M), date of birth (in MM/DD/YYYY format), monthly and yearly income (coded on a 0-12 scale where each number represents a range (e.g., for yr_income, 0 corresponds to $4,999 or less), and race. Race is coded in multiple ways. There is a column called "race" where each row has a value such as "Black" or "Missing". "racenum" directly corresponds to this, but has numbers instead of words (i.e. 1 = Black, 2 = White, etc.). There is also a column for each category; so under the "Asian" column, if there is a 1, then that participant identified as Asian, but if there is a 0, then that participant could've identified as Black, White, etc.. The dataset demographic.csv may also require some wrangling, like you may want to create an age variable based on their birthday and the day that you're doing data analysis. Or if you're doing something with yearly income, you may want to exclude all the rows that have "NA" since not all participants wanted to report their income. 
 
 ```{r}
 demographic <- read.csv("C:/Users/jrcala/Desktop/demographic.csv")
@@ -221,7 +221,7 @@ rm(demographic)
 
 ## Cleaning/managing the combined dataset
 
-Just by looking at my dataset, you can tell that some people decided to entirely skip the SCARED survey during their Wave 15 visit. I can tell this because there's a long row of NA's or 88's. For SCARED, these people include 10134 and 10219, which are rows 51 and 89 respectively. It might be best to remove them. We'll use the same syntax that we used to drop empty rows at the beginning.
+Just by looking at my dataset, I can tell that some people decided to entirely skip the SCARED survey during their Wave 15 visit. I can tell this because there's a long row of NA's or 88's. For SCARED, these people include 10134 and 10219, which are rows 51 and 89 respectively. It might be best to remove them. We'll use the same syntax that we used to drop empty rows at the beginning.
 
 ```{r}
 scared <- scared[-c(51, 89), ]
