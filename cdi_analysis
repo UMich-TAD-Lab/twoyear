@@ -145,7 +145,7 @@ cdi_melt1 <- melt(cdi1, id.vars = c("id", "gender"))
 labels1 <- c("Male", "Female")
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Gender stacked, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_melt1, aes(x = as.numeric(value), y = variable, fill = gender)) + 
   geom_histogram(stat= "identity", position = "stack") + 
   ggtitle("CDI Total Sum with Gender") + ylab("Frequency") + 
@@ -164,7 +164,7 @@ rm(cdi_melt1)
 cdi_f <- cdi[ which(cdi$gender =='F'), ]
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Girls, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_f, aes(x=cdi_sum)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("CDI Total Sum for Girls") + 
   annotate("rect", xmin=24, xmax=39, ymin=0, ymax=Inf, alpha=0.6, fill="red") + 
   annotate("rect", xmin=20, xmax=24, ymin=0, ymax=Inf, alpha=0.4, fill="red") + 
@@ -177,7 +177,7 @@ ggplot(cdi_f, aes(x=cdi_sum)) + geom_histogram(colour="white",fill="cyan3")  + x
 cdi_m <- cdi[ which(cdi$gender =='M'), ]
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Boys, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_m, aes(x=cdi_sum)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("CDI Total Sum for Boys") + 
   annotate("rect", xmin=19, xmax=31, ymin=0, ymax=Inf, alpha=0.6, fill="red") + 
   annotate("rect", xmin=16, xmax=19, ymin=0, ymax=Inf, alpha=0.4, fill="red") + 
@@ -200,7 +200,7 @@ cdi_melt2 <- cdi_melt1
 cdi_melt2$racenum <- factor(cdi_melt2$racenum, levels = rev(levels(cdi_melt2$racenum)))
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Total race, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_melt2, aes(x = as.numeric(value), y = variable, fill = racenum)) + 
   geom_histogram(stat= "identity", position = "stack") + 
   ggtitle("CDI Total Sum with Race") + ylab("Frequency") + 
@@ -218,6 +218,66 @@ rm(labels)
 ```
 
 ```{r include=FALSE}
+cdi1 <- data.frame(cdi_f$id, cdi_f$gender, cdi_f$cdi_sum, cdi_f$race, cdi_f$racenum)
+names(cdi1) <- substring(names(cdi1),7,58)
+cdi_melt1 <- melt(cdi1, id.vars = c("id", "gender", "race", "racenum"))
+labels <- c("Native American", "Hispanic", "Asian", "Missing", "Biracial", "White", "Black")
+cdi_melt2 <- cdi_melt1
+cdi_melt2$racenum <- factor(cdi_melt2$racenum, levels = rev(levels(cdi_melt2$racenum)))
+```
+
+```{r Race in Girls, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cdi_melt2, aes(x = as.numeric(value), y = variable, fill = racenum)) + 
+  geom_histogram(stat= "identity", position = "stack") + 
+  ggtitle("CDI Total Sum with Race in Girls") + ylab("Frequency") + 
+  xlab("Score Distribution") + 
+  theme(axis.text.y = element_blank()) +
+  theme(legend.position = "right") +
+  scale_fill_discrete(name = "Race", labels=labels) + 
+  annotate("rect", xmin=24, xmax=39, ymin=0, ymax=Inf, alpha=0.6, fill="red") + 
+  annotate("rect", xmin=20, xmax=24, ymin=0, ymax=Inf, alpha=0.4, fill="red") + 
+  annotate("rect", xmin=15, xmax=20, ymin=0, ymax=Inf, alpha=0.2, fill="red") +
+  annotate("rect", xmin=0, xmax=14, ymin=0, ymax=Inf, alpha=0.0, fill="red")
+```
+
+```{r include=FALSE}
+rm(cdi_melt1)
+rm(cdi_melt2)
+rm(cdi1)
+rm(labels)
+```
+
+```{r include=FALSE}
+cdi1 <- data.frame(cdi_m$id, cdi_m$gender, cdi_m$cdi_sum, cdi_m$race, cdi_m$racenum)
+names(cdi1) <- substring(names(cdi1),7,58)
+cdi_melt1 <- melt(cdi1, id.vars = c("id", "gender", "race", "racenum"))
+labels <- c("Native American", "Hispanic", "Asian", "Missing", "Biracial", "White", "Black")
+cdi_melt2 <- cdi_melt1
+cdi_melt2$racenum <- factor(cdi_melt2$racenum, levels = rev(levels(cdi_melt2$racenum)))
+```
+
+```{r Race with Boys, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cdi_melt2, aes(x = as.numeric(value), y = variable, fill = racenum)) + 
+  geom_histogram(stat= "identity", position = "stack") + 
+  ggtitle("CDI Total Sum with Race in Boys") + ylab("Frequency") + 
+  xlab("Score Distribution") + 
+  theme(axis.text.y = element_blank()) +
+  theme(legend.position = "right") +
+  scale_fill_discrete(name = "Race", labels=labels) + 
+  annotate("rect", xmin=19, xmax=31, ymin=0, ymax=Inf, alpha=0.6, fill="red") + 
+  annotate("rect", xmin=16, xmax=19, ymin=0, ymax=Inf, alpha=0.4, fill="red") + 
+  annotate("rect", xmin=13, xmax=16, ymin=0, ymax=Inf, alpha=0.2, fill="red") +
+  annotate("rect", xmin=0, xmax=13, ymin=0, ymax=Inf, alpha=0.0, fill="red")
+```
+
+```{r include=FALSE}
+rm(cdi_melt1)
+rm(cdi_melt2)
+rm(cdi1)
+rm(labels)
+```
+
+```{r include=FALSE}
 cdib <- cdi[ which(cdi$race =='Black'), ]
 cdib <- data.frame(cdib$id, cdib$gender, cdib$cdi_sum)
 names(cdib) <- substring(names(cdib),6,58)
@@ -225,7 +285,7 @@ cdi_melt1 <- melt(cdib, id.vars = c("id", "gender"))
 labels1 <- c("Male", "Female")
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Gender and Black participants, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_melt1, aes(x = as.numeric(value), y = variable, fill = gender)) + 
   geom_histogram(stat= "identity", position = "stack") + 
   ggtitle("CDI Total Sum with Gender with only Black participants") + ylab("Frequency") + 
@@ -247,7 +307,7 @@ names(cdinb) <- substring(names(cdinb),7,58)
 cdi_melt1 <- melt(cdinb, id.vars = c("id", "gender", "race", "racenum"))
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Gender and non-Black participants, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_melt1, aes(x = as.numeric(value), y = variable, fill = race)) + 
   geom_histogram(stat= "identity", position = "stack") + 
   ggtitle("CDI Total Sum with only non-Black participants") + ylab("Frequency") + 
@@ -289,14 +349,13 @@ cdi_melt1$yr_income_1[cdi_melt1$yr_income == "11"] <- "$80,000 to $89,999"
 cdi_melt1$yr_income_1[cdi_melt1$yr_income == "12"] <- "$90,000 or more"
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Total income, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_melt1, aes(x = as.numeric(value), y = variable, fill = yr_income_1)) + 
   geom_histogram(stat= "identity", position = "stack") + 
   ggtitle("CDI Total Sum with Income") + ylab("Frequency") + 
   xlab("Score Distribution") + 
   theme(axis.text.y = element_blank()) +
-  theme(legend.position = "right"") +
-  scale_fill_discrete(name = "Yearly Income")
+  theme(legend.position = "right") + scale_fill_discrete(name = "Yearly Income")
 ```
 
 ```{r include=FALSE}
@@ -330,7 +389,7 @@ cdi_melt1$yr_income_1[cdi_melt1$yr_income == "11"] <- "$80,000 to $89,999"
 cdi_melt1$yr_income_1[cdi_melt1$yr_income == "12"] <- "$90,000 or more"
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Income in Girls, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_melt1, aes(x = as.numeric(value), y = variable, fill = yr_income_1)) + 
   geom_histogram(stat= "identity", position = "stack") + 
   ggtitle("CDI Total Sum with Income in Girls") + ylab("Frequency") + 
@@ -375,13 +434,13 @@ cdi_melt1$yr_income_1[cdi_melt1$yr_income == "11"] <- "$80,000 to $89,999"
 cdi_melt1$yr_income_1[cdi_melt1$yr_income == "12"] <- "$90,000 or more"
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Income in Boys, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_melt1, aes(x = as.numeric(value), y = variable, fill = yr_income_1)) + 
   geom_histogram(stat= "identity", position = "stack") + 
   ggtitle("CDI Total Sum with Income in Boys") + ylab("Frequency") + 
   xlab("Score Distribution") + 
   theme(axis.text.y = element_blank()) +
-  theme(legend.position = "right"") +
+  theme(legend.position = "right") +
   scale_fill_discrete(name = "Yearly Income") + 
   annotate("rect", xmin=19, xmax=31, ymin=0, ymax=Inf, alpha=0.6, fill="red") + 
   annotate("rect", xmin=16, xmax=19, ymin=0, ymax=Inf, alpha=0.4, fill="red") + 
@@ -421,13 +480,13 @@ cdi_melt1$yr_income_1[cdi_melt1$yr_income == "11"] <- "$80,000 to $89,999"
 cdi_melt1$yr_income_1[cdi_melt1$yr_income == "12"] <- "$90,000 or more"
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Income in Black participants, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_melt1, aes(x = as.numeric(value), y = variable, fill = yr_income_1)) + 
   geom_histogram(stat= "identity", position = "stack") + 
   ggtitle("CDI Total Sum with Income in Black participants") + ylab("Frequency") + 
   xlab("Score Distribution") + 
   theme(axis.text.y = element_blank()) +
-  theme(legend.position = "right"") +
+  theme(legend.position = "right") +
   scale_fill_discrete(name = "Yearly Income")
 ```
 
@@ -463,13 +522,13 @@ cdi_melt1$yr_income_1[cdi_melt1$yr_income == "11"] <- "$80,000 to $89,999"
 cdi_melt1$yr_income_1[cdi_melt1$yr_income == "12"] <- "$90,000 or more"
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r Income in non-Black participants, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cdi_melt1, aes(x = as.numeric(value), y = variable, fill = yr_income_1)) + 
   geom_histogram(stat= "identity", position = "stack") + 
   ggtitle("CDI Total Sum by income in non-Black participants") + ylab("Frequency") + 
   xlab("Score Distribution") + 
   theme(axis.text.y = element_blank()) +
-  theme(legend.position = "right"") +
+  theme(legend.position = "right") +
   scale_fill_discrete(name = "Yearly Income")
 ```
 
