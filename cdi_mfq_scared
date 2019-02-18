@@ -2,7 +2,10 @@
 title: "CDI, MFQ, and SCARED: What we found versus what others found"
 author: "Julianna Calabrese"
 date: "February 18, 2019"
-output: html_document
+output:
+  rmarkdown::html_document:
+    theme: united
+    highlight: tango
 editor_options: 
   chunk_output_type: console
 ---
@@ -99,77 +102,106 @@ mean(scared$SCARED_C_Sum, na.rm=TRUE)
 ```{r include=FALSE}
 cdi_others <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cdi_others.csv')
 cdi_others2 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cdi_others2.csv')
+cdi_others3 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cdi_others3.csv')
+
 mfq_others <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/mfq_others.csv')
 mfq_others2 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/mfq_others2.csv')
+mfq_others3 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/mfq_others3.csv')
+
 scared_others <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/scared_others.csv')
 scared_others2 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/scared_others2.csv')
+scared_others3 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/scared_others3.csv')
 ```
 
 ## CDI
 
-```{r echo=FALSE, include=FALSE}
-cdi_col <- c("grey50", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3")
-
-cdi_others$study_sample <- factor(cdi_others$study_sample, cdi_others$study_sample)
-
-ggplot(data=cdi_others, aes(x=study_sample, y=cdi_mean)) +
-  geom_bar(stat="identity", fill=cdi_col) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ggtitle("CDI Total in various studies") + xlab("") + ylab("CDI Score")
-```
-
-```{r echo=FALSE}
+```{r Total CDI, echo=FALSE}
 cdi_col2 <- c("grey70", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3")
 
 cdi_others2$study_sample <- factor(cdi_others2$study_sample, cdi_others2$study_sample)
 
 ggplot(data=cdi_others2, aes(x=study_sample, y=cdi_mean)) + 
-  geom_bar(stat="identity", fill=cdi_col2) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_bar(stat="identity", fill=cdi_col2) + theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
   geom_text(data=cdi_others2, aes(label=n), vjust=5) + 
-  ggtitle("CDI Total in various studies") + xlab("") + ylab("CDI Score") + labs(caption = "Sun & Wang (2015) is a meta-analysis")
+  ggtitle("CDI Total in various studies") + xlab("") + ylab("CDI Score") + labs(caption = "Sun & Wang (2015) is a meta-analysis") + theme(axis.text.x = element_text(size=10))
+```
+
+```{r include=FALSE}
+cdi2 <- Reduce(function(x, y) merge(x, y, all=TRUE), list(cdi, demo))
+cdi_f <- cdi2[ which(cdi2$gender =='F'), ]
+cdi_m <- cdi2[ which(cdi2$gender =='M'), ]
+
+mean(cdi_f$CDIchild_Tot_Sum)
+mean(cdi_m$CDIchild_Tot_Sum, na.rm=TRUE)
+```
+
+```{r Gender CDI, echo=FALSE}
+#cdi_others3$study_sample <- factor(cdi_others3$study_sample, cdi_others3$study_sample)
+cdi_others3$gender <- as.factor(cdi_others3$gender)
+
+ggplot(data=cdi_others3, aes(x=study_sample, y=cdi_mean, fill=gender)) + 
+  geom_bar(stat="identity", position="dodge") + theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+  ggtitle("CDI Total by Gender in various studies") + xlab("") + ylab("CDI Score") + theme(axis.text.x = element_text(size=10))
 ```
 
 ## MFQ
 
-```{r echo=FALSE, include=FALSE}
-mfq_col <- c("grey50", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3")
-
-mfq_others$study_sample <- factor(mfq_others$study_sample, mfq_others$study_sample)
-
-ggplot(data=mfq_others, aes(x=study_sample, y=mfq_mean)) +
-  geom_bar(stat="identity", fill=mfq_col) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ggtitle("MFQ Total in various studies") + xlab("") + ylab("MFQ Score")
-```
-
-```{r echo=FALSE}
-mfq_col2 <- c("grey50", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3")
+```{r Total MFQ, echo=FALSE}
+mfq_col2 <- c("grey70", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3")
 
 mfq_others2$study_sample <- factor(mfq_others2$study_sample, mfq_others2$study_sample)
 
 ggplot(data=mfq_others2, aes(x=study_sample, y=mfq_mean)) +
-  geom_bar(stat="identity", fill=mfq_col2) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_bar(stat="identity", fill=mfq_col2) + theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
   ggtitle("MFQ Total in various studies") + xlab("") + ylab("MFQ Score") +
-  geom_text(data=mfq_others2, aes(label=n), vjust=5)
+  geom_text(data=mfq_others2, aes(label=n), vjust=5) + theme(axis.text.x = element_text(size=10))
+```
+
+```{r include=FALSE}
+mfq2 <- Reduce(function(x, y) merge(x, y, all=TRUE), list(mfq, demo))
+mfq_f <- mfq2[ which(mfq2$gender =='F'), ]
+mfq_m <- mfq2[ which(mfq2$gender =='M'), ]
+
+mean(mfq_f$MFQ_C_Sum, na.rm=TRUE)
+mean(mfq_m$MFQ_C_Sum, na.rm=TRUE)
+```
+
+```{r Gender MFQ, echo=FALSE}
+#mfq_others3$study_sample <- factor(mfq_others3$study_sample, mfq_others3$study_sample)
+mfq_others3$gender <- as.factor(mfq_others3$gender)
+
+ggplot(data=mfq_others3, aes(x=study_sample, y=mfq_mean, fill=gender)) + 
+  geom_bar(stat="identity", position="dodge") + theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+  ggtitle("MFQ Total by Gender in various studies") + xlab("") + ylab("MFQ Score") + theme(axis.text.x = element_text(size=10))
 ```
 
 ## SCARED
 
-```{r echo=FALSE, include=FALSE}
-scared_col <- c("grey50", "thistle", "thistle", "thistle", "thistle", "thistle", "thistle", "thistle", "thistle", "thistle", "thistle")
-
-scared_others$study_sample <- factor(scared_others$study_sample, scared_others$study_sample)
-
-ggplot(data=scared_others, aes(x=study_sample, y=scared_mean)) +
-  geom_bar(stat="identity", fill=scared_col) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ggtitle("SCARED Total in various studies") + xlab("") + ylab("SCARED Score")
-```
-
-```{r echo=FALSE}
-scared_col2 <- c("grey50", "thistle", "thistle", "thistle", "thistle", "thistle")
+```{r Total SCARED, echo=FALSE}
+scared_col2 <- c("grey70", "thistle", "thistle", "thistle", "thistle", "thistle")
 
 scared_others2$study_sample <- factor(scared_others2$study_sample, scared_others2$study_sample)
 
 ggplot(data=scared_others2, aes(x=study_sample, y=scared_mean)) +
-  geom_bar(stat="identity", fill=scared_col2) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_bar(stat="identity", fill=scared_col2) + theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
   ggtitle("SCARED Total in various studies") + xlab("") + ylab("SCARED Score") +
-  geom_text(data=scared_others2, aes(label=n), vjust=5)
+  geom_text(data=scared_others2, aes(label=n), vjust=5) + theme(axis.text.x = element_text(size=10))
+```
+
+```{r include=FALSE}
+scared2 <- Reduce(function(x, y) merge(x, y, all=TRUE), list(scared, demo))
+scared_f <- scared2[ which(scared2$gender =='F'), ]
+scared_m <- scared2[ which(scared2$gender =='M'), ]
+
+mean(scared_f$SCARED_C_Sum, na.rm=TRUE)
+mean(scared_m$SCARED_C_Sum, na.rm=TRUE)
+```
+
+```{r Gender SCARED, echo=FALSE}
+#scared_others3$study_sample <- factor(scared_others3$study_sample, scared_others3$study_sample)
+scared_others3$gender <- as.factor(scared_others3$gender)
+
+ggplot(data=scared_others3, aes(x=study_sample, y=scared_mean, fill=gender)) + 
+  geom_bar(stat="identity", position="dodge") + theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+  ggtitle("SCARED Total by Gender in various studies") + xlab("") + ylab("SCARED Score") + theme(axis.text.x = element_text(size=10))
 ```
