@@ -1,0 +1,175 @@
+---
+title: "CDI, MFQ, and SCARED: What we found versus what others found"
+author: "Julianna Calabrese"
+date: "February 18, 2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(mosaic)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(psych)
+library(nlme)
+library(plyr)
+library(Hmisc)
+library(rmarkdown)
+library(psych)
+library(corrr)
+library(corrplot)
+library(reshape2)
+library(scales)
+library(sjPlot)
+library(car)
+library(knitr)
+library(kableExtra)
+library(summarytools)
+library(DT)
+library(qdapTools)
+library(data.table)
+library(tibble)
+library(stats)
+library(reshape)
+library(yaml)
+library(shiny)
+library(scales)
+library(RColorBrewer)
+```
+
+```{r Load in data, include=FALSE}
+cdi <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cdi.csv')
+mfq <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/mfq.csv')
+scared <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/scared.csv')
+demo <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/full_demo.csv')
+names(cdi)[names(cdi) == "ï..id"] <- "id"
+names(mfq)[names(mfq) == "ï..id"] <- "id"
+names(scared)[names(scared) == "ï..id"] <- "id"
+```
+
+```{r My Notes, include=FALSE}
+#cdi is cadetblue3
+#mfq is palevioletred3
+#scared is thistle
+```
+
+```{r include=FALSE}
+#Turn all 77s, 88s, and -99s into NA
+cdi[cdi=="77"] <- NA
+cdi[cdi=="88"] <- NA
+cdi[cdi=="-99"] <- NA
+
+mfq[mfq=="77"] <- NA
+mfq[mfq=="88"] <- NA
+mfq[mfq=="-99"] <- NA
+
+scared[scared=="77"] <- NA
+scared[scared=="88"] <- NA
+scared[scared=="-99"] <- NA
+```
+
+```{r include=FALSE}
+#Make a full dataset
+data <- Reduce(function(x, y) merge(x, y, all=TRUE), list(cdi, mfq, scared, demo))
+```
+
+## SAND Sample Findings: Total Sum
+
+```{r CDI Total Sum, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cdi, aes(x=CDIchild_Tot_Sum)) + geom_histogram(colour="white",fill="cadetblue3")  + xlab("Total Score") + ylab("Count") + ggtitle("CDI Total Sum Distribution")
+```
+
+```{r MFQ Total Sum, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(mfq, aes(x=MFQ_C_Sum)) + geom_histogram(colour="white",fill="palevioletred3")  + xlab("Total Score") + ylab("Count") + ggtitle("MFQ Total Sum Distribution")
+```
+
+```{r SCARED Total Sum, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared, aes(x=SCARED_C_Sum)) + geom_histogram(colour="white",fill="thistle")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Total Sum Distribution")
+```
+
+```{r Measure means, include=FALSE}
+mean(cdi$CDIchild_Tot_Sum, na.rm=TRUE)
+mean(mfq$MFQ_C_Sum, na.rm=TRUE)
+mean(scared$SCARED_C_Sum, na.rm=TRUE)
+```
+
+```{r include=FALSE}
+cdi_others <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cdi_others.csv')
+cdi_others2 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cdi_others2.csv')
+mfq_others <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/mfq_others.csv')
+mfq_others2 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/mfq_others2.csv')
+scared_others <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/scared_others.csv')
+scared_others2 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/scared_others2.csv')
+```
+
+## CDI
+
+```{r echo=FALSE, include=FALSE}
+cdi_col <- c("grey50", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3")
+
+cdi_others$study_sample <- factor(cdi_others$study_sample, cdi_others$study_sample)
+
+ggplot(data=cdi_others, aes(x=study_sample, y=cdi_mean)) +
+  geom_bar(stat="identity", fill=cdi_col) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("CDI Total in various studies") + xlab("") + ylab("CDI Score")
+```
+
+```{r echo=FALSE}
+cdi_col2 <- c("grey70", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3")
+
+cdi_others2$study_sample <- factor(cdi_others2$study_sample, cdi_others2$study_sample)
+
+ggplot(data=cdi_others2, aes(x=study_sample, y=cdi_mean)) + 
+  geom_bar(stat="identity", fill=cdi_col2) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_text(data=cdi_others2, aes(label=n), vjust=5) + 
+  ggtitle("CDI Total in various studies") + xlab("") + ylab("CDI Score") + labs(caption = "Sun & Wang (2015) is a meta-analysis")
+```
+
+## MFQ
+
+```{r echo=FALSE, include=FALSE}
+mfq_col <- c("grey50", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3")
+
+mfq_others$study_sample <- factor(mfq_others$study_sample, mfq_others$study_sample)
+
+ggplot(data=mfq_others, aes(x=study_sample, y=mfq_mean)) +
+  geom_bar(stat="identity", fill=mfq_col) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("MFQ Total in various studies") + xlab("") + ylab("MFQ Score")
+```
+
+```{r echo=FALSE}
+mfq_col2 <- c("grey50", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3")
+
+mfq_others2$study_sample <- factor(mfq_others2$study_sample, mfq_others2$study_sample)
+
+ggplot(data=mfq_others2, aes(x=study_sample, y=mfq_mean)) +
+  geom_bar(stat="identity", fill=mfq_col2) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("MFQ Total in various studies") + xlab("") + ylab("MFQ Score") +
+  geom_text(data=mfq_others2, aes(label=n), vjust=5)
+```
+
+## SCARED
+
+```{r echo=FALSE, include=FALSE}
+scared_col <- c("grey50", "thistle", "thistle", "thistle", "thistle", "thistle", "thistle", "thistle", "thistle", "thistle", "thistle")
+
+scared_others$study_sample <- factor(scared_others$study_sample, scared_others$study_sample)
+
+ggplot(data=scared_others, aes(x=study_sample, y=scared_mean)) +
+  geom_bar(stat="identity", fill=scared_col) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("SCARED Total in various studies") + xlab("") + ylab("SCARED Score")
+```
+
+```{r echo=FALSE}
+scared_col2 <- c("grey50", "thistle", "thistle", "thistle", "thistle", "thistle")
+
+scared_others2$study_sample <- factor(scared_others2$study_sample, scared_others2$study_sample)
+
+ggplot(data=scared_others2, aes(x=study_sample, y=scared_mean)) +
+  geom_bar(stat="identity", fill=scared_col2) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("SCARED Total in various studies") + xlab("") + ylab("SCARED Score") +
+  geom_text(data=scared_others2, aes(label=n), vjust=5)
+```
