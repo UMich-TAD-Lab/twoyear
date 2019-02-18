@@ -41,6 +41,8 @@ library(yaml)
 library(shiny)
 library(scales)
 library(RColorBrewer)
+library(papaja)
+library(knitcitations)
 ```
 
 ```{r Load in data, include=FALSE}
@@ -113,7 +115,14 @@ scared_others2 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/scared_other
 scared_others3 <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/scared_others3.csv')
 ```
 
-## CDI
+## Children's Depression Inventory (CDI)
+
+```{r include=FALSE}
+citet("10.1007/s10826-006-9054-9") #Steele
+citet("10.1080/08039480600636395") #Ivarsson
+citet("10.1007/s00787-009-0005-z") #Giannakopoulos
+citet("10.1007/s10826-014-0038-x") #Sun
+```
 
 ```{r Total CDI, echo=FALSE}
 cdi_col2 <- c("grey70", "cadetblue3", "cadetblue3", "cadetblue3", "cadetblue3")
@@ -144,7 +153,15 @@ ggplot(data=cdi_others3, aes(x=study_sample, y=cdi_mean, fill=gender)) +
   ggtitle("CDI Total by Gender in various studies") + xlab("") + ylab("CDI Score") + theme(axis.text.x = element_text(size=10))
 ```
 
-## MFQ
+## Mood and Feelings Questionnaire (MFQ)
+
+```{r include=FALSE}
+citet("10.1016/j.psychres.2018.07.016") #Eg
+citet("10.1007/s10802-015-0108-6") #Jeffreys
+citet("10.1080/10615801003703193") #Salloum
+citet("10.1002/mpr.1610") #Thabrew
+citet("10.1111/j.1467-9450.2008.00661.x") #Undheim
+```
 
 ```{r Total MFQ, echo=FALSE}
 mfq_col2 <- c("grey70", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3", "palevioletred3")
@@ -175,7 +192,14 @@ ggplot(data=mfq_others3, aes(x=study_sample, y=mfq_mean, fill=gender)) +
   ggtitle("MFQ Total by Gender in various studies") + xlab("") + ylab("MFQ Score") + theme(axis.text.x = element_text(size=10))
 ```
 
-## SCARED
+## Screen for Child Anxiety Related Disorders
+
+```{r SCARED citations, include=FALSE}
+citet("10.1007/s10578-015-0589-0") #Arab
+citet("10.1097/AJP.0000000000000667") #Cunningham
+citet("10.1007/s10826-017-0760-2") #Scaini
+citet("10.1016/j.jaac.2018.04.009 ") #van Niekerk
+```
 
 ```{r Total SCARED, echo=FALSE}
 scared_col2 <- c("grey70", "thistle", "thistle", "thistle", "thistle", "thistle")
@@ -204,4 +228,10 @@ scared_others3$gender <- as.factor(scared_others3$gender)
 ggplot(data=scared_others3, aes(x=study_sample, y=scared_mean, fill=gender)) + 
   geom_bar(stat="identity", position="dodge") + theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
   ggtitle("SCARED Total by Gender in various studies") + xlab("") + ylab("SCARED Score") + theme(axis.text.x = element_text(size=10))
+```
+
+## References
+
+```{r CDI Citations, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+bibliography(style="html")
 ```
