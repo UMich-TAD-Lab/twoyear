@@ -1,0 +1,175 @@
+---
+title: 'Stuff we found and stuff other people found: the sequel'
+author: "Julianna Calabrese"
+date: "February 21, 2019"
+output:
+  rmarkdown::html_document:
+    theme: united
+    highlight: tango
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r include=FALSE}
+library(mosaic)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(psych)
+library(nlme)
+library(plyr)
+library(Hmisc)
+library(rmarkdown)
+library(psych)
+library(corrr)
+library(corrplot)
+library(reshape2)
+library(scales)
+library(sjPlot)
+library(car)
+library(knitr)
+library(kableExtra)
+library(summarytools)
+library(DT)
+library(qdapTools)
+library(data.table)
+library(tibble)
+library(stats)
+library(reshape)
+library(yaml)
+library(shiny)
+library(scales)
+library(RColorBrewer)
+library(papaja)
+library(knitcitations)
+```
+
+# Children's Depression Inventory
+
+## Twenge & Nolen-Hoeksema, 2002
+
+* Meta-analysis on 310 samples/studies, aged 8-16, N = 61,424, 51.7% female, from U.S. or Canada
+* Data used was collected between 1980 and 1998
+* Each study may have had multiple waves
+* No SES differences, no score differences in white vs. black samples
+* Hispanic samples scored significantly higher on the CDI
+* There was an interaction between age and gender
+    * Girls' CDI scores were steady 8-12, then increased
+    * Girls' CDI scores peaked at 15 and remained high at 16
+    * Boys' CDI were steady 8-16 except were a bit higher at age 12
+    
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+race <- c("white", "black", "hispanic")
+cdi <- 0
+df <- data.frame(race, cdi)
+rm(race)
+rm(cdi)
+df$cdi[df$race == "white"] <- 8.84
+df$cdi[df$race == "black"] <- 8.67
+df$cdi[df$race == "hispanic"] <- 10.34
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+
+ggplot(data=df, aes(x=race, y=cdi)) + 
+  geom_bar(stat="identity") + ggtitle("Twenge & Nolen-Hoeksema, 2002")
+```
+
+```{r include=FALSE}
+citep("10.1037/0021-843X.111.4.578") #Twenge & Nolen-Hoeksema
+```
+
+## Zhu, 2018
+
+* Used a sample from 1995-1996, N = 4228, grades 7th to 12th, 52.3% female, all from the United States
+* **Did not use the CDI**
+* Measured depression using the "Center for Epidemiologic Studies-Depression Scale (CES-D"
+* Adolescents participated in two waves with one year in between
+* An adolescent is more likely to be depressed one year later if they are:
+    * Female
+    * African-American
+    * Have low perceived family support and low school connectedness
+
+```{r include=FALSE}
+citep("10.3390/socsci7050072") #Zhu
+```
+
+## McLaughlin, Hilt, & Nolen-Hoeksema, 2007
+
+* Recruited sample from two middle schools in central Connecitcut (I think around 2001ish, it's unclear)
+* N = 1065, grades 6th to 8th, 51.2% male, 57% Hispanic/Latino
+* Hispanic females had the highest CDI scores
+* Hispanic adolescents (esp. females) and Black males had higher anxiety levels than other groups
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+gender <- c("male", "male", "male", "male", "female", "female", "female", "female")
+race <- c("white", "black", "hispanic", "other", "white", "black", "hispanic", "other")
+cdi <- 0
+df <- data.frame(gender, race, cdi)
+rm(gender)
+rm(race)
+rm(cdi)
+df$cdi[df$gender == "male" & df$race == "white"] <- 8.33
+df$cdi[df$gender == "female" & df$race == "white"] <- 8.13
+df$cdi[df$gender == "male" & df$race == "black"] <- 9.55
+df$cdi[df$gender == "female" & df$race == "black"] <- 8.52
+df$cdi[df$gender == "male" & df$race == "hispanic"] <- 9.07
+df$cdi[df$gender == "female" & df$race == "hispanic"] <- 11.33
+df$cdi[df$gender == "male" & df$race == "other"] <- 9.41
+df$cdi[df$gender == "female" & df$race == "other"] <- 9.18
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+
+ggplot(data=df, aes(x=race, y=cdi, fill=gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("McLaughlin, Hilt, & Nolen-Hoeksema, 2007")
+
+rm(df)
+```
+
+```{r include=FALSE}
+citep("10.1007/s10802-007-9128-1") #McLaughlin, Hilt, & Nolen-Hoeksema
+```
+
+## Bjorkenstam, Pebley, Burstrom, & Kosidou, 2017
+
+* Obtained data from the Child Development Supplement to the Panel Study of Income Dynamics, a nationally representative sample from three waves: 1997, 2002, and 2007, oversampled for African-American and low-income families
+* N = 2223, born between 1985 and 1995, 50% female, 65% white, 17% African-American, 13% Hispanic
+* Individuals exposed to childhood social adversity had higher CDI scores
+* Didn't look at CDI scores in relation to gender or race
+* Reported an overall mean CDI of 2.8, but I don't think that's right???
+
+```{r include=FALSE}
+citep("10.1016/j.jad.2017.01.035") #Bjorkenstam, Pebley, Burstrom, & Kosidou, 2017
+```
+
+## Chaplin, Gillham, & Seligman, 2009
+
+* Sample recruited from schools in northeastern US in 2002
+* N = 113, aged 11-14, 79% white, took measures at two times (one year apart)
+* Mean CDI score of 11.05
+* Girls had higher CDI scores than boys but it wasn't significant
+
+```{r include=FALSE}
+citep("10.1177/0272431608320125") #Chaplin, Gillham, & Seligman, 2009
+```
+
+## mysterious kovacs, 2001
+
+apparently the CDI maker has a manual that everyone references yet I cannot find online!!! maybe its in room 1415.
+
+# Mood and Feelings Questionnaire
+
+
+
+
+## References
+
+```{r Citations, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+bibliography(style="html")
+```
+
+
