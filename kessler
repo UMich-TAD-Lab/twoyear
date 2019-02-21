@@ -56,37 +56,71 @@ names(mfq)[names(mfq) == "ï..id"] <- "id"
 names(scared)[names(scared) == "ï..id"] <- "id"
 ```
 
-```{r}
+```{r include=FALSE}
 cdi2 <- Reduce(function(x, y) merge(x, y, all=TRUE), list(cdi, demo))
 cdi_f <- cdi2[ which(cdi2$gender =='F'), ]
 cdi_m <- cdi2[ which(cdi2$gender =='M'), ]
-rm(cdi2)
+#rm(cdi2)
 
 mfq2 <- Reduce(function(x, y) merge(x, y, all=TRUE), list(mfq, demo))
 mfq_f <- mfq2[ which(mfq2$gender =='F'), ]
 mfq_m <- mfq2[ which(mfq2$gender =='M'), ]
-rm(mfq2)
+#rm(mfq2)
 
 scared2 <- Reduce(function(x, y) merge(x, y, all=TRUE), list(scared, demo))
 scared_f <- scared2[ which(scared2$gender =='F'), ]
 scared_m <- scared2[ which(scared2$gender =='M'), ]
-rm(scared2)
+#rm(scared2)
+```
+
+```{r include=FALSE}
+demo[demo=="77"] <- NA
+demo[demo=="88"] <- NA
+demo[demo=="-99"] <- NA
+```
+
+```{r include=FALSE}
+cdi[cdi=="77"] <- NA
+cdi[cdi=="88"] <- NA
+cdi[cdi=="-99"] <- NA
+```
+
+```{r include=FALSE}
+mfq[mfq=="77"] <- NA
+mfq[mfq=="88"] <- NA
+mfq[mfq=="-99"] <- NA
+```
+
+```{r include=FALSE}
+scared[scared=="77"] <- NA
+scared[scared=="88"] <- NA
+scared[scared=="-99"] <- NA
 ```
 
 # Children's Depression Inventory
 
-## Sand Sample
+## SAND Sample
 
-```{r}
-sand_cdi_total_mean <- mean(cdi$CDIchild_Tot_Sum, na.rm=TRUE)
-sand_cdi_male_mean <- mean(cdi_m$CDIchild_Tot_Sum, na.rm=TRUE)
-sand_cdi_female_mean <- mean(cdi_f$CDIchild_Tot_Sum, na.rm=TRUE)
+```{r include=FALSE}
+Gender <- c("Male", "Female", "All")
+Score <- c(mean(cdi_m$CDIchild_Tot_Sum, na.rm=TRUE), mean(cdi_f$CDIchild_Tot_Sum, na.rm=TRUE),mean(cdi$CDIchild_Tot_Sum, na.rm=TRUE))
+cdi_df <- data.frame(Gender, Score)
+```
 
-cdi_df <- data.frame(sand_cdi_total_mean, sand_cdi_female_mean, sand_cdi_male_mean)
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(data=cdi_df, aes(x=Gender, y=Score, fill=Gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("CDI SAND Sample") + theme(legend.position = "none")
+```
 
-gender <- c("male", "female", "all")
-scores <- c(mean(cdi_m$CDIchild_Tot_Sum), mean(cdi_f$CDIchild_Tot_Sum),mean(cdi_m$CDIchild_Tot_Sum))
-cdi_df <- data.frame(gender, scores)
+```{r include=FALSE}
+rm(cdi_df)
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+cdi1 <- merge(cdi, demo, by="id")
+ggplot(data=cdi1, aes(x=race, y=CDIchild_Tot_Sum, fill=race)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("CDI SAND Sample") + theme(legend.position = "none") + ylab("CDI Total")
+rm(cdi1)
 ```
 
 ## Kovacs, 2001 (CDI2 Manual)
@@ -103,20 +137,15 @@ rm(Age)
 rm(Gender)
 rm(CDI)
 
-df %>%
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+#df %>%
+  #kable() %>%
+  ##kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
 ggplot(data=df, aes(x=Age, y=CDI, fill=Gender)) + 
   geom_bar(stat="identity", position="dodge") + ggtitle("Kovacs, 2001")
 
 rm(df)
 ```
-
-```{r}
-
-```
-
 
 ```{r include=FALSE}
 #Kovacs, M. (2011). Children's depression inventory (CDI2): Technical manual. North Tonawanda, NY: Multi-Health Systems, Inc.
@@ -148,9 +177,9 @@ df$CDI[df$Race == "White"] <- 8.84
 df$CDI[df$Race == "Black"] <- 8.67
 df$CDI[df$Race == "Hispanic"] <- 10.34
 
-df %>%
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+#df %>%
+  #kable() %>%
+  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
 col <- c("red", "blue", "green")
 
@@ -191,9 +220,9 @@ df$CDI[df$Gender == "Female" & df$Race == "Hispanic"] <- 11.33
 df$CDI[df$Gender == "Male" & df$Race == "Other"] <- 9.41
 df$CDI[df$Gender == "Female" & df$Race == "Other"] <- 9.18
 
-df %>%
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+#df %>%
+  #kable() %>%
+  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
 ggplot(data=df, aes(x=Race, y=CDI, fill=Gender)) + 
   geom_bar(stat="identity", position="dodge") + ggtitle("McLaughlin, Hilt, & Nolen-Hoeksema, 2007")
@@ -236,9 +265,9 @@ rm(Gender)
 rm(Time)
 rm(CDI)
 
-df %>%
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+#df %>%
+  #kable() %>%
+  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
 ggplot(data=df, aes(x=Time, y=CDI, fill=Gender)) + 
   geom_bar(stat="identity", position="dodge") + ggtitle("Chaplin, Gillham, & Seligman, 2009")
@@ -251,6 +280,30 @@ citep("10.1177/0272431608320125") #Chaplin, Gillham, & Seligman, 2009
 ```
 
 # Mood and Feelings Questionnaire
+
+## SAND Sample
+
+```{r include=FALSE}
+Gender <- c("Male", "Female", "All")
+Score <- c(mean(mfq_m$MFQ_C_Sum, na.rm=TRUE), mean(mfq_f$MFQ_C_Sum, na.rm=TRUE),mean(mfq$MFQ_C_Sum, na.rm=TRUE))
+mfq_df <- data.frame(Gender, Score)
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(data=mfq_df, aes(x=Gender, y=Score, fill=Gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("MFQ SAND Sample") + theme(legend.position = "none")
+```
+
+```{r include=FALSE}
+rm(cdi_df)
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+mfq1 <- merge(mfq, demo, by="id")
+ggplot(data=mfq1, aes(x=race, y=MFQ_C_Sum, fill=race)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("MFQ SAND Sample") + theme(legend.position = "none") + ylab("MFQ Total")
+rm(mfq1)
+```
 
 ## Banh et al., 2012
 
@@ -286,9 +339,9 @@ rm(Race)
 rm(Criteria)
 rm(MFQ)
 
-df %>%
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+#df %>%
+  #kable() %>%
+  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
 ggplot(data=df, aes(x=Criteria, y=MFQ, fill=Race)) + 
   geom_bar(stat="identity", position="dodge") + ggtitle("Kuo, Stoep, & Stewart, 2005")
@@ -315,9 +368,9 @@ df <- data.frame(Criteria, MFQ)
 rm(Criteria)
 rm(MFQ)
 
-df %>%
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+#df %>%
+  #kable() %>%
+  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
 col2 <- c("#F8766D", "#00BFC4")
 
@@ -343,6 +396,30 @@ citep(" 10.1002/jcop.21904") #Stein, Taylor, Kulish, & Gonzalez
 
 # Screen for Child Anxiety Related Disorders
 
+## SAND Sample
+
+```{r include=FALSE}
+Gender <- c("Male", "Female", "All")
+Score <- c(mean(scared_m$SCARED_C_Sum, na.rm=TRUE), mean(scared_f$SCARED_C_Sum, na.rm=TRUE),mean(scared$SCARED_C_Sum, na.rm=TRUE))
+scared_df <- data.frame(Gender, Score)
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(data=scared_df, aes(x=Gender, y=Score, fill=Gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("SCARED SAND Sample") + theme(legend.position = "none")
+```
+
+```{r include=FALSE}
+rm(scared_df)
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+scared1 <- merge(scared, demo, by="id")
+ggplot(data=scared1, aes(x=race, y=SCARED_C_Sum, fill=race)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("CDI SAND Sample") + theme(legend.position = "none") + ylab("SCARED Total")
+rm(scared1)
+```
+
 ## Birmaher et al., 1997 (the original study)
 
 * All participants were attending a mood/anxiety disorders clinic at the time of study
@@ -360,9 +437,9 @@ df <- data.frame(Diagnosis, mean_SCARED)
 rm(Diagnosis)
 rm(mean_SCARED)
 
-df %>%
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+#df %>%
+  #kable() %>%
+  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
 ggplot(data=df, aes(x=Diagnosis, y=mean_SCARED, fill=col2)) + 
   geom_bar(stat="identity") + ggtitle("Birmaher et al., 1999") + ylab("Mean SCARED Score") + theme(legend.position = "none")
@@ -389,9 +466,9 @@ df <- data.frame(Diagnosis, mean_SCARED)
 rm(Diagnosis)
 rm(mean_SCARED)
 
-df %>%
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+#df %>%
+  #kable() %>%
+  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
 ggplot(data=df, aes(x=Diagnosis, y=mean_SCARED, fill=col2)) + 
   geom_bar(stat="identity") + ggtitle("Birmaher et al., 1999") + ylab("Mean SCARED Score") + theme(legend.position = "none")
@@ -454,9 +531,9 @@ rm(Subscale)
 rm(Gender)
 rm(Score)
 
-df %>%
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+#df %>%
+  #kable() %>%
+  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
 ggplot(data=df, aes(x=Subscale, y=Score, fill=Gender)) + 
   geom_bar(stat="identity", position="dodge") + ggtitle("Boyd, Ginsburg, Lambert, Cooley, & Campbell, 2003")
