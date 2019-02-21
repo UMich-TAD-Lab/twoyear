@@ -4,6 +4,7 @@ author: "Julianna Calabrese"
 date: "February 21, 2019"
 output:
   rmarkdown::html_document:
+    self_contained: no
     theme: united
     highlight: tango
 editor_options: 
@@ -45,14 +46,92 @@ library(papaja)
 library(knitcitations)
 ```
 
+```{r include=FALSE}
+cdi <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/kessler/cdi.csv')
+mfq <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/kessler/mfq.csv')
+scared <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/kessler/scared.csv')
+demo <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/kessler/full_demo.csv')
+names(cdi)[names(cdi) == "ï..id"] <- "id"
+names(mfq)[names(mfq) == "ï..id"] <- "id"
+names(scared)[names(scared) == "ï..id"] <- "id"
+```
+
+```{r}
+cdi2 <- Reduce(function(x, y) merge(x, y, all=TRUE), list(cdi, demo))
+cdi_f <- cdi2[ which(cdi2$gender =='F'), ]
+cdi_m <- cdi2[ which(cdi2$gender =='M'), ]
+rm(cdi2)
+
+mfq2 <- Reduce(function(x, y) merge(x, y, all=TRUE), list(mfq, demo))
+mfq_f <- mfq2[ which(mfq2$gender =='F'), ]
+mfq_m <- mfq2[ which(mfq2$gender =='M'), ]
+rm(mfq2)
+
+scared2 <- Reduce(function(x, y) merge(x, y, all=TRUE), list(scared, demo))
+scared_f <- scared2[ which(scared2$gender =='F'), ]
+scared_m <- scared2[ which(scared2$gender =='M'), ]
+rm(scared2)
+```
+
 # Children's Depression Inventory
+
+## Sand Sample
+
+```{r}
+sand_cdi_total_mean <- mean(cdi$CDIchild_Tot_Sum, na.rm=TRUE)
+sand_cdi_male_mean <- mean(cdi_m$CDIchild_Tot_Sum, na.rm=TRUE)
+sand_cdi_female_mean <- mean(cdi_f$CDIchild_Tot_Sum, na.rm=TRUE)
+
+cdi_df <- data.frame(sand_cdi_total_mean, sand_cdi_female_mean, sand_cdi_male_mean)
+
+gender <- c("male", "female", "all")
+scores <- c(mean(cdi_m$CDIchild_Tot_Sum), mean(cdi_f$CDIchild_Tot_Sum),mean(cdi_m$CDIchild_Tot_Sum))
+cdi_df <- data.frame(gender, scores)
+```
+
+## Kovacs, 2001 (CDI2 Manual)
+
+* N = 1266 from Florida public schools, 53% female
+* Didn't gather data on race/ethnicity but estimated that the sample was 77% White, mostly middle class
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Age <- c("Age 7-12", "Age 13-17", "Age 7-12", "Age 13-17", "Age 7-12", "Age 13-17")
+Gender <- c("Male", "Male", "Female", "Female", "All", "All")
+CDI <- c(10.76, 11.36, 9, 9.74, 9.81, 10.49)
+df <- data.frame(Age, Gender, CDI)
+rm(Age)
+rm(Gender)
+rm(CDI)
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+ggplot(data=df, aes(x=Age, y=CDI, fill=Gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Kovacs, 2001")
+
+rm(df)
+```
+
+```{r}
+
+```
+
+
+```{r include=FALSE}
+#Kovacs, M. (2011). Children's depression inventory (CDI2): Technical manual. North Tonawanda, NY: Multi-Health Systems, Inc.
+```
 
 ## Twenge & Nolen-Hoeksema, 2002
 
-* Meta-analysis on 310 samples/studies, aged 8-16, N = 61,424, 51.7% female, from U.S. or Canada
+* Meta-analysis on 310 samples/studies
+    * N = 61,424 
+    * aged 8-16
+    * 51.7% female
+    * All from U.S. or Canada
 * Data used was collected between 1980 and 1998
 * Each study may have had multiple waves
-* No SES differences, no score differences in white vs. black samples
+* No SES differences, no score differences in White vs. Black samples
 * Hispanic samples scored significantly higher on the CDI
 * There was an interaction between age and gender
     * Girls' CDI scores were steady 8-12, then increased
@@ -60,71 +139,63 @@ library(knitcitations)
     * Boys' CDI were steady 8-16 except were a bit higher at age 12
     
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-race <- c("white", "black", "hispanic")
-cdi <- 0
-df <- data.frame(race, cdi)
-rm(race)
-rm(cdi)
-df$cdi[df$race == "white"] <- 8.84
-df$cdi[df$race == "black"] <- 8.67
-df$cdi[df$race == "hispanic"] <- 10.34
+Race <- c("White", "Black", "Hispanic")
+CDI <- 0
+df <- data.frame(Race, CDI)
+rm(Race)
+rm(CDI)
+df$CDI[df$Race == "White"] <- 8.84
+df$CDI[df$Race == "Black"] <- 8.67
+df$CDI[df$Race == "Hispanic"] <- 10.34
 
 df %>%
   kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
-ggplot(data=df, aes(x=race, y=cdi)) + 
-  geom_bar(stat="identity") + ggtitle("Twenge & Nolen-Hoeksema, 2002")
+col <- c("red", "blue", "green")
+
+ggplot(data=df, aes(x=Race, y=CDI, fill=col)) + 
+  geom_bar(stat="identity") + ggtitle("Twenge & Nolen-Hoeksema, 2002") + theme(legend.position = "none")
+
+rm(col)
 ```
 
 ```{r include=FALSE}
 citep("10.1037/0021-843X.111.4.578") #Twenge & Nolen-Hoeksema
 ```
 
-## Zhu, 2018
-
-* Used a sample from 1995-1996, N = 4228, grades 7th to 12th, 52.3% female, all from the United States
-* **Did not use the CDI**
-* Measured depression using the "Center for Epidemiologic Studies-Depression Scale (CES-D"
-* Adolescents participated in two waves with one year in between
-* An adolescent is more likely to be depressed one year later if they are:
-    * Female
-    * African-American
-    * Have low perceived family support and low school connectedness
-
-```{r include=FALSE}
-citep("10.3390/socsci7050072") #Zhu
-```
-
 ## McLaughlin, Hilt, & Nolen-Hoeksema, 2007
 
 * Recruited sample from two middle schools in central Connecitcut (I think around 2001ish, it's unclear)
-* N = 1065, grades 6th to 8th, 51.2% male, 57% Hispanic/Latino
+    * N = 1065
+    * Grades 6th to 8th
+    * 51.2% male
+    * 57% Hispanic/Latino
 * Hispanic females had the highest CDI scores
 * Hispanic adolescents (esp. females) and Black males had higher anxiety levels than other groups
 
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-gender <- c("male", "male", "male", "male", "female", "female", "female", "female")
-race <- c("white", "black", "hispanic", "other", "white", "black", "hispanic", "other")
-cdi <- 0
-df <- data.frame(gender, race, cdi)
-rm(gender)
-rm(race)
-rm(cdi)
-df$cdi[df$gender == "male" & df$race == "white"] <- 8.33
-df$cdi[df$gender == "female" & df$race == "white"] <- 8.13
-df$cdi[df$gender == "male" & df$race == "black"] <- 9.55
-df$cdi[df$gender == "female" & df$race == "black"] <- 8.52
-df$cdi[df$gender == "male" & df$race == "hispanic"] <- 9.07
-df$cdi[df$gender == "female" & df$race == "hispanic"] <- 11.33
-df$cdi[df$gender == "male" & df$race == "other"] <- 9.41
-df$cdi[df$gender == "female" & df$race == "other"] <- 9.18
+Gender <- c("Male", "Male", "Male", "Male", "Female", "Female", "Female", "Female")
+Race <- c("White", "Black", "Hispanic", "Other", "White", "Black", "Hispanic", "Other")
+CDI <- 0
+df <- data.frame(Gender, Race, CDI)
+rm(Gender)
+rm(Race)
+rm(CDI)
+df$CDI[df$Gender == "Male" & df$Race == "White"] <- 8.33
+df$CDI[df$Gender == "Female" & df$Race == "White"] <- 8.13
+df$CDI[df$Gender == "Male" & df$Race == "Black"] <- 9.55
+df$CDI[df$Gender == "Female" & df$Race == "Black"] <- 8.52
+df$CDI[df$Gender == "Male" & df$Race == "Hispanic"] <- 9.07
+df$CDI[df$Gender == "Female" & df$Race == "Hispanic"] <- 11.33
+df$CDI[df$Gender == "Male" & df$Race == "Other"] <- 9.41
+df$CDI[df$Gender == "Female" & df$Race == "Other"] <- 9.18
 
 df %>%
   kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
-ggplot(data=df, aes(x=race, y=cdi, fill=gender)) + 
+ggplot(data=df, aes(x=Race, y=CDI, fill=Gender)) + 
   geom_bar(stat="identity", position="dodge") + ggtitle("McLaughlin, Hilt, & Nolen-Hoeksema, 2007")
 
 rm(df)
@@ -137,10 +208,13 @@ citep("10.1007/s10802-007-9128-1") #McLaughlin, Hilt, & Nolen-Hoeksema
 ## Bjorkenstam, Pebley, Burstrom, & Kosidou, 2017
 
 * Obtained data from the Child Development Supplement to the Panel Study of Income Dynamics, a nationally representative sample from three waves: 1997, 2002, and 2007, oversampled for African-American and low-income families
-* N = 2223, born between 1985 and 1995, 50% female, 65% white, 17% African-American, 13% Hispanic
+    * N = 2223
+    * Born between 1985 and 1995
+    * 50% female
+    * 65% White
 * Individuals exposed to childhood social adversity had higher CDI scores
 * Didn't look at CDI scores in relation to gender or race
-* Reported an overall mean CDI of 2.8, but I don't think that's right???
+* Reported an overall mean CDI of 2.8 (which is really low! I don't know why this is!)
 
 ```{r include=FALSE}
 citep("10.1016/j.jad.2017.01.035") #Bjorkenstam, Pebley, Burstrom, & Kosidou, 2017
@@ -148,28 +222,257 @@ citep("10.1016/j.jad.2017.01.035") #Bjorkenstam, Pebley, Burstrom, & Kosidou, 20
 
 ## Chaplin, Gillham, & Seligman, 2009
 
-* Sample recruited from schools in northeastern US in 2002
-* N = 113, aged 11-14, 79% white, took measures at two times (one year apart)
-* Mean CDI score of 11.05
-* Girls had higher CDI scores than boys but it wasn't significant
+* **Community** sample recruited from schools in northeastern US in 2002
+* N = 113, aged 11-14, 79% White, 10% Black, took measures at two times (one year apart)
+* Overall mean CDI score was 11.05
+* Unable to make conclusions about race due to homogenous sample
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Gender <- c("Male", "Male", "Female", "Female")
+Time <- c("Time 1", "Time 2", "Time 1", "Time 2")
+CDI <- c(11.15, 7.65, 10.32, 8.72)
+df <- data.frame(Gender, Time, CDI)
+rm(Gender)
+rm(Time)
+rm(CDI)
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+ggplot(data=df, aes(x=Time, y=CDI, fill=Gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Chaplin, Gillham, & Seligman, 2009")
+
+rm(df)
+```
 
 ```{r include=FALSE}
 citep("10.1177/0272431608320125") #Chaplin, Gillham, & Seligman, 2009
 ```
 
-## mysterious kovacs, 2001
-
-apparently the CDI maker has a manual that everyone references yet I cannot find online!!! maybe its in room 1415.
-
 # Mood and Feelings Questionnaire
 
+## Banh et al., 2012
 
+* Sample formed by  
+    * All from the Seattle Public School District
+    * N =  3593
+    * 6th to 8th graders
+    * 50.6% female
+    * 58% White
+* Paper didn't report mean MFQ scores for any subgroups
+* White students had the lowest rates of depression
 
+```{r include=FALSE}
+citep("10.1007/s10802-011-9569-4") #Banh et al
+```
+
+## Kuo, Stoep, & Stewart, 2005
+
+* Sample of **detained youth**
+    * N = 227
+    * aged 13-17
+    * 75% male
+    * 51% White
+* Data collected in 2002 from a detention center near Seattle
+* Female detainees and those who were the youngest and oldest the sample had high depression prevalence
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Race <- c("Black", "Black", "White", "White", "Other", "Other")
+Criteria <- c(">= 27", ">= 29", ">= 27", ">= 29", ">= 27", ">= 29")
+MFQ <- c(11, 11, 31, 23, 8, 8)
+df <- data.frame(Race, Criteria, MFQ)
+rm(Race)
+rm(Criteria)
+rm(MFQ)
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+ggplot(data=df, aes(x=Criteria, y=MFQ, fill=Race)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Kuo, Stoep, & Stewart, 2005")
+
+rm(df)
+```
+
+```{r include=FALSE}
+citep("10.1177/1073191105279984") #Kuo, Stoep, & Stewart
+```
+
+## Stoep et al., 2005
+
+* Used part or all of the sample that was used in Banh et al., 2012
+    * N = 861 6th graders
+    * 54% male
+    * 42% Asian
+* Didn't report score differences between subgroups
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Criteria <- c(">= 20", "< 20")
+MFQ <- c(120, 741)
+df <- data.frame(Criteria, MFQ)
+rm(Criteria)
+rm(MFQ)
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+col2 <- c("#F8766D", "#00BFC4")
+
+ggplot(data=df, aes(x=Criteria, y=MFQ, fill=col2)) + 
+  geom_bar(stat="identity") + ggtitle("Stoep et al., 2005") + ylab("Number of Participants") + theme(legend.position = "none")
+
+rm(df)
+```
+
+## Stein, Taylor, Kulish, & Gonzalez, 2017
+
+* **Sample was entirely Latino**, recruited from rural North Carolina schools
+    * N = 140
+    * 7th to 10th graders
+    * 47% male
+* Data collected at two times (one year apart)
+* Paper reports an overall depression mean of .29, which is very low!
+* Boys were less likely to report depression symptoms compared to girls
+
+```{r include=FALSE}
+citep(" 10.1002/jcop.21904") #Stein, Taylor, Kulish, & Gonzalez
+```
+
+# Screen for Child Anxiety Related Disorders
+
+## Birmaher et al., 1997 (the original study)
+
+* All participants were attending a mood/anxiety disorders clinic at the time of study
+    * N = 341
+    * 59% female
+    * 82% White
+    * aged 8-19
+* No differences between races
+* Total anxiety scores higher in girls than boys
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Diagnosis <- c("Anxiety Cases", "Non-Anxiety cases")
+mean_SCARED <- c(26.76, 17.24)
+df <- data.frame(Diagnosis, mean_SCARED)
+rm(Diagnosis)
+rm(mean_SCARED)
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+ggplot(data=df, aes(x=Diagnosis, y=mean_SCARED, fill=col2)) + 
+  geom_bar(stat="identity") + ggtitle("Birmaher et al., 1999") + ylab("Mean SCARED Score") + theme(legend.position = "none")
+
+rm(df)
+```
+
+```{r include=FALSE}
+citep("10.1097/00004583-199704000-00018") #Biramaher et al
+```
+
+## Birmaher et al., 1999 (replication of the original study)
+
+* All participants were attending a mood/anxiety disorders clinic at the time of study
+    * N = 190
+    * aged 9-19
+    * 51% female
+    * 71% White
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Diagnosis <- c("Anxiety Cases", "Non-Anxiety cases")
+mean_SCARED <- c(36.1, 20.3)
+df <- data.frame(Diagnosis, mean_SCARED)
+rm(Diagnosis)
+rm(mean_SCARED)
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+ggplot(data=df, aes(x=Diagnosis, y=mean_SCARED, fill=col2)) + 
+  geom_bar(stat="identity") + ggtitle("Birmaher et al., 1999") + ylab("Mean SCARED Score") + theme(legend.position = "none")
+
+rm(df)
+rm(col2)
+```
+
+```{r include=FALSE}
+citep("10.1097/00004583-199910000-00011") #Biramaher et al
+```
+
+## Pantaleao & Ohannessian, 2018
+
+* **Communtiy sample**
+    * N = 980
+    * 53% female
+    * 58% White
+    * 10th and 11th graders
+    * Recruited from 7 Mid-Atlantic high schools in 2007
+* Data collected at 3 times (each a year apart)
+* Sample drawn from a larger project (the Adolescent Adjustment Project)
+* Overall SCARED mean was 19.69
+* Girls reported higher anxiety scores than boys
+* No conclusions made about race or other subgroups
+
+```{r include=FALSE}
+citep("10.1007/s10826-018-1289-8") #Pantaleao & Ohannessian
+```
+
+## Wren et al., 2006
+
+* **Consecutive sample**, participants were recruited from pediatric primary care clinic waiting rooms
+    * N = 515
+    * aged 8-12
+    * 50.9% female
+    * 37% White, 33% Hispanic
+* Predictors of higher SCARED scores were less parental education, the child being younger, and the child being female
+* Hispanic children reported the highest anxiety and Asian children reported the lowest
+
+![From Wren et al., 2006.](/C:/Users/jrcala/Desktop/monks_task/kessler/figure1.png)
+
+```{r include=FALSE}
+citep(" 10.1097/chi.0b013e31802f1267") #Wren et al., 2006
+```
+
+## Boyd, Ginsburg, Lambert, Cooley, & Campbell, 2003
+
+* Sample was **entirely African-American** and was recruited from American parochial school
+    * N = 111
+    * aged 12-19
+    * 50% female
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Subscale <- c("Somatic/Panic", "Gen Anx", "Sep Anx", "Social Phobia", "School Phobia", "Total SCARED", "Somatic/Panic", "Gen Anx", "Sep Anx", "Social Phobia", "School Phobia", "Total SCARED")
+Gender <- c("Male", "Male", "Male", "Male", "Male", "Male", "Female", "Female", "Female", "Female", "Female", "Female")
+Score <- c(3.56, 4.79, 2.72, 4.98, 1.65, 17.69, 4.47, 6.80, 2.89, 6.16, 2.18, 22.45)
+df <- data.frame(Subscale, Gender, Score)
+rm(Subscale)
+rm(Gender)
+rm(Score)
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+ggplot(data=df, aes(x=Subscale, y=Score, fill=Gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Boyd, Ginsburg, Lambert, Cooley, & Campbell, 2003")
+
+rm(df)
+```
+
+```{r include=FALSE}
+citep("10.1097/00004583-200310000-00009")
+```
 
 ## References
 
+Kovacs, M. (2011). Children's depression inventory (CDI2): Technical manual. North Tonawanda, NY: Multi-Health Systems, Inc.
+
 ```{r Citations, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+#Manually citing the books above
 bibliography(style="html")
 ```
-
-
