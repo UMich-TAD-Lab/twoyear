@@ -1,5 +1,5 @@
 ---
-title: 'Stuff we found and stuff other people found: the sequel'
+title: 'Lit Review for the CDI, MFQ, and SCARED'
 author: "Julianna Calabrese"
 date: "February 21, 2019"
 output:
@@ -109,7 +109,7 @@ cdi_df <- data.frame(Gender, Score)
 
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(data=cdi_df, aes(x=Gender, y=Score, fill=Gender)) + 
-  geom_bar(stat="identity", position="dodge") + ggtitle("CDI SAND Sample") + theme(legend.position = "none")
+  geom_bar(stat="identity", position="dodge") + ggtitle("CDI Total Sum in SAND Sample") + theme(legend.position = "none")
 ```
 
 ```{r include=FALSE}
@@ -255,6 +255,7 @@ citep("10.1016/j.jad.2017.01.035") #Bjorkenstam, Pebley, Burstrom, & Kosidou, 20
 * N = 113, aged 11-14, 79% White, 10% Black, took measures at two times (one year apart)
 * Overall mean CDI score was 11.05
 * Unable to make conclusions about race due to homogenous sample
+* Males had higher CDI scores at Time 1, but females had higher scores at Time 2, although both genders reported oervall reduced scores at Time 2 compared to Time 1
 
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 Gender <- c("Male", "Male", "Female", "Female")
@@ -269,14 +270,60 @@ rm(CDI)
   #kable() %>%
   #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 
-ggplot(data=df, aes(x=Time, y=CDI, fill=Gender)) + 
-  geom_bar(stat="identity", position="dodge") + ggtitle("Chaplin, Gillham, & Seligman, 2009")
+#ggplot(data=df, aes(x=Time, y=CDI, fill=Gender)) + 
+  #geom_bar(stat="identity", position="dodge") + ggtitle("Chaplin, Gillham, & Seligman, 2009")
 
 rm(df)
 ```
 
 ```{r include=FALSE}
 citep("10.1177/0272431608320125") #Chaplin, Gillham, & Seligman, 2009
+```
+
+## McLaughlin, Hatzenbuehler, Mennin, & Nolen-Hoeksema, 2011
+
+* N = 1065
+    * Grades 6th to 8th
+    * Recruited from middle schools in Connecticut
+    * 51% male
+    * 57% Hispanic/Latino
+* Data collected at two time points separated by seven months
+* Did not report means
+* All analyses controlled for gender and race/ethnicity
+
+```{r include=FALSE}
+citep("10.1016/j.brat.2011.06.003")
+```
+
+## McLaughlin & King, 2015
+
+* The same sample used in McLaughlin, Hatzenbuehler, Mennin, & Nolen-Hoeksema, 2011
+* N = 1065
+    * Grades 6th to 8th
+    * Aged 10-15
+    * 51% male
+    * 57% Hispanic/Latino
+* Data collected at 3 time points
+* Did not report differences between subgroups except gender
+* Females reported higher CDI scores than males
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Gender <- c("Male", "Male", "Male", "Female", "Female", "Female")
+Time <- c("Time 1", "Time 2", "Time 3", "Time 1", "Time 2", "Time 3")
+CDI <- c(9.11, 9.7, 9.07, 10.25, 10.73, 9.7)
+df <- data.frame(Gender, Time, CDI)
+rm(Gender)
+rm(Time)
+rm(CDI)
+
+ggplot(data=df, aes(x=Time, y=CDI, fill=Gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("McLaughlin & King, 2015")
+
+rm(df)
+```
+
+```{r include=FALSE}
+citep("10.1007/s10802-014-9898-1") #McLaughlin & King, 2015
 ```
 
 # Mood and Feelings Questionnaire
@@ -291,7 +338,7 @@ mfq_df <- data.frame(Gender, Score)
 
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(data=mfq_df, aes(x=Gender, y=Score, fill=Gender)) + 
-  geom_bar(stat="identity", position="dodge") + ggtitle("MFQ SAND Sample") + theme(legend.position = "none")
+  geom_bar(stat="identity", position="dodge") + ggtitle("MFQ Total Sum in SAND Sample") + theme(legend.position = "none")
 ```
 
 ```{r include=FALSE}
@@ -394,6 +441,53 @@ rm(df)
 citep(" 10.1002/jcop.21904") #Stein, Taylor, Kulish, & Gonzalez
 ```
 
+## Lewis et al., 2017
+
+* Sample recruited from Mumbai, India; Victoria, Australia; and Seattle, U.S.
+    * Total N = 7075
+    * 46% from India
+    * About even gender split
+    * 7th to 9th graders
+* Utilized the **Short Form MFQ**
+* Did not report data on race/ethnicity background
+* In India, males are more depressed than females, while the opposite is true in Australia and the U.S.
+
+```{r include=FALSE}
+Location <- c("Australia", "United States", "India")
+SMFQ <- c(7.4, 7.21, 10.21)
+df <- data.frame(Location, SMFQ)
+rm(Location)
+rm(SMFQ)
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(data=df, aes(x=Location, y=SMFQ, fill=Location)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Lewis et al., 2017") + theme(legend.position = "none")
+```
+
+```{r include=FALSE}
+rm(df)
+```
+
+```{r include=FALSE}
+citep("10.1016/j.jad.2017.01.020") #Lewis et al.
+```
+
+## Rhew et al., 2010
+
+* N = 521
+    * All from Seattle Public School District, part of the Developmental Pathways Program
+    * Aged 11-13
+    * 52% male
+    * 44% white, 26% African-American, 26% Asian
+    * Data collected in two waves
+* **Utilized the Short Form MFQ**
+* No significant differences for gender, race, or age
+
+```{r include=FALSE}
+citep("10.1186/1753-2000-4-8")
+```
+
 # Screen for Child Anxiety Related Disorders
 
 ## SAND Sample
@@ -416,7 +510,7 @@ rm(scared_df)
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 scared1 <- merge(scared, demo, by="id")
 ggplot(data=scared1, aes(x=race, y=SCARED_C_Sum, fill=race)) + 
-  geom_bar(stat="identity", position="dodge") + ggtitle("CDI SAND Sample") + theme(legend.position = "none") + ylab("SCARED Total")
+  geom_bar(stat="identity", position="dodge") + ggtitle("CDI Total Sum in SAND Sample") + theme(legend.position = "none") + ylab("SCARED Total")
 rm(scared1)
 ```
 
