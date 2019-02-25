@@ -192,7 +192,10 @@ summarytools::descr(scared_twoyear, style = "rmarkdown", na.rm=TRUE)
 
 ```{r}
 plot(scared_twoyear$id, scared_twoyear$scared_total_sum)
-plot(scared_twoyear$id, scared_twoyear$scared_)
+```
+
+```{r}
+plot(scared_twoyear$id, scared_twoyear$scared_total_mean)
 ```
 
 # Comparing Wave 15 and Two Year data
