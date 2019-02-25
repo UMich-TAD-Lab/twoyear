@@ -1,0 +1,281 @@
+---
+title: "scaredyouth_2yr"
+author: "Diane Choi"
+date: "February 18, 2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+## Load in library
+
+```{r include=FALSE}
+library(car)
+library(ggplot2)
+library(MASS)
+library(Hmisc)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(plyr)
+library(summarytools)
+library(psych)
+```
+
+First, you should download your survey data from Redcap in the form of a csv file. Instructions are on the Github readme. 
+
+# Pre-Analysis Cleaning for Two Year Data
+
+## Load in Two Year data
+
+Change the below syntax to fit your computer and where you put your data file, like Desktop or Documents. Replace scared_twoyear with whatever you want to call your dataset, e.g. data or nameofmeasure, just make sure you'll be able to tell that it's the two year data. 
+
+```{r}
+scared_twoyear <- read.csv("C:/Users/dicone/Desktop/SCAREDyouth_2yr.csv")
+```
+
+## Remove empty rows
+
+Replace scared_twoyear with whatever you want to call your dataset and replace scared1_1_2yr with whatever the first item of the dataset. The syntax removes all rows where there is NA for the first item, so theoretically, this should remove everyone who hasn't completed the Qualtrics survey first. This isn't perfect, since some people may have just happened to skip the first item, but this will do for preliminary statistics. 
+
+```{r}
+scared_twoyear <- scared_twoyear[!is.na(scared_twoyear$scared1_1_2yr),]
+```
+
+## Remove people with a lot of 88s and change any 88s to NA
+
+```{r}
+#scared_twoyear <- scared_twoyear[!scared_twoyear$scared_total_sum > 1700,] #removes row 73, which had a sum score over 1700
+scared_twoyear[scared_twoyear == 88] <- NA
+```
+
+## Re-scaling variables
+
+This requires a bit of foresight, but eventually you're going to want to compare the two year data with the original data. I know that the original SCARED data follows a 0-1-2 scale, but the two year data uses a 1-2-3 scale, so we're going to want to always alter the two year data to fit the original data. 
+
+```{r}
+scared_twoyear$scared1_1_2yr <- car::recode(scared_twoyear$scared1_1_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared1_2_2yr <- car::recode(scared_twoyear$scared1_2_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared1_3_2yr <- car::recode(scared_twoyear$scared1_3_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared1_4_2yr <- car::recode(scared_twoyear$scared1_4_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared1_5_2yr <- car::recode(scared_twoyear$scared1_5_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared1_6_2yr <- car::recode(scared_twoyear$scared1_6_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared2_7_2yr <- car::recode(scared_twoyear$scared2_7_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared2_8_2yr <- car::recode(scared_twoyear$scared2_8_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared2_9_2yr <- car::recode(scared_twoyear$scared2_9_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared2_10_2yr <- car::recode(scared_twoyear$scared2_10_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared2_11_2yr <- car::recode(scared_twoyear$scared2_11_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared2_12_2yr <- car::recode(scared_twoyear$scared2_12_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared3_13_2yr <- car::recode(scared_twoyear$scared3_13_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared3_14_2yr <- car::recode(scared_twoyear$scared3_14_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared3_15_2yr <- car::recode(scared_twoyear$scared3_15_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared3_16_2yr <- car::recode(scared_twoyear$scared3_16_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared3_17_2yr <- car::recode(scared_twoyear$scared3_17_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared3_18_2yr <- car::recode(scared_twoyear$scared3_18_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared4_19_2yr <- car::recode(scared_twoyear$scared4_19_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared4_20_2yr <- car::recode(scared_twoyear$scared4_20_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared4_21_2yr <- car::recode(scared_twoyear$scared4_21_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared4_22_2yr <- car::recode(scared_twoyear$scared4_22_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared4_23_2yr <- car::recode(scared_twoyear$scared4_23_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared4_24_2yr <- car::recode(scared_twoyear$scared4_24_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared5_25_2yr <- car::recode(scared_twoyear$scared5_25_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared5_26_2yr <- car::recode(scared_twoyear$scared5_26_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared5_27_2yr <- car::recode(scared_twoyear$scared5_27_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared5_28_2yr <- car::recode(scared_twoyear$scared5_28_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared5_29_2yr <- car::recode(scared_twoyear$scared5_29_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared5_30_2yr <- car::recode(scared_twoyear$scared5_30_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared6_31_2yr <- car::recode(scared_twoyear$scared6_31_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared6_32_2yr <- car::recode(scared_twoyear$scared6_32_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared6_33_2yr <- car::recode(scared_twoyear$scared6_33_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared6_34_2yr <- car::recode(scared_twoyear$scared6_34_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared6_35_2yr <- car::recode(scared_twoyear$scared6_35_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared6_36_2yr <- car::recode(scared_twoyear$scared6_36_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared6_37_2yr <- car::recode(scared_twoyear$scared6_37_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_twoyear$scared6_38_2yr <- car::recode(scared_twoyear$scared6_38_2yr, "1 = 0; 2 = 1; 3 = 2")
+```
+
+## Make a sum and a mean variable
+
+The below syntax creates two variables and adds them back to the dataset: the mean of all the items and the sum of all the items.
+
+```{r}
+names(scared_twoyear) #This prints the dataset's variables names so, which makes it so I don't totally have to write out each individual variable name
+
+scared_vars <- cbind(scared_twoyear$scared1_1_2yr, scared_twoyear$scared1_2_2yr, scared_twoyear$scared1_3_2yr, scared_twoyear$scared1_4_2yr, scared_twoyear$scared1_5_2yr, scared_twoyear$scared1_6_2yr, scared_twoyear$scared2_7_2yr, scared_twoyear$scared2_8_2yr, scared_twoyear$scared2_9_2yr, scared_twoyear$scared2_10_2yr, scared_twoyear$scared2_11_2yr, scared_twoyear$scared2_12_2yr, scared_twoyear$scared3_13_2yr, scared_twoyear$scared3_14_2yr, scared_twoyear$scared3_15_2yr, scared_twoyear$scared3_16_2yr, scared_twoyear$scared3_17_2yr, scared_twoyear$scared3_18_2yr, scared_twoyear$scared4_19_2yr, scared_twoyear$scared4_20_2yr, scared_twoyear$scared4_21_2yr, scared_twoyear$scared4_22_2yr, scared_twoyear$scared4_23_2yr, scared_twoyear$scared4_24_2yr, scared_twoyear$scared5_25_2yr, scared_twoyear$scared5_26_2yr, scared_twoyear$scared5_27_2yr, scared_twoyear$scared5_28_2yr, scared_twoyear$scared5_29_2yr, scared_twoyear$scared5_30_2yr, scared_twoyear$scared6_31_2yr, scared_twoyear$scared6_32_2yr, scared_twoyear$scared6_33_2yr, scared_twoyear$scared6_34_2yr, scared_twoyear$scared6_35_2yr, scared_twoyear$scared6_36_2yr, scared_twoyear$scared6_37_2yr, scared_twoyear$scared6_38_2yr)
+
+```
+
+```{r}
+scared_twoyear$scared_total_mean <- rowMeans(scared_vars, na.rm=TRUE)
+```
+
+```{r}
+scared_twoyear$scared_total_sum <- rowSums(scared_vars, na.rm=TRUE)
+```
+
+```{r}
+rm(scared_vars)
+```
+
+## Calculate subscales
+
+SCARED has multiple subscales: social anxiety, general anxiety, panic disorder, etc. Below I calculate the Panic Disorder subscale. I'll bind all the items of that specific subscale, add them together, sum their rows, and put it back in the dataset with a new variable name. Then I remove the "binded" variables because we don't need that object anymore.
+
+```{r}
+panic_disorder <- cbind(scared_twoyear$scared1_1_2yr, scared_twoyear$scared1_6_2yr, scared_twoyear$scared2_9_2yr, scared_twoyear$scared2_12_2yr, scared_twoyear$scared3_15_2yr, scared_twoyear$scared3_18_2yr, scared_twoyear$scared4_19_2yr, scared_twoyear$scared4_23_2yr, scared_twoyear$scared4_24_2yr, scared_twoyear$scared5_27_2yr, scared_twoyear$scared5_30_2yr, scared_twoyear$scared6_34_2yr, scared_twoyear$scared6_38_2yr)
+
+scared_twoyear$panic_disorder <- rowSums(panic_disorder, na.rm=TRUE)
+
+scared_twoyear$panic_disorder <- rowMeans(panic_disorder, na.rm=TRUE)
+
+rm(panic_disorder)
+```
+
+```{r}
+generalized_anxiety_disorder <- cbind(scared_twoyear$scared1_5_2yr, scared_twoyear$scared2_7_2yr, scared_twoyear$scared3_14_2yr, scared_twoyear$scared4_21_2yr, scared_twoyear$scared4_22_2yr, scared_twoyear$scared5_28_2yr, scared_twoyear$scared6_33_2yr, scared_twoyear$scared6_35_2yr, scared_twoyear$scared6_37_2yr)
+
+scared_twoyear$generalized_anxiety_disorder <- rowSums(generalized_anxiety_disorder, na.rm=TRUE)
+
+scared_twoyear$generalized_anxiety_disorder <- rowMeans(generalized_anxiety_disorder, na.rm=TRUE)
+
+
+rm(generalized_anxiety_disorder)
+```
+
+```{r}
+separation_anxiety_disorder <- cbind(scared_twoyear$scared1_4_2yr, scared_twoyear$scared2_8_2yr, scared_twoyear$scared3_13_2yr, scared_twoyear$scared3_16_2yr, scared_twoyear$scared4_20_2yr, scared_twoyear$scared5_25_2yr, scared_twoyear$scared5_29_2yr, scared_twoyear$scared6_31_2yr)
+
+scared_twoyear$separation_anxiety_disorder <- rowSums(separation_anxiety_disorder, na.rm=TRUE)
+
+scared_twoyear$separation_anxiety_disorder <- rowMeans(separation_anxiety_disorder, na.rm=TRUE)
+
+rm(separation_anxiety_disorder)
+```
+
+```{r}
+social_anxiety_disorder <- cbind(scared_twoyear$scared1_3_2yr, scared_twoyear$scared2_10_2yr, scared_twoyear$scared5_26_2yr, scared_twoyear$scared6_32_2yr)
+
+scared_twoyear$social_anxiety_disorder <- rowSums(social_anxiety_disorder, na.rm=TRUE)
+
+scared_twoyear$social_anxiety_disorder <- rowMeans(social_anxiety_disorder, na.rm=TRUE)
+
+rm(social_anxiety_disorder)
+```
+
+```{r}
+school_avoidance <- cbind(scared_twoyear$scared1_2_2yr, scared_twoyear$scared2_11_2yr, scared_twoyear$scared3_17_2yr, scared_twoyear$scared6_36_2yr)
+
+scared_twoyear$school_avoidance <- rowSums(school_avoidance, na.rm=TRUE)
+
+scared_twoyear$school_avoidance <- rowMeans(school_avoidance, na.rm=TRUE)
+
+rm(school_avoidance)
+```
+
+# Descriptive statistics for two year data
+
+Now you can start to descriptive statistics. Below is a list of things that you might want to calculate for all the items. Make sure to be careful to not run statistics on the *entire* dataset, as the entire dataset includes id, scared_youth_paper_2yr, and scared_youth_complete, and those aren't meaningful variables.
+
+* Sum
+* Mean
+* Median
+* Std dev
+* Std error
+* Min/max/range
+* IQR
+* Kurtosis
+* Skewness
+
+```{r, results='asis'}
+summarytools::descr(scared_twoyear, style = "rmarkdown", na.rm=TRUE)
+```
+
+```{r}
+plot(scared_twoyear$id, scared_twoyear$scared_total_sum)
+plot(scared_twoyear$id, scared_twoyear$scared_)
+```
+
+# Comparing Wave 15 and Two Year data
+
+First, follow the instructions on the Github readme to download the original Wave 15 data for your measure. Once you've done that, read in your data.
+
+## Load in Wave 15 data
+
+```{r}
+scared_original <- read.csv("C:/Users/dicone/Desktop/SCARED_original.csv")
+names(scared_original)[names(scared_original) == "ï..id"] <- "id"
+#Don't ask why the id variable looks funny, it just does that sometimes when exporting/importing.
+```
+
+
+```{r}
+View(scared_original)
+```
+
+## Merge the original and two year datasets
+
+Merging the datasets drops all the IDs in scared_original that aren't present in scared_twoyear. Since we've combined the datasets into a new dataset ("scared"), there is no need to the keep the old datasets (and any objects associated with either of those datasets) in our environment. Additionally, as long as you don't move your data files and you keep all the code above, you can get them right back where they were if you realize that you need them back. 
+
+```{r}
+scared <- merge(scared_original, scared_twoyear, by="id")
+```
+
+```{r}
+rm(scared_twoyear)
+rm(scared_original)
+```
+
+## Add demographic data
+
+There is a file called "demographic.csv" and it is located in the "Data Cleaning Protocol" on the Fragile Families server (it's at the very bottom). Copy it and paste the copy to your desktop. As of 2/15/19, this file contains gender (F or M), date of birth (in MM/DD/YYYY format), monthly and yearly income (coded on a 0-12 scale where each number represents a range (e.g., for yr_income, 0 corresponds to $4,999 or less), and race. Race is coded in multiple ways. There is a column called "race" where each row has a value such as "Black" or "Missing". "racenum" directly corresponds to this, but has numbers instead of words (i.e. 1 = Black, 2 = White, etc.). There is also a column for each category; so under the "Asian" column, if there is a 1, then that participant identified as Asian, but if there is a 0, then that participant could've identified as Black, White, etc.. The dataset demographic.csv may also require some wrangling, like you may want to create an age variable based on their birthday and the day that you're doing data analysis. Or if you're doing something with yearly income, you may want to exclude all the rows that have "NA" since not all participants wanted to report their income. 
+
+```{r}
+demographic <- read.csv("C:/Users/dicone/Desktop/demographic.csv")
+scared <- merge(scared, demographic, by="id")
+rm(demographic)
+```
+
+## Cleaning/managing the combined dataset
+
+Just by looking at my dataset, I can tell that some people decided to entirely skip the SCARED survey during their Wave 15 visit. I can tell this because there's a long row of NA's or 88's. For SCARED, these people include 10134 and 10219, which are rows 51 and 89 respectively. It might be best to remove them. We'll use the same syntax that we used to drop empty rows at the beginning.
+
+```{r}
+scared <- scared[-c(51, 89), ]
+```
+
+Also, whenever a value is missing or not applicable, we've been coding it as 88 and -99. We should take all the values that equal 88 or -99 and make them NA.
+
+```{r}
+scared[scared=="88"] <- NA
+
+scared[scared=="-99"] <- NA
+```
+
+## Descriptive statistics on the combined dataset
+
+Now we have a dataset that includes the original and two year data, so we can start answering questions: have participants' anxiety gotten worse over two years? Gotten better? Maybe worse with panic disorder but not with social anxiety? 
+
+Feel free to add age or gender to your analyses, but just be careful with how the data is formatted. You might want to re-code gender so instead of it being M/F, it would be 0=Male and 1=Female. Also for age, you might to want make TeenBirthday a numeric variable by subtracting it from today's date.
+
+```{r Basic stuff}
+mean(scared$SCARED_C_Sum)
+mean(scared$scared_total_sum)
+
+sd(scared$SCARED_C_Sum)
+sd(scared$scared_total_sum)
+
+hist(scared$SCARED_C_Sum)
+hist(scared$scared_total_sum)
+```
+
+```{r}
+cor.test(scared$SCARED_C_Sum, scared$scared_total_sum) #Is there a correlation between the old and new scores?
+```
+
+```{r}
+t.test(scared$SCARED_C_Sum, scared$scared_total_sum) #Is there a significant difference between these two scores?
+```
+
+```{r}
+plot(scared$SCARED_C_Sum, scared$scared_total_sum)
+```
