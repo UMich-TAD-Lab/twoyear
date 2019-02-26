@@ -448,7 +448,7 @@ df <- data.frame(Groups, Scores)
 col <- c("#F8766D", "#00BFC4", "#7CAE00", "#C77CFF")
 
 ggplot(data=df, aes(x=Groups, y=Scores, fill=col)) + 
-  geom_bar(stat="identity", position="dodge") + ggtitle("Daviss et al., 2006 vs. SAND Sample") + ylab("") + scale_fill_discrete(name="Study") + xlab("MFQ Total")  + theme(legend.position = "none")
+  geom_bar(stat="identity", position="dodge") + ggtitle("Daviss et al., 2006 vs. SAND Sample") + ylab("") + scale_fill_discrete(name="Study") + ylab("MFQ Total") + xlab("")  + theme(legend.position = "none")
 
 rm(df)
 rm(col)
@@ -456,10 +456,9 @@ rm(Groups)
 rm(Scores)
 ```
 
-```{r}
+```{r include=FALSE}
 citep("10.1111/j.1469-7610.2006.01646.x") #Daviss et al., 2006
 ```
-
 
 # Screen for Child Anxiety Related Disorders
 
@@ -520,19 +519,24 @@ rm(school_avoidance)
 ```
 
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-df <- data.frame(scared$gender, scared$panic_disorder, scared$generalized_anxiety_disorder, scared$separation_anxiety_disorder, scared$social_anxiety_disorder, scared$school_avoidance)
-names(df) <- substring(names(df),8,99)
-df1 <- melt(df, id.vars="gender")
+df <- data.frame(mean(scared$panic_disorder), mean(scared$generalized_anxiety_disorder), mean(scared$separation_anxiety_disorder), mean(scared$social_anxiety_disorder), mean(scared$school_avoidance))
+names(df) <- substring(names(df),13,99)
+df1 <- data.frame(t(df))
 labels <- c("Panic Disorder", "Generalized Anxiety", "Separation Anxiety", "Social Anxiety", "School Avoidance")
+df1$labels <- labels
+names(df1)[names(df1) == "t.df."] <- "Scores"
+col <- rainbow(5)
 
-ggplot(data=df1, aes(x=variable, y=value, fill=gender)) + 
-  geom_bar(stat="identity", position="dodge") + ggtitle("SCARED SAND Sample Subscales") + 
+ggplot(data=df1, aes(x=labels, y=Scores, fill=col)) + 
+  geom_bar(stat="identity") + ggtitle("SCARED SAND Sample Subscales") + 
   theme(legend.position = "right") + ylab("Subscale Total") + xlab("") +
   scale_x_discrete(labels=labels) +
-  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) 
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + theme(legend.position = "none")
+
 rm(df)
 rm(df1)
 rm(labels)
+rm(col)
 ```
 
 ## Birmaher et al., 1997 (the original study)
