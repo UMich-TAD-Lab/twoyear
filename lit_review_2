@@ -81,8 +81,6 @@ rm(demo)
 
 ## SAND Sample CDI Subscales
 
-### Negative Mood/Physical Symptoms
-
 ```{r include=FALSE}
 neg_mood_dummy <- cbind(cdi$cdic1, cdi$cdic26, cdi$cdic27, cdi$cdic9, cdi$cdic10_recode, cdi$cdic15_recode, cdi$cdic16_recode, cdi$cdic17, cdi$cdic18_recode)
 cdi$neg_mood <- rowSums(neg_mood_dummy, na.rm=TRUE)
@@ -118,12 +116,43 @@ labels <- c("Negative Mood", "Negative Self-Esteem", "Ineffectiveness", "Interpe
 ggplot(data=df1, aes(x=variable, y=value, fill=gender)) + 
   geom_bar(stat="identity", position="dodge") + ggtitle("CDI SAND Sample Subscales") + 
   theme(legend.position = "right") + ylab("Subscale Total") + xlab("") +
-  labs(caption = "Please note that the Emotional Problems subscale is a combination of the Negative Mood and Negative Self-Esteem subscales, and the Functional Problems is a combination of the Ineffectiveness and Interpersonal subscales.") +
   scale_x_discrete(labels=labels) +
   theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) 
 rm(df)
 rm(df1)
 rm(labels)
+```
+
+Please note that the Emotional Problems subscale is a combination of the Negative Mood and Negative Self-Esteem subscales, and the Functional Problems is a combination of the Ineffectiveness and Interpersonal Problems subscales
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+cdi_survey <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review_2/cdic_data_dictionary.csv')
+
+names(cdi_survey)[names(cdi_survey) == "Item.Number"] <- "Item Number"
+names(cdi_survey)[names(cdi_survey) == "Item.Definition"] <- "Item Definition"
+names(cdi_survey)[names(cdi_survey) == "Option.1"] <- "Option 1"
+names(cdi_survey)[names(cdi_survey) == "Option.2"] <- "Option 2"
+names(cdi_survey)[names(cdi_survey) == "Option.3"] <- "Option 3"
+
+cdi_survey %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+rm(cdi_survey)
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Subscale <- c("Negative Mood", "Negative Self-Esteem", "Ineffectiveness", "Interpersonal Problems", "Emotional Problems", "Functional Problems")
+Items <- c("1, 10, 15, 16, 17, 18, 26, 27", "2, 6, 7, 8, 13, 24", "3, 4, 12, 14, 22, 23, 28", "5, 11, 19, 21, 25", "Negative Mood + Negative Self-Esteem", "Ineffectiveness + Interpersonal Problems")
+df <- data.frame(Subscale, Items)
+rm(Subscale)
+rm(Items)
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+rm(df)
 ```
 
 ## Kovacs, 2001 (CDI2 Manual)
@@ -155,75 +184,27 @@ Kovacs <- c(2.38, 1.98, 3.46, 1.86)
 SAND <- c((mean(cdi$factor1)), (mean(cdi$factor3)), (mean(cdi$factor4)), (mean(cdi$factor5)))
 df <- data.frame(Subscales, Kovacs, SAND)
 df1 <- melt(df, id.vars="Subscales")
+rm(Subscales)
+rm(Kovacs)
+rm(SAND)
 
 ggplot(data=df1, aes(x=Subscales, y=value, fill=variable)) + 
-  geom_bar(stat="identity", position="dodge") + ggtitle("Kovacs, 2001 with Normative Sample in Ages 13-17") + ylab("") + scale_fill_discrete(name="Study")
+  geom_bar(stat="identity", position="dodge") + ggtitle("Kovacs, 2001 with Normative Sample in Ages 13-17") + ylab("") + scale_fill_discrete(name="Study") + xlab("Subscale Scores")
 
 cdi$factor1 <- NULL
 cdi$factor3 <- NULL
 cdi$factor4 <- NULL
 cdi$factor5 <- NULL
+rm(df)
+rm(df1)
 ```
 
 ```{r include=FALSE}
 #Kovacs, M. (2011). Children's depression inventory (CDI2): Technical manual. North Tonawanda, NY: Multi-Health Systems, Inc.
 ```
 
-## Siegel et al., 1998
-
-* N = 877
-    * All recruited from Los Angeles area
-    * Aged 12-17
-    * 54% male
-    * 49% Hispanic/Latino
-* Girls reported higher CDI scores than boys
-* Hispanic/Latino adolescents reported the highest CDI scores
-* Did not examine subscales or specific symptoms
-
 ```{r include=FALSE}
-citep("10.1023/A:1022873601030") #Siegel et al., 1998
-```
-
-## Twenge & Nolen-Hoeksema, 2002
-
-* Meta-analysis on 310 samples/studies
-    * N = 61,424 
-    * aged 8-16
-    * 51.7% female
-    * All from U.S. or Canada
-* Data used was collected between 1980 and 1998
-* Each study may have had multiple waves
-* No SES differences, no score differences in White vs. Black samples
-* Hispanic samples scored significantly higher on the CDI
-* There was an interaction between age and gender
-    * Girls' CDI scores were steady 8-12, then increased
-    * Girls' CDI scores peaked at 15 and remained high at 16
-    * Boys' CDI were steady 8-16 except were a bit higher at age 12
-    
-```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-Race <- c("White", "Black", "Hispanic")
-CDI <- 0
-df <- data.frame(Race, CDI)
-rm(Race)
-rm(CDI)
-df$CDI[df$Race == "White"] <- 8.84
-df$CDI[df$Race == "Black"] <- 8.67
-df$CDI[df$Race == "Hispanic"] <- 10.34
-
-#df %>%
-  #kable() %>%
-  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
-
-col <- c("red", "blue", "green")
-
-ggplot(data=df, aes(x=Race, y=CDI, fill=col)) + 
-  geom_bar(stat="identity") + ggtitle("Twenge & Nolen-Hoeksema, 2002") + theme(legend.position = "none")
-
-rm(col)
-```
-
-```{r include=FALSE}
-citep("10.1037/0021-843X.111.4.578") #Twenge & Nolen-Hoeksema
+#citep("10.1037/0021-843X.111.4.578") #Twenge & Nolen-Hoeksema
 ```
 
 ## McLaughlin, Hilt, & Nolen-Hoeksema, 2007
@@ -234,32 +215,28 @@ citep("10.1037/0021-843X.111.4.578") #Twenge & Nolen-Hoeksema
     * 51.2% male
     * 57% Hispanic/Latino
 * Hispanic females had the highest CDI scores
+* Didn't look at subscales or symptoms, just CDI total scores
 
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-Gender <- c("Male", "Male", "Male", "Male", "Female", "Female", "Female", "Female")
-Race <- c("White", "Black", "Hispanic", "Other", "White", "Black", "Hispanic", "Other")
-CDI <- 0
-df <- data.frame(Gender, Race, CDI)
+cdi_f <- cdi[ which(cdi$gender =='F'), ]
+cdi_m <- cdi[ which(cdi$gender =='M'), ]
+
+Gender <- c("Male", "Female")
+McLaughlin <- c(9.09, 9.29)
+SAND <- c(mean(cdi_m$CDIchild_Tot_Sum, na.rm=TRUE), mean(cdi_f$CDIchild_Tot_Sum, na.rm=TRUE))
+df <- data.frame(Gender, McLaughlin, SAND)
+df1 <- melt(df, id.vars="Gender")
 rm(Gender)
-rm(Race)
-rm(CDI)
-df$CDI[df$Gender == "Male" & df$Race == "White"] <- 8.33
-df$CDI[df$Gender == "Female" & df$Race == "White"] <- 8.13
-df$CDI[df$Gender == "Male" & df$Race == "Black"] <- 9.55
-df$CDI[df$Gender == "Female" & df$Race == "Black"] <- 8.52
-df$CDI[df$Gender == "Male" & df$Race == "Hispanic"] <- 9.07
-df$CDI[df$Gender == "Female" & df$Race == "Hispanic"] <- 11.33
-df$CDI[df$Gender == "Male" & df$Race == "Other"] <- 9.41
-df$CDI[df$Gender == "Female" & df$Race == "Other"] <- 9.18
+rm(SAND)
+rm(McLaughlin)
 
-#df %>%
-  #kable() %>%
-  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
-
-ggplot(data=df, aes(x=Race, y=CDI, fill=Gender)) + 
-  geom_bar(stat="identity", position="dodge") + ggtitle("McLaughlin, Hilt, & Nolen-Hoeksema, 2007")
+ggplot(data=df1, aes(x=variable, y=value, fill=Gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("McLaughlin, Hilt, & Nolen-Hoeksema, 2007 vs. SAND Sample") + theme(legend.position = "right") + xlab("") + ylab("CDI Total Scores")
 
 rm(df)
+rm(df1)
+rm(cdi_f)
+rm(cdi_m)
 ```
 
 ```{r include=FALSE}
@@ -276,22 +253,25 @@ citep("10.1007/s10802-007-9128-1") #McLaughlin, Hilt, & Nolen-Hoeksema
 * Males had higher CDI scores at Time 1, but females had higher scores at Time 2, although both genders reported overall reduced scores at Time 2 compared to Time 1
 
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-Gender <- c("Male", "Male", "Female", "Female")
-Time <- c("Time 1", "Time 2", "Time 1", "Time 2")
-CDI <- c(11.15, 7.65, 10.32, 8.72)
-df <- data.frame(Gender, Time, CDI)
+cdi_f <- cdi[ which(cdi$gender =='F'), ]
+cdi_m <- cdi[ which(cdi$gender =='M'), ]
+
+Gender <- c("Male", "Female")
+Chaplin <- c(9.4, 9.52)
+SAND <- c(mean(cdi_m$CDIchild_Tot_Sum, na.rm=TRUE), mean(cdi_f$CDIchild_Tot_Sum, na.rm=TRUE))
+df <- data.frame(Gender, Chaplin, SAND)
+df1 <- melt(df, id.vars="Gender")
 rm(Gender)
-rm(Time)
-rm(CDI)
+rm(Chaplin)
+rm(SAND)
 
-#df %>%
-  #kable() %>%
-  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
-
-#ggplot(data=df, aes(x=Time, y=CDI, fill=Gender)) + 
-  #geom_bar(stat="identity", position="dodge") + ggtitle("Chaplin, Gillham, & Seligman, 2009")
+ggplot(data=df1, aes(x=variable, y=value, fill=Gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Chaplin, Gillham, & Seligman, 2009 vs. SAND Sample") + theme(legend.position = "right") + xlab("") + ylab("CDI Total Scores")
 
 rm(df)
+rm(df1)
+rm(cdi_f)
+rm(cdi_m)
 ```
 
 ```{r include=FALSE}
@@ -309,43 +289,115 @@ citep("10.1177/0272431608320125") #Chaplin, Gillham, & Seligman, 2009
 * Data collected at 3 time points
 * Did not report differences between subgroups except gender
 * Females reported higher CDI scores than males at all times
+* Didn't look at CDI subscales
 
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-Gender <- c("Male", "Male", "Male", "Female", "Female", "Female")
-Time <- c("Time 1", "Time 2", "Time 3", "Time 1", "Time 2", "Time 3")
-CDI <- c(9.11, 9.7, 9.07, 10.25, 10.73, 9.7)
-df <- data.frame(Gender, Time, CDI)
-rm(Gender)
-rm(Time)
-rm(CDI)
+cdi_f <- cdi[ which(cdi$gender =='F'), ]
+cdi_m <- cdi[ which(cdi$gender =='M'), ]
 
-#ggplot(data=df, aes(x=Time, y=CDI, fill=Gender)) + 
-  #geom_bar(stat="identity", position="dodge") + ggtitle("McLaughlin & King, 2015")
+Gender <- c("Male", "Female")
+McLaughlin <- c(9.29, 10.23)
+SAND <- c(mean(cdi_m$CDIchild_Tot_Sum, na.rm=TRUE), mean(cdi_f$CDIchild_Tot_Sum, na.rm=TRUE))
+df <- data.frame(Gender, McLaughlin, SAND)
+df1 <- melt(df, id.vars="Gender")
+rm(Gender)
+rm(SAND)
+rm(McLaughlin)
+
+ggplot(data=df1, aes(x=variable, y=value, fill=Gender)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("McLaughlin & King, 2015 vs. SAND Sample") + theme(legend.position = "right") + xlab("") + ylab("CDI Total Scores")
 
 rm(df)
+rm(df1)
+rm(cdi_f)
+rm(cdi_m)
 ```
 
 ```{r include=FALSE}
 citep("10.1007/s10802-014-9898-1") #McLaughlin & King, 2015
 ```
 
-## Bjorkenstam, Pebley, Burstrom, & Kosidou, 2017
-
-* Obtained data from the Child Development Supplement to the Panel Study of Income Dynamics, a nationally representative sample from three waves: 1997, 2002, and 2007
-    * Tried to oversample for African-American and low-income families
-    * N = 2223
-    * Born between 1985 and 1995
-    * 50% female
-    * 65% White
-* Individuals exposed to childhood social adversity had higher CDI scores
-* Didn't look at CDI scores in relation to gender or race
-* Reported an overall mean CDI of 2.8 (which is **really** low, they don't address this in the paper)
-
 ```{r include=FALSE}
-citep("10.1016/j.jad.2017.01.035") #Bjorkenstam, Pebley, Burstrom, & Kosidou, 2017
+#citep("10.1016/j.jad.2017.01.035") #Bjorkenstam, Pebley, Burstrom, & Kosidou, 2017
+```
+
+## Logan et al., 2013
+
+* Sample recruited from a pediatric pain clinic in the U.S.
+    * N = 1043
+    * Aged 8-18
+    * 89% white
+    * 78% female
+    * Sample was "largely middle class"
+* Did examine CDI subscales
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+logan <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review_2/logan.csv')
+
+labels <- c("Negative Mood", "Negative Self-Esteem", "Ineffectiveness", "Interpersonal Problems", "Emotional Problems", "Functional Problems")
+logan1 <- data.frame(labels)
+logan1$mean <- 0
+
+neg_mood <- sum(logan$item1, logan$item26, logan$item27,logan$item9,logan$item10,logan$item15,logan$item16,logan$item17,logan$item18)
+logan1$mean[logan1$labels == "Negative Mood"] <- neg_mood
+
+neg_selfesteem <- sum(logan$item2,logan$item6,logan$item7,logan$item8,logan$item13,logan$item24)
+logan1$mean[logan1$labels == "Negative Self-Esteem"] <- neg_selfesteem
+
+ineffect <- sum(logan$item3,logan$item4,logan$item12,logan$item14,logan$item22,logan$item23,logan$item28)
+logan1$mean[logan1$labels == "Ineffectiveness"] <- ineffect
+
+inter_prob <- sum(logan$item5,logan$item11,logan$item19,logan$item21,logan$item25)
+logan1$mean[logan1$labels == "Interpersonal Problems"] <- inter_prob
+
+emo_prob <- sum(neg_mood, neg_selfesteem)
+logan1$mean[logan1$labels == "Emotional Problems"] <- emo_prob
+
+func_prob <- sum(ineffect, inter_prob)
+logan1$mean[logan1$labels == "Functional Problems"] <- func_prob
+
+logan <- logan1
+rm(logan1)
+rm(neg_mood)
+rm(neg_selfesteem)
+rm(ineffect)
+rm(inter_prob)
+rm(emo_prob)
+rm(func_prob)
+rm(labels)
+
+logan$SAND <- c(mean(cdi$neg_mood), mean(cdi$neg_selfesteem), mean(cdi$ineffect), mean(cdi$inter_prob), mean(cdi$emo_prob), mean(cdi$func_prob))
+
+names(logan)[names(logan) == "mean"] <- "Logan"
+names(logan)[names(logan) == "labels"] <- "Subscales"
+
+df1 <- melt(logan, id.vars="Subscales")
+
+ggplot(data=df1, aes(x=Subscales, y=value, fill=variable)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Logan et al., 2013 vs. SAND Sample") + ylab("") + scale_fill_discrete(name="Study") +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) 
+
+rm(logan)
+rm(df1)
 ```
 
 # Mood and Feelings Questionnaire
+
+## SAND Sample MFQ
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+mfq_survey <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review_2/mfqc_data_dictionary.csv')
+
+names(mfq_survey)[names(mfq_survey) == "Item.Options"] <- "Item Description"
+
+mfq_survey %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+rm(mfq_survey)
+```
+
+Please note that the MFQ contains no subscales.
 
 ## Kuo, Stoep, & Stewart, 2005
 
@@ -357,42 +409,12 @@ citep("10.1016/j.jad.2017.01.035") #Bjorkenstam, Pebley, Burstrom, & Kosidou, 20
 * Data collected in 2002 from a detention center near Seattle
 * Female detainees and those who were the youngest and oldest the sample had high depression prevalence
 
-```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-Race <- c("Black", "Black", "White", "White", "Other", "Other")
-Criteria <- c(">= 27", ">= 29", ">= 27", ">= 29", ">= 27", ">= 29")
-MFQ <- c(11, 11, 31, 23, 8, 8)
-df <- data.frame(Race, Criteria, MFQ)
-rm(Race)
-rm(Criteria)
-rm(MFQ)
-
-#df %>%
-  #kable() %>%
-  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
-
-#ggplot(data=df, aes(x=Criteria, y=MFQ, fill=Race)) + 
-  #geom_bar(stat="identity", position="dodge") + ggtitle("Kuo, Stoep, & Stewart, 2005")
-
-rm(df)
-```
-
 ```{r include=FALSE}
 citep("10.1177/1073191105279984") #Kuo, Stoep, & Stewart
 ```
 
-## Rhew et al., 2010
-
-* N = 521
-    * All from Seattle Public School District, part of the Developmental Pathways Program
-    * Aged 11-13
-    * 52% male
-    * 44% white, 26% African-American, 26% Asian
-    * Data collected in two waves
-* **Utilized the Short Form MFQ**
-* No significant differences for gender, race, or age
-
 ```{r include=FALSE}
-citep("10.1186/1753-2000-4-8")
+#citep("10.1186/1753-2000-4-8") #Rhew et al., 2010
 ```
 
 ## Banh et al., 2012
@@ -405,14 +427,73 @@ citep("10.1186/1753-2000-4-8")
 * Paper didn't report mean MFQ scores for any subgroups
 * White students had the lowest rates of depression
     * In the SAND sample, white adolescents had the second-highest MFQ scores (when not dividing by gender)
+* Didn't report any means
 
 ```{r include=FALSE}
 citep("10.1007/s10802-011-9569-4") #Banh et al
 ```
 
+## Daviss et al., 2006
+
+* Sample recruited from clinics or previous research studies
+    * N = 470
+    * Average age 13.6
+    * 81% white
+    * 50% female
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Groups <- c("No mood disorder", "Non-MDE mood disorder", "MDE", "SAND Sample")
+Scores <- c(11.6, 24, 32.8, mean(mfq$MFQ_C_Sum, na.rm=TRUE))
+df <- data.frame(Groups, Scores)
+col <- c("#F8766D", "#00BFC4", "#7CAE00", "#C77CFF")
+
+ggplot(data=df, aes(x=Groups, y=Scores, fill=col)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Daviss et al., 2006 vs. SAND Sample") + ylab("") + scale_fill_discrete(name="Study") + xlab("MFQ Total")  + theme(legend.position = "none")
+
+rm(df)
+rm(col)
+rm(Groups)
+rm(Scores)
+```
+
+```{r}
+citep("10.1111/j.1469-7610.2006.01646.x") #Daviss et al., 2006
+```
+
+
 # Screen for Child Anxiety Related Disorders
 
-## SAND Sample Subscales
+## SAND Sample SCARED Subscales
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+scared_survey <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review_2/scaredc_data_dictionary.csv')
+
+names(scared_survey)[names(scared_survey) == "Field.Label"] <- "Item Description"
+
+scared_survey %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+rm(scared_survey)
+```
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Subscale <- c("Panic Disorder", "Generalized Anxiety", "Separation Anxiety", "Social Anxiety", "School Avoidance")
+Items <- c("1, 6, 9, 12, 15, 18, 19, 23, 24, 27, 30, 34, 38", 
+           "5, 7, 14, 21, 22, 28, 33, 35, 37", 
+           "4, 8, 13, 16, 20, 25, 29, 31", 
+           "3, 10, 26, 32", 
+           "2, 11, 17, 38")
+df <- data.frame(Subscale, Items)
+rm(Subscale)
+rm(Items)
+
+df %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+rm(df)
+```
 
 ```{r include=FALSE}
 #Thanks to Diane for the subscale code!
@@ -465,20 +546,49 @@ rm(labels)
 * Total anxiety scores higher in girls than boys
 
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-Diagnosis <- c("Anxiety Cases", "Non-Anxiety cases")
-mean_SCARED <- c(26.76, 17.24)
-df <- data.frame(Diagnosis, mean_SCARED)
-rm(Diagnosis)
-rm(mean_SCARED)
+Subscale <- c("Panic Disorder", "Generalized Anxiety", "Separation Anxiety", "Social Anxiety", "School Avoidance", "Total SCARED")
+df <- data.frame(Subscale)
+df$Anxiety_Cases <- 0
+df$Non_Anxiety_Cases <- 0
+df$SAND_Sample <- 0
 
-#df %>%
-  #kable() %>%
-  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+df$Anxiety_Cases[df$Subscale == "Panic Disorder"] <- 6.86
+df$Non_Anxiety_Cases[df$Subscale == "Panic Disorder"] <- 3.87
+df$SAND_Sample[df$Subscale == "Panic Disorder"] <- mean(scared$panic_disorder)
 
-#ggplot(data=df, aes(x=Diagnosis, y=mean_SCARED, fill=col2)) + 
-  #geom_bar(stat="identity") + ggtitle("Birmaher et al., 1999") + ylab("Mean SCARED Score") + theme(legend.position = "none")
+df$Anxiety_Cases[df$Subscale == "Generalized Anxiety"] <- 9.14
+df$Non_Anxiety_Cases[df$Subscale == "Generalized Anxiety"] <- 6.58
+df$SAND_Sample[df$Subscale == "Generalized Anxiety"] <- mean(scared$generalized_anxiety_disorder)
+
+df$Anxiety_Cases[df$Subscale == "Separation Anxiety"] <- 3.45
+df$Non_Anxiety_Cases[df$Subscale == "Separation Anxiety"] <- 1.84
+df$SAND_Sample[df$Subscale == "Separation Anxiety"] <- mean(scared$separation_anxiety_disorder)
+
+df$Anxiety_Cases[df$Subscale == "Social Anxiety"] <- 3.69
+df$Non_Anxiety_Cases[df$Subscale == "Social Anxiety"] <- 2.73
+df$SAND_Sample[df$Subscale == "Social Anxiety"] <- mean(scared$social_anxiety_disorder)
+
+df$Anxiety_Cases[df$Subscale == "School Avoidance"] <- 2.58
+df$Non_Anxiety_Cases[df$Subscale == "School Avoidance"] <- 1.43
+df$SAND_Sample[df$Subscale == "School Avoidance"] <- mean(scared$school_avoidance)
+
+df$Anxiety_Cases[df$Subscale == "Total SCARED"] <- 26.76
+df$Non_Anxiety_Cases[df$Subscale == "Total SCARED"] <- 17.24
+df$SAND_Sample[df$Subscale == "Total SCARED"] <- mean(scared$SCARED_C_Sum, na.rm=TRUE)
+
+names(df)[names(df) == "Anxiety_Cases"] <- "Anxiety Cases"
+names(df)[names(df) == "Non_Anxiety_Cases"] <- "Non-Anxiety Cases"
+names(df)[names(df) == "SAND_Sample"] <- "SAND Sample"
+
+df1 <- melt(df, id.vars="Subscale")
+
+ggplot(data=df1, aes(x=Subscale, y=value, fill=variable)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Birmaher et al., 1997 vs. SAND Sample") + ylab("") + scale_fill_discrete(name="Study") + xlab("Subscale Scores") +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) 
 
 rm(df)
+rm(df1)
+rm(Subscale)
 ```
 
 ```{r include=FALSE}
@@ -497,29 +607,46 @@ citep("10.1097/00004583-199704000-00018") #Biramaher et al
     * In the SAND sample, black adolescents had an mean of 16.7
 
 ```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-Subscale <- c("Somatic/Panic", "Gen Anx", "Sep Anx", "Social Phobia", "School Phobia", "Total SCARED", "Somatic/Panic", "Gen Anx", "Sep Anx", "Social Phobia", "School Phobia", "Total SCARED")
-Gender <- c("Male", "Male", "Male", "Male", "Male", "Male", "Female", "Female", "Female", "Female", "Female", "Female")
-Score <- c(3.56, 4.79, 2.72, 4.98, 1.65, 17.69, 4.47, 6.80, 2.89, 6.16, 2.18, 22.45)
-df <- data.frame(Subscale, Gender, Score)
-rm(Subscale)
-rm(Gender)
-rm(Score)
+Subscale <- c("Panic Disorder", "Generalized Anxiety", "Separation Anxiety", "Social Anxiety", "School Avoidance", "Total SCARED")
+df <- data.frame(Subscale)
+df$Boyd <- 0
+df$SAND_Sample <- 0
 
-#df %>%
-  #kable() %>%
-  #kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+df$Boyd[df$Subscale == "Panic Disorder"] <- 3.8
+df$SAND_Sample[df$Subscale == "Panic Disorder"] <- mean(scared$panic_disorder)
 
-#ggplot(data=df, aes(x=Subscale, y=Score, fill=Gender)) + 
-  #geom_bar(stat="identity", position="dodge") + ggtitle("Boyd, Ginsburg, Lambert, Cooley, & Campbell, 2003")
+df$Boyd[df$Subscale == "Generalized Anxiety"] <- 5.7
+df$SAND_Sample[df$Subscale == "Generalized Anxiety"] <- mean(scared$generalized_anxiety_disorder)
+
+df$Boyd[df$Subscale == "Separation Anxiety"] <- 2.7
+df$SAND_Sample[df$Subscale == "Separation Anxiety"] <- mean(scared$separation_anxiety_disorder)
+
+df$Boyd[df$Subscale == "Social Anxiety"] <- 5.56
+df$SAND_Sample[df$Subscale == "Social Anxiety"] <- mean(scared$social_anxiety_disorder)
+
+df$Boyd[df$Subscale == "School Avoidance"] <- 1.9
+df$SAND_Sample[df$Subscale == "School Avoidance"] <- mean(scared$school_avoidance)
+
+df$Boyd[df$Subscale == "Total SCARED"] <- 19.36
+df$SAND_Sample[df$Subscale == "Total SCARED"] <- mean(scared$SCARED_C_Sum, na.rm=TRUE)
+
+names(df)[names(df) == "SAND_Sample"] <- "SAND Sample"
+
+df1 <- melt(df, id.vars="Subscale")
+
+ggplot(data=df1, aes(x=Subscale, y=value, fill=variable)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Boyd, Ginsburg, Lambert, Cooley, & Campbell, 2003 vs. SAND Sample") + theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + ylab("")
 
 rm(df)
+rm(df1)
+rm(Subscale)
 ```
 
 ```{r include=FALSE}
-citep("10.1097/00004583-200310000-00009")
+citep("10.1097/00004583-200310000-00009") #Boyd, Ginsburg, Lambert, Cooley, & Campbell, 2003
 ```
 
-## Wren et al., 2006
+## Wren et al., 2007
 
 * **Consecutive sample**, participants were recruited from pediatric primary care clinic waiting rooms
     * N = 515
@@ -528,11 +655,10 @@ citep("10.1097/00004583-200310000-00009")
     * 37% White, 33% Hispanic
 * Predictors of higher SCARED scores were less parental education, the child being younger, and the child being female
 * Hispanic children reported the highest anxiety and Asian children reported the lowest
-
-![From Wren et al., 2006.](C:\Users\jrcala\Desktop\monks_task\kessler\figure1.png)
+* Didn't report means, but might come back to this one later...
 
 ```{r include=FALSE}
-citep(" 10.1097/chi.0b013e31802f1267") #Wren et al., 2006
+citep("10.1097/chi.0b013e31802f1267") #Wren et al., 2007
 ```
 
 ## Haley, & Puskar, & Terhorst, 2011
@@ -546,8 +672,44 @@ citep(" 10.1097/chi.0b013e31802f1267") #Wren et al., 2006
     * In the SAND sample, the average SCARED score for white adolescents was 20.54
 * Did not report differences between subgroups
 
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Subscale <- c("Panic Disorder", "Generalized Anxiety", "Separation Anxiety", "Social Anxiety", "School Avoidance", "Total SCARED")
+df <- data.frame(Subscale)
+df$Haley <- 0
+df$SAND_Sample <- 0
+
+df$Haley[df$Subscale == "Panic Disorder"] <- 4.77
+df$SAND_Sample[df$Subscale == "Panic Disorder"] <- mean(scared$panic_disorder)
+
+df$Haley[df$Subscale == "Generalized Anxiety"] <- 6.44 
+df$SAND_Sample[df$Subscale == "Generalized Anxiety"] <- mean(scared$generalized_anxiety_disorder)
+
+df$Haley[df$Subscale == "Separation Anxiety"] <- 2.91
+df$SAND_Sample[df$Subscale == "Separation Anxiety"] <- mean(scared$separation_anxiety_disorder)
+
+df$Haley[df$Subscale == "Social Anxiety"] <- 5.28
+df$SAND_Sample[df$Subscale == "Social Anxiety"] <- mean(scared$social_anxiety_disorder)
+
+df$Haley[df$Subscale == "School Avoidance"] <- 1.93
+df$SAND_Sample[df$Subscale == "School Avoidance"] <- mean(scared$school_avoidance)
+
+df$Haley[df$Subscale == "Total SCARED"] <- 21.24
+df$SAND_Sample[df$Subscale == "Total SCARED"] <- mean(scared$SCARED_C_Sum, na.rm=TRUE)
+
+names(df)[names(df) == "SAND_Sample"] <- "SAND Sample"
+
+df1 <- melt(df, id.vars="Subscale")
+
+ggplot(data=df1, aes(x=Subscale, y=value, fill=variable)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Haley, & Puskar, & Terhorst, 2011 vs. SAND Sample") + theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + ylab("")
+
+rm(df)
+rm(df1)
+rm(Subscale)
+```
+
 ```{r include=FALSE}
-citep(" 10.1111/j.1744-6171.2010.00264.x") #Haley, & Puskar, & Terhorst, 2011
+citep("10.1111/j.1744-6171.2010.00264.x") #Haley, & Puskar, & Terhorst, 2011
 ```
 
 ## Pantaleao & Ohannessian, 2018
@@ -565,6 +727,21 @@ citep(" 10.1111/j.1744-6171.2010.00264.x") #Haley, & Puskar, & Terhorst, 2011
     * In the SAND sample, white adolescents had an mean SCARED of 20.54
 * Girls reported higher anxiety scores than boys
 * No conclusions made about race or other subgroups
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Study <- c("Pantaleao", "SAND Sample")
+Score <- c(12.77, mean(scared$SCARED_C_Sum, na.rm=TRUE))
+df <- data.frame(Study, Score)
+col <- c("#F8766D", "#00BFC4")
+
+ggplot(data=df, aes(x=Study, y=Score, fill=col)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("Pantaleao & Ohannessian, 2018 vs. SAND Sample") + ylab("Total SCARED Score") + theme(legend.position = "none")
+
+rm(df)
+rm(Study)
+rm(Score)
+rm(col)
+```
 
 ```{r include=FALSE}
 citep("10.1007/s10826-018-1289-8") #Pantaleao & Ohannessian
