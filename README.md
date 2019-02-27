@@ -5,13 +5,13 @@
 | Measure  | Undergrad | Status |
 | --- | --- | --- |
 | APQ Child | Paulina | &#9744; |
-| ALES Child | Diane | &#9744; |
+| ALES Child | none | unable to be completed since Wave 15 ALES data has not been cleaned yet |
 | CTQ Child | Alexa | &#9744; |
 | MFQ Child | Nisha | &#9744; |
 | NQ Child | none | &#9744; |
 | SCARED Child | Diane | &#9744; |
-| SRD Child | none | &#9744; |
-| SUB Child | none | &#9744; |
+| SRD Child | Diane | &#9744; |
+| SUB Child | none | 2yr data hasn't been uploaded to Redcap yet |
 
 
 ## How to download two-year data from Redcap
