@@ -1,0 +1,282 @@
+---
+title: "Learning RStudio"
+author: "Multiple sources put together by Julianna Calabrese"
+date: "November 7, 2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r include=FALSE}
+#install.packages(rmarkdown)
+#install.packages(knitr)
+library(rmarkdown)
+library(knitr)
+```
+
+# Additional Resources for Learning R
+
+http://www.fon.hum.uva.nl/paul/lot2015/Navarro2014.pdf (A 500+ page textbook)
+
+https://dss.princeton.edu/training/ (Resources for R and Stata)
+
+http://www.science.smith.edu/~amcnamara/sds291/labs/lab-intro.html (The website for a class I took 3 years ago)
+
+https://www.statmethods.net/ (A really really useful website--if you Google an issue in R, this website will have one of the results)
+
+https://swirlstats.com/students.html (Swirl teaches you R in R)
+
+## What is R?
+
+R is a programming language specfically designed for statistical analysis. R is open-source, and is developed by a team of statisticians and programmers in both academia and industry. Alternatives to R include SPSS, Stata, SAS, and Python. 
+
+RStudio is an Integrated Development Environment (aka a user-friendly interface) for R and requires R installation to function. 
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. You can embed an R code chunk like this:
+
+```{r}
+plot(cars)
+```
+
+## What do all the buttons do?
+
+The panel in the upper right contains your **Environment** as well as a **History** of the commands that you've previously entered. Your Environment contains any objects or variables you've created or datasets that you have read into RStudio. 
+
+Any plots that you generate will show up in the panel in the lower right corner under the **Plots** tab or will appear directly in the RMarkdown document directly below the code.
+
+The panel on below is where the action happens. It's called the **Console**. Everytime you launch RStudio, it will have the same text at the top of the console telling you the version of R that you're running. Below that information is the prompt. As its name suggests, this prompt is really a request, a request for a command. Initially, interacting with R is all about typing commands and interpreting the output. These commands and their syntax have evolved over decades (literally) and now provide what many users feel is a fairly natural way to access data and organize, describe, and invoke statistical computations.
+
+To get you started, you will enter all commands at the R prompt (i.e. right after > on the console). You can either type them in manually or copy and paste them. To test the below code out, copy and paste it into the Console or place your cursor in the chunk and press Ctrl+Enter.
+
+```{r}
+print("Hello world")
+```
+
+## R and RStudio tips and tricks
+
+The up arrow on your keyboard will allow you to scroll up through your past commands.
+
+The tab key on your keyboard will help you (particularly in RStudio) by offering ways to finish your code. If you start typing mea and hit tab, it will suggest mean() among other things. If you type mean(~hwy, data=vehicles, and hit tab, it will tell you the other arguments you can use for the mean() function.
+
+When working within a .R or .Rmd file, you can put your cursor on a line and hit Ctrl + Enter to get the code to execute in the Console. (On a Mac, Command + Enter.)
+
+If you get stuck with some syntax (usually, mismatched parentheses or quotes), the R Console will change from the > at the beginning of the line (which means it is waiting for a new command) to the + at the beginning of the line (which means it is waiting for you to finish a command). To get out, hit the Escape key.
+
+## What are packages?
+
+Packages are collections of R functions, data, and compiled code in a well-defined format. The directory where packages are stored is called the library. R comes with a standard set of packages. Others are available for download and installation, which can found in the **Packages** tab to the left. Once installed, they have to be loaded into the session every time RStudio is opened.
+
+Some common packages are *mosiac*, *car*, *dplyr*, *ggplot2*, *stats*, and *psych*. *mosiac* and *car* are basic packages used to teach math, statistics, computation, and modeling. *dplyr* is used for "data wrangling", e.g. turning raw data into less-messy datasets. *ggplot2* is used for making pretty graphs and visualizations. *psych* and *stats* include several commands related to concepts in introductory statistics, such as descriptive statistics, correlation matrices, and factor analysis. *Stat2Data* just includes a bunch of datasets.
+
+Run the following chunk by first removing the hashtags. Then place your cursor anywhere in the chunk below and press Crtl+Shift+Enter.
+
+```{r, eval=FALSE}
+#Putting a hashtag in front of a line turns the line into a comment. It's useful for explaining code.
+#install.packages("mosaic")
+#install.packages("car")
+#install.packages("dplyr")
+#install.packages("ggplot2")
+#install.packages("stats")
+#install.packages("psych")
+#install.packages("Stat2Data")
+```
+
+Now do the same thing for the chunk below.
+
+```{r, eval=FALSE}
+library(mosaic)
+library(car)
+library(dplyr)
+library(ggplot2)
+library(stats)
+library(psych)
+library(Stat2Data)
+```
+
+# Actual Statistics
+
+View the following dataset. Placing "?" before a object or function tells you more about it. Pressing Ctrl+Enter will run a single line of code, while pressing Crtl+Shift+Enter will run all the code in the current chunk. 
+
+```{r}
+library(Stat2Data)
+data(FirstYearGPA)
+?FirstYearGPA
+View(FirstYearGPA)
+```
+
+## Descriptive Statistics
+
+```{r}
+?base::mean
+
+#Average GPA
+mean(FirstYearGPA$GPA)
+
+#Average SAT Verbal
+mean(FirstYearGPA$SATV)
+
+#Average SAT Math
+mean(FirstYearGPA$SATM)
+```
+
+```{r}
+?stats::sd
+#How spread out are the values from the mean? 
+
+#SD GPA
+sd(FirstYearGPA$GPA)
+
+#SD SAT Verbal
+sd(FirstYearGPA$SATV)
+
+#SD SAT Math
+sd(FirstYearGPA$SATM)
+```
+
+```{r}
+hist(FirstYearGPA$GPA)
+
+hist(FirstYearGPA$SATV)
+
+hist(FirstYearGPA$SATM, freq=FALSE)
+lines(density(FirstYearGPA$SATM),col="red",lwd=3)
+#If you run the above lines at the same time, it produces a histogram with a density curve. "col" and "lwd" specify the color and thickness of the line. You can make "col" equal blue or hotpink or almost any color. 
+```
+
+#### P.S. Putting "base::" or "mosaic::" in front of the function just specifies that "count()" (or whatever the functionis) is from the mosaic package (because many packages have commands with identical names)
+
+```{r}
+?mosaicCore::count
+
+#Gender distribution of the sample
+mosaic::count(FirstYearGPA$Male == '0')
+mosaic::count(FirstYearGPA$Male == '1')
+
+#Number of FirstGen students
+mosaic::count(FirstYearGPA$FirstGen == '0')
+mosaic::count(FirstYearGPA$FirstGen == '1')
+```
+
+### Many R commands do basically the same thing...
+
+```{r}
+mosaic::favstats(FirstYearGPA$SATM)
+psych::describe(FirstYearGPA$SATM)
+fivenum(FirstYearGPA$SATM)
+summary(FirstYearGPA)
+
+#To see what the commands do, enter "?favstats" or a question mark followed by the command into the Console
+```
+
+## Basic Statistics
+
+## Correlations
+
+```{r}
+stats::cor(FirstYearGPA$HSGPA,FirstYearGPA$GPA)
+
+stats::cor(FirstYearGPA$SATM,FirstYearGPA$GPA)
+
+stats::cor(FirstYearGPA$SATV,FirstYearGPA$GPA)
+```
+
+```{r}
+#Make dataset that just has female students and another dataset that just has male students
+
+female <- FirstYearGPA[ which(FirstYearGPA$Male=='0'), ]
+male <- FirstYearGPA[ which(FirstYearGPA$Male=='1'), ]
+```
+
+
+## T-tests
+
+```{r}
+#Are female SATM scores significantly different from zero?
+
+t.test(female$SATM)
+
+#What about male scores?
+
+t.test(male$SATM)
+
+#Are boys' and girls' scores significantly different from each other?
+
+t.test(male$SATM,female$SATM)
+```
+
+## Fun Plots
+
+#### P.S. "Index" just refers to row number in the dataset
+
+```{r}
+#Plots all high school GPAs
+plot(FirstYearGPA$HSGPA,main="High School GPA")
+
+#Plots all freshman GPAs
+plot(FirstYearGPA$GPA,main="Freshman GPA")
+```
+
+```{r}
+#Plots male and female SAT Math scores
+plot(male$SATM,col="blue",main="Male and Female SAT Math Scores")
+points(female$SATM,col='magenta')
+```
+
+```{r}
+col <- c("lightblue","pink") #This makes a variable to color the plot.
+
+boxplot(male$SATM,female$SATM,names=c("Male","Female"),main="Gender and SAT Math scores",col=col)
+
+#Try making a boxplot but this time use SAT Verbal scores
+```
+
+## Linear models
+
+### Does high school GPA predict freshman GPA?
+
+```{r}
+plot(GPA~HSGPA,data=FirstYearGPA,main="High School GPA predicting Freshman GPA",xlab="Freshman GPA",ylab="High School GPA") + abline(lm(GPA~HSGPA,data=FirstYearGPA), col='red')
+#If you took away everything after the plus sign, it would just be a plot without a line
+```
+
+```{r}
+#Linear models help us describe the relationship between the outcome variable and one or more predictor variables. Does high school GPA actually have an impact on freshman GPA?
+mod1 <- lm(GPA~HSGPA,data=FirstYearGPA)
+summary(mod1)
+```
+
+### Do SAT Math scores predict freshman GPA?
+
+```{r}
+plot(GPA~SATM,data=FirstYearGPA) + abline(lm(GPA~SATM,data=FirstYearGPA), col='red')
+#Try making it so there's a title and captions along the x and y axes
+```
+
+```{r}
+mod2 <- lm(GPA~SATM,data=FirstYearGPA)
+summary(mod2)
+#Try making a linear model that predicts GPA using SAT Verbal scores
+```
+
+### Does high school GPA predict freshman GPA with gender as a moderator? With race as a moderator?
+
+```{r}
+mod3 <- lm(GPA~HSGPA*Male,data=FirstYearGPA)
+summary(mod3)
+```
+
+```{r}
+mod4 <- lm(GPA~HSGPA*White,data=FirstYearGPA)
+summary(mod4)
+```
+
+```{r}
+white <- FirstYearGPA[ which(FirstYearGPA$White=='1'), ]
+nonwhite <- FirstYearGPA[ which(FirstYearGPA$White=='0'), ]
+
+plot(white$HSGPA,col="yellowgreen")
+points(nonwhite$HSGPA,col='purple')
+
+#Now try making a linear regression model where FirstGen is the moderator instead of gender or race. Then make a similiar plot for FirstGen students. This will involve making two datasets (first-gen and not first-gen, like the male/female and white/nonwhite datasets) and overlaying their scatterplots.
+```
+
