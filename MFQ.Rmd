@@ -200,8 +200,16 @@ rm(demographic)
 Just by looking at my dataset, you can tell that some people decided to entirely skip the SCARED survey during their Wave 15 visit. I can tell this because there's a long row of NA's or 88's. For SCARED, these people include 10134 and 10219, which are rows 51 and 89 respectively. It might be best to remove them. We'll use the same syntax that we used to drop empty rows at the beginning.
 
 ```{r}
-scared <- scared[-c(51, 89), ]
+#mfq <- mfq[-c(73), ]
+#mfq <- mfq[-c(113), ]
+which(mfq == 88, arr.ind=TRUE)
 ```
+
+```{r}
+mfq <- mfq[!(mfq$id == "10219"),]
+mfq <- mfq[!(mfq$id == "10023"),]
+```
+
 
 Also, whenever a value is missing or not applicable, we've been coding it as 88 and -99. We should take all the values that equal 88 or -99 and make them NA.
 
@@ -216,24 +224,38 @@ Now we have a dataset that includes the original and two year data, so we can st
 Feel free to add age or gender to your analyses, but just be careful with how the data is formatted. You might want to re-code gender so instead of it being M/F, it would be 0=Male and 1=Female. Also for age, you might to want make TeenBirthday a numeric variable by subtracting it from today's date.
 
 ```{r Basic stuff}
-mean(scared$SCARED_C_Sum)
-mean(scared$scared_total_sum)
+mean(mfq$MFQ_C_Sum)
+mean(mfq$mfq_total_sum)
 
-sd(scared$SCARED_C_Sum)
-sd(scared$scared_total_sum)
+sd(mfq$MFQ_C_Sum)
+sd(mfq$mfq_total_sum)
 
-hist(scared$SCARED_C_Sum)
-hist(scared$scared_total_sum)
+hist(mfq$MFQ_C_Sum)
+hist(mfq$mfq_total_sum)
+
+female <- mfq[ which(mfq$gender=='F'), ]
+male <- mfq[ which(mfq$gender=='M'), ]
+
+hist(female$MFQ_C_Sum)
+hist(female$mfq_total_sum)
+
+hist(male$MFQ_C_Sum)
+hist(male$mfq_total_sum)
+
 ```
 
 ```{r}
-cor.test(scared$SCARED_C_Sum, scared$scared_total_sum) #Is there a correlation between the old and new scores?
+cor.test(mfq$MFQ_C_Sum, mfq$mfq_total_sum) #Is there a correlation between the old and new scores?
+cor.test(female$MFQ_C_Sum, female$mfq_total_sum)
+cor.test(male$MFQ_C_Sum, male$mfq_total_sum)
 ```
 
 ```{r}
-t.test(scared$SCARED_C_Sum, scared$scared_total_sum) #Is there a significant difference between these two scores?
+t.test(mfq$MFQ_C_Sum, mfq$mfq_total_sum) #Is there a significant difference between these two scores?
+t.test(female$MFQ_C_Sum, female$mfq_total_sum)
+t.test(male$MFQ_C_Sum, male$mfq_total_sum)
 ```
 
 ```{r}
-plot(scared$SCARED_C_Sum, scared$scared_total_sum)
+plot(mfq$MFQ_C_Sum, mfq$mfq_total_sum)
 ```
