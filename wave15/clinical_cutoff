@@ -127,7 +127,7 @@ cdi_count$Male[cdi_count$Criteria == "Average or Lower"] <- average_boy
 
 ```{r CDI Count Table, echo=FALSE, warning=FALSE, message=FALSE}
 cdi_count %>%
-  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "SAND Sample & CDI Cutoffs", font_size=2) %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "SAND Sample & CDI Cutoffs") %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 ```
 
@@ -166,14 +166,24 @@ p <- ggplot(mfq, aes(gender, MFQ_C_Sum))
 p + geom_boxplot(fill=col) + ylab("MFQ Total Score") + xlab("Gender")
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+```{r include=FALSE}
 summarytools::descr(mfq$MFQ_C_Sum, na.rm=TRUE, style = "rmarkdown", 
                     stats = c("mean", "sd", "min", "med", "max", "Q1", "Q3", "IQR"),
                     headings = FALSE, justify = "left", col.widths = 600)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(mfq, aes(x=MFQ_C_Sum)) + geom_histogram(colour="white",fill="yellowgreen")  + xlab("Total Score") + ylab("Count") + ggtitle("MFQ Total Sum")
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+Statistics <- c("Mean", "SD", "Minimum", "Median", "Maximum", "Q1", "Q3", "IQR")
+Result <- c(15.37, 10.05, 0, 13, 47, 8, 21, 13)
+df <- data.frame(Statistics, Result)
+rm(Statistics)
+rm(Result)
+
+df %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "MFQ") %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+rm(df)
 ```
 
 According to a publication (Daviss et al., 2006) that is listed on the MFQ's website, a total MFQ score of 29 "optimally discriminated youth with MDE from the rest of the sample." 36 participants have a MFQ score of 29+.
@@ -199,7 +209,7 @@ Cutoff <- c(25, 7, 9, 5, 8, 3)
 scared_info <- data.frame(Subscale, Cutoff)
 
 scared_info %>%
-  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "SCARED Cutoffs", font_size=2) %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "SCARED Cutoffs") %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
 ```
 
