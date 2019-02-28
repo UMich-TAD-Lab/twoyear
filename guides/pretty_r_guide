@@ -1,10 +1,10 @@
 ---
-title: "How to make pretty things in RMarkdown"
+title: "TaDLab's Guide to Making Pretty RMarkdown Documents"
 author: "Julianna Calabrese"
 date: "February 27, 2019"
 output:
   html_document:
-    toc: true
+    toc: false
     theme: united
     highlight: tango
   pdf_document: default
@@ -36,7 +36,7 @@ Before you start going through this document, you should have first gone through
 
 Even though R is a program for statistical analysis, it can be used to create scientific and nice-looking reports. RMarkdown files can be "knitted", aka converted, into HTML files or PDF files. Knitting won't alter the .rmd file, but rather make a wholly separate file based on the .rmd file. Since the RMarkdown-to-PDF conversion process involves LaTeX (a document system that I do not fully understand yet), this guide is going to focus on making HTML files with RMarkdown.
 
-For you reference, [here is a cheatsheet for RMarkdown](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf), at least for almost everything that occurs outside of chunks. 
+For your reference, [here is a cheatsheet for RMarkdown](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf), at least for almost everything that occurs outside of chunks. 
 
 ## RMarkdown Basics
 
@@ -94,7 +94,7 @@ Additionally, if you look at the outline, it will also say chunk names. Here is 
 head(iris)
 ```
 
-If you look in the outline, you can see "Iris dataset" under "Example 6". If you don't name your chunks, it'll automatically label them "Chunk 1", "Chunk 2", etc. There is no particular reason to name chunks other than keeping track/organizing your document. While headers will appear in knitted HTML documents, chunk names will not. 
+If you look in the outline, you can see `Iris dataset` under "Example 6". If you don't name your chunks, it'll automatically label them "Chunk 1", "Chunk 2", etc. There is no particular reason to name chunks other than keeping track/organizing your document. While headers will appear in knitted HTML documents, chunk names will not. 
 
 It is important that you place chunk names in the right place, after the little r but between the brackets. You also can't have two chunks with the same name or else the file will halt knitting. Chunk names also go before chunk options, which is discussed below.
 
@@ -102,17 +102,17 @@ It is important that you place chunk names in the right place, after the little 
 
 When writing a RMarkdown document, you may do many "behind the scene" things, like re-coding variables. While it is important to the reader to know that you re-coded certain variables, they probably don't need to see the lines and lines of code where you do this. This is where chunk options come into play.
 
-"include" is an option that says whether this chunk should be included in the HTML document at all. In your HTML document, it'll seem like you never wrote this code in the first place. Chunks will default to "include=TRUE" if nothing contradicting it is specified.
+`include` is an option that says whether this chunk should be included in the HTML document at all. In your HTML document, it'll seem like you never wrote this code in the first place. Chunks will default to `include=TRUE` if nothing contradicting it is specified.
 
 ```{r include=FALSE}
 plot(iris$Sepal.Length, iris$Sepal.Width)
 ```
 
 ```{r}
-# See? It's disappeared!
+# See? It disappeared!
 ```
 
-"echo" is an option that allows you to hide the code but show the output in a HTML document. Imagine if you wrote a lot of code to create a nice visualization, but the code is so messy it would distract the reader from the visualization. Therefore, you could use "echo=FALSE" to hide the code but show the visualization. Readers would not know how you created the visualization. Chunks will default to "echo=TRUE" if nothing contradicting it is specified.
+`echo` is an option that allows you to hide the code but show the output in a HTML document. Imagine if you wrote a lot of code to create a nice visualization, but the code is so messy it would distract the reader from the visualization. Therefore, you could use `echo=FALSE` to hide the code but show the visualization. Readers would not know how you created the visualization. Chunks will default to `echo=TRUE` if nothing contradicting it is specified.
 
 ```{r echo=FALSE}
 barplot(euro)
@@ -134,14 +134,20 @@ sjp.corr(data)
 # Message is suppressed
 ```
 
-If you wanted to hide your results but show the syntax, you would use the "results = 'hide'" along with "echo=TRUE".
+If you wanted to hide your results but show the syntax, you would use the `results = 'hide'`. However, this only works for things like summary output and tables.
 
-```{r echo=TRUE, results='hide'}
+```{r results='hide'}
+summary(cars)
+```
+
+If you wanted to suppress a plot, you would use `fig.keep = 'none'`.
+
+```{r fig.keep='none'}
 matrix <- matrix(rexp(200, rate=.1), ncol=20)
 barplot(matrix)
 ```
 
-Additionally, you may find packages that require you to put "results = 'asis'" in your chunks. The package *summarytools* is a package that can make pretty tables out of descriptive statistics, but its output can look very different depending on your chunk options. The difference between the two chunks below can be seen when knitted to a HTML.
+Additionally, you may find packages that require you to put `results = 'asis'` in your chunks. The package `summarytools` is a package that can make pretty tables out of descriptive statistics, but its output can look very different depending on your chunk options. The difference between the two chunks below can be seen when knitted to a HTML.
 
 ```{r results='asis'}
 data <- data.frame(replicate(5,sample(0:1,10,rep=TRUE)))
@@ -172,17 +178,19 @@ Your YAML header is that thing at the top that says your name, the date you made
 
 By default, output type will be "html_document". 
 
-You can include a table of contents to your document by adding "toc: true" under output. Table of contents are made up by your headers (not chunk names). If you put "toc_float: true", your table of contents will float on the left side of the document. "toc_float: false" is the default and puts the table of contents at the top of the document. "toc_depth" specifies the threshold of whether headers should be included in the table of contents. If you put "toc_depth: 2", then headers with three hashtags beside them will not be included in the table of contents.
+You can include a table of contents to your document by adding `toc: true` under output. Table of contents are made up by your headers (not chunk names). If you put `toc_float: true`, your table of contents will float on the left side of the document. `toc_float: false` is the default and puts the table of contents at the top of the document. `toc_depth` specifies the threshold of whether headers should be included in the table of contents. If you put `toc_depth: 2`, then headers with three hashtags beside them will not be included in the table of contents.
 
-If you wanted to add a theme to your HTML document, the YAML header would be the place to do this. This document uses the *united* theme with the *tango* highlight. Highlights specifies a syntax highlighting style, while themes affect the whole document. Both *united* and *tango* come installed with R. Additional themes can be downloaded with packages. 
+If you wanted to add a theme to your HTML document, the YAML header would be the place to do this. This document uses the `united` theme with the `tango` highlight. Highlights specifies a syntax highlighting style, while themes affect the whole document. Both `united` and `tango` come installed with R. Additional themes can be downloaded with packages. 
 
-[Here is a general guide about controlling the appearance of HTML documents.](https://bookdown.org/yihui/rmarkdown/html-document.html), which includes more information about tables of contents. 
+[Here is a general guide about controlling the appearance of HTML documents](https://bookdown.org/yihui/rmarkdown/html-document.html), which includes more information about tables of contents. 
 
 [Here is a gallery that shows the appearances of different themes.](http://www.datadreaming.org/post/r-markdown-theme-gallery/)
 
 ## ggplot2
 
 ggplot2 is a package that everyone loves and hates. You can use it to create beautiful visualizations but it can be difficult to learn.
+
+[Here is an introduction to ggplot if you dare!](http://r-statistics.co/Complete-Ggplot2-Tutorial-Part1-With-R-Code.html)
 
 [Here is where I got the below visualizations.](http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html)
 
