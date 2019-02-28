@@ -1,7 +1,7 @@
 ---
 title: "How to make pretty things in RMarkdown"
 author: "Julianna Calabrese"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+date: "February 27, 2019"
 output:
   html_document:
     toc: true
@@ -32,9 +32,9 @@ library(kableExtra)
 
 ## Introduction
 
-Before you start going through this document, you should have first gone through the RMarkdown document called "Learning_R.rmd", which goes over the super basics of R and RStudio. "Learning_R.rmd" can be found on GoogleDrive: Undergrad resources -> Other -> Learning R. 
+Before you start going through this document, you should have first gone through the RMarkdown document called "Learning_R.rmd", which can be found in the TaDLab's GoogleDrive and in the twoyear Github repository. 
 
-Even though R is a program for statistical analysis, it can be used to create scientific and nice-looking reports. RMarkdown files can be "knitted", aka converted, into HTML files or PDF files. Knitting won't alter the .rmd file, but rather make a wholly separate file based on the .rmd file. Since the RMarkdown-to-PDF conversion process involves LaTeX (a document system a bit like Microsoft that I do not fully understand yet), this guide is going to focus on making HTML files with RMarkdown.
+Even though R is a program for statistical analysis, it can be used to create scientific and nice-looking reports. RMarkdown files can be "knitted", aka converted, into HTML files or PDF files. Knitting won't alter the .rmd file, but rather make a wholly separate file based on the .rmd file. Since the RMarkdown-to-PDF conversion process involves LaTeX (a document system that I do not fully understand yet), this guide is going to focus on making HTML files with RMarkdown.
 
 For you reference, [here is a cheatsheet for RMarkdown](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf), at least for almost everything that occurs outside of chunks. 
 
@@ -66,9 +66,9 @@ or make | tables with
 things | inside
 the | table
 
-[Here is a cheatsheet for RMarkdown](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf) that includes the stuff I have and haven't gone over. Also this is how you embed links, using [word word word](www.word.com). 
+[Here is a cheatsheet for RMarkdown](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf) that includes the stuff I have and haven't gone over. Also this is how you embed links, using [word word word](link to a website). 
 
-### Headers and chunk names
+## Headers and chunk names
 
 Headers can be used while making RMarkdown documents and can be seen when knitted to HTML. Headers are always blue and are signified with hashtags. You can use between one and six hashtags to designate the "size" of the header with more hastags equalling smaller header sizes.
 
@@ -96,7 +96,7 @@ head(iris)
 
 If you look in the outline, you can see "Iris dataset" under "Example 6". If you don't name your chunks, it'll automatically label them "Chunk 1", "Chunk 2", etc. There is no particular reason to name chunks other than keeping track/organizing your document. While headers will appear in knitted HTML documents, chunk names will not. 
 
-It is important that you place chunk names in the right place, after the little r but between the brackets. Chunk names also go before chunk options, which is discussed below.
+It is important that you place chunk names in the right place, after the little r but between the brackets. You also can't have two chunks with the same name or else the file will halt knitting. Chunk names also go before chunk options, which is discussed below.
 
 ## Chunk options
 
@@ -108,7 +108,11 @@ When writing a RMarkdown document, you may do many "behind the scene" things, li
 plot(iris$Sepal.Length, iris$Sepal.Width)
 ```
 
-"echo" is an option that allows you to hide the code but show the output in a HTML document. Imagine if wrote a lot of code to create a nice visualization, but the code is so messy it would distract from the visualization. Therefore, you could use "echo=FALSE" to hide the code but show the visualization. Readers would not know how you created the visualization. Chunks will default to "echo=TRUE" if nothing contradicting it is specified.
+```{r}
+# See? It's disappeared!
+```
+
+"echo" is an option that allows you to hide the code but show the output in a HTML document. Imagine if you wrote a lot of code to create a nice visualization, but the code is so messy it would distract the reader from the visualization. Therefore, you could use "echo=FALSE" to hide the code but show the visualization. Readers would not know how you created the visualization. Chunks will default to "echo=TRUE" if nothing contradicting it is specified.
 
 ```{r echo=FALSE}
 barplot(euro)
@@ -119,17 +123,20 @@ Similiarly, imagine you are doing statistical analyses and you end up with some 
 ```{r warning=FALSE}
 data <- data.frame(replicate(10,sample(0:1,10,rep=TRUE)))
 sjp.corr(data)
+# Warning is supressed
 ```
 
-Messages are different warnings as they are usually harmless. Messages often tell you details about your analysis that you might not be aware of, like the correlation method used when creating a correlation matrix.
+Messages are different from warnings as they are usually harmless. Messages often tell you details about your analysis that you might not be aware of, like the correlation method used when creating a correlation matrix.
 
 ```{r message=FALSE}
+data <- data.frame(replicate(10,sample(0:1,10,rep=TRUE)))
 sjp.corr(data)
+# Message is suppressed
 ```
 
-If you wanted to hide your results but show the syntax, you would use the "results = 'hide'".
+If you wanted to hide your results but show the syntax, you would use the "results = 'hide'" along with "echo=TRUE".
 
-```{r results = 'hide'}
+```{r echo=TRUE, results='hide'}
 matrix <- matrix(rexp(200, rate=.1), ncol=20)
 barplot(matrix)
 ```
@@ -208,4 +215,3 @@ plot(gg)
 rm(gg)
 rm(midwest)
 ```
-
