@@ -1,0 +1,252 @@
+---
+title: 'Clinical Cut-Offs for the CDI, MFQ, and SCARED'
+author: "Julianna Calabrese"
+date: "February 28, 2019"
+output:
+  html_document:
+    toc: true
+    theme: united
+    highlight: tango
+editor_options:
+  chunk_output_type: console
+---
+
+```{r include=FALSE}
+library(mosaic)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(psych)
+library(nlme)
+library(plyr)
+library(Hmisc)
+library(rmarkdown)
+library(psych)
+library(corrr)
+library(corrplot)
+library(reshape2)
+library(scales)
+library(sjPlot)
+library(car)
+library(knitr)
+library(kableExtra)
+library(summarytools)
+library(DT)
+library(qdapTools)
+library(data.table)
+library(tibble)
+library(stats)
+library(reshape)
+library(yaml)
+library(shiny)
+library(scales)
+library(RColorBrewer)
+library(papaja)
+library(knitcitations)
+```
+
+```{r include=FALSE}
+cdi <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review/cdi.csv')
+mfq <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review/mfq.csv')
+scared <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review/scared.csv')
+demo <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review/full_demo.csv')
+names(cdi)[names(cdi) == "ï..id"] <- "id"
+names(mfq)[names(mfq) == "ï..id"] <- "id"
+names(scared)[names(scared) == "ï..id"] <- "id"
+
+demo[demo=="77"] <- NA
+demo[demo=="88"] <- NA
+demo[demo=="-99"] <- NA
+
+cdi[cdi=="77"] <- NA
+cdi[cdi=="88"] <- NA
+cdi[cdi=="-99"] <- NA
+
+mfq[mfq=="77"] <- NA
+mfq[mfq=="88"] <- NA
+mfq[mfq=="-99"] <- NA
+
+scared[scared=="77"] <- NA
+scared[scared=="88"] <- NA
+scared[scared=="-99"] <- NA
+
+cdi <- merge(cdi, demo, by="id")
+mfq <- merge(mfq, demo, by="id")
+scared <- merge(scared, demo, by="id")
+rm(demo)
+```
+
+## Children's Depression Inventory
+
+```{r Making CDI datasets, include=FALSE}
+cdi_info <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cdi/cdi_info.csv')
+cdi_f <- cdi[ which(cdi$gender =='F'), ]
+cdi_m <- cdi[ which(cdi$gender =='M'), ]
+```
+
+```{r CDI Criteria Table, echo=FALSE, message=FALSE, warning=FALSE}
+cdi_info %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "CDI Cutoffs") %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+```{r include=FALSE}
+very_elevated_girl <- nrow(cdi_f[cdi_f$CDIchild_Tot_Sum >= 24, ])
+very_elevated_boy <- nrow(cdi_m[cdi_m$CDIchild_Tot_Sum >= 19, ])
+
+elevated_girl <- nrow(cdi_f[cdi_f$CDIchild_Tot_Sum == 20 | cdi_f$CDIchild_Tot_Sum == 21 | cdi_f$CDIchild_Tot_Sum == 22 | cdi_f$CDIchild_Tot_Sum == 23, ])
+elevated_boy <- nrow(cdi_m[cdi_m$CDIchild_Tot_Sum == 16 | cdi_m$CDIchild_Tot_Sum == 17 | cdi_m$CDIchild_Tot_Sum == 18, ])
+
+high_average_girl <- nrow(cdi_f[cdi_f$CDIchild_Tot_Sum == 19 | cdi_f$CDIchild_Tot_Sum == 18 | cdi_f$CDIchild_Tot_Sum == 17 | cdi_f$CDIchild_Tot_Sum == 16, ])
+high_average_boy <- nrow(cdi_m[cdi_m$CDIchild_Tot_Sum == 13 | cdi_m$CDIchild_Tot_Sum == 14 | cdi_m$CDIchild_Tot_Sum == 15, ])
+
+average_girl <- nrow(cdi_f[cdi_f$CDIchild_Tot_Sum <= 15, ])
+average_boy <- nrow(cdi_m[cdi_m$CDIchild_Tot_Sum <= 12, ])
+```
+
+```{r include=FALSE}
+Criteria <- c("Very Elevated", "Elevated", "High Average", "Average or Lower", "Very Elevated", "Elevated", "High Average", "Average or Lower")
+Gender <- c("Male", "Male", "Male", "Male", "Female", "Female", "Female", "Female")
+Count <- 0            
+cdi_count <- data.frame(Criteria, Gender, Count)
+cdi_count <- dcast(cdi_count, Criteria ~ Gender)
+
+cdi_count$Female[cdi_count$Criteria == "Very Elevated"] <- very_elevated_girl
+cdi_count$Male[cdi_count$Criteria == "Very Elevated"] <- very_elevated_boy
+
+cdi_count$Female[cdi_count$Criteria == " Elevated"] <- elevated_girl
+cdi_count$Male[cdi_count$Criteria == "Elevated"] <- elevated_boy
+
+cdi_count$Female[cdi_count$Criteria == "High Average"] <- high_average_girl
+cdi_count$Male[cdi_count$Criteria == "High Average"] <- high_average_boy
+
+cdi_count$Female[cdi_count$Criteria == "Average or Lower"] <- average_girl
+cdi_count$Male[cdi_count$Criteria == "Average or Lower"] <- average_boy
+```
+
+```{r CDI Count Table, echo=FALSE, warning=FALSE, message=FALSE}
+cdi_count %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "SAND Sample & CDI Cutoffs", font_size=2) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+```{r CDI Girls, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cdi_f, aes(x=CDIchild_Tot_Sum)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("CDI Total Sum for Girls") + 
+  annotate("rect", xmin=24, xmax=39, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=20, xmax=24, ymin=0, ymax=Inf, alpha=0.4, fill="red") +
+  annotate("rect", xmin=15, xmax=20, ymin=0, ymax=Inf, alpha=0.2, fill="red") +
+  annotate("rect", xmin=0, xmax=14, ymin=0, ymax=Inf, alpha=0.0, fill="red")
+```
+
+```{r CDI Boys, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cdi_m, aes(x=CDIchild_Tot_Sum)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("CDI Total Sum for Boys") + 
+  annotate("rect", xmin=19, xmax=31, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=16, xmax=19, ymin=0, ymax=Inf, alpha=0.4, fill="red") +
+  annotate("rect", xmin=13, xmax=16, ymin=0, ymax=Inf, alpha=0.2, fill="red") +
+  annotate("rect", xmin=0, xmax=13, ymin=0, ymax=Inf, alpha=0.0, fill="red")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cdi","mfq", "scared")])
+```
+
+```{r include=FALSE}
+# Kovacs, M. (2011). Children's depression inventory (CDI2): Technical manual. North Tonawanda, NY: Multi-Health Systems, Inc.
+```
+
+## Mood and Feelings Questionnaire
+
+Please note that the MFQ has no cut-off scores. [Here is a link to a message from creator of the MFQ regarding cut-off scores.](http://devepi.duhs.duke.edu/.%5Cinstruments%5CMFQ%20user.pdf) It says, "Rather it is up to users to decide what will be most useful in their particular
+circumstances."
+
+```{r MFQ Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
+col <- c("mediumorchid3", "cyan3")
+p <- ggplot(mfq, aes(gender, MFQ_C_Sum))
+p + geom_boxplot(fill=col) + ylab("MFQ Total Score") + xlab("Gender")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+summarytools::descr(mfq$MFQ_C_Sum, na.rm=TRUE, style = "rmarkdown", 
+                    stats = c("mean", "sd", "min", "med", "max", "Q1", "Q3", "IQR"),
+                    headings = FALSE, justify = "left", col.widths = 600)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(mfq, aes(x=MFQ_C_Sum)) + geom_histogram(colour="white",fill="yellowgreen")  + xlab("Total Score") + ylab("Count") + ggtitle("MFQ Total Sum")
+```
+
+According to a publication (Daviss et al., 2006) that is listed on the MFQ's website, a total MFQ score of 29 "optimally discriminated youth with MDE from the rest of the sample." 36 participants have a MFQ score of 29+.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(mfq, aes(x=MFQ_C_Sum)) + geom_histogram(colour="white",fill="yellowgreen")  + xlab("Total Score") + ylab("Count") + ggtitle("MFQ Total Sum") + 
+  annotate("rect", xmin=29, xmax=47, ymin=0, ymax=Inf, alpha=0.6, fill="red")
+```
+
+```{r include=FALSE}
+nrow(mfq[mfq$MFQ_C_Sum >= 29, ]) #36
+```
+
+```{r include=FALSE}
+citep("10.1111/j.1469-7610.2006.01646.x")
+```
+
+## Screen for Child Anxiety Related Disorders
+
+```{r SCARED Criteria Table, echo=FALSE, warning=FALSE, message=FALSE}
+Subscale <- c("SCARED Total", "Panic Disorder", "GAD", "Separation Anx", "Social Anx", "School Avoidance")
+Cutoff <- c(25, 7, 9, 5, 8, 3)
+scared_info <- data.frame(Subscale, Cutoff)
+
+scared_info %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "SCARED Cutoffs", font_size=2) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+```{r include=FALSE}
+scared_f <- scared[ which(scared$gender =='F'), ]
+scared_m <- scared[ which(scared$gender =='M'), ]
+```
+
+```{r include=FALSE} 
+nrow(scared_f[scared_f$SCARED_C_Sum >= 25, ]) #44
+```
+
+```{r SCARED Girls, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared_f, aes(x=SCARED_C_Sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Total Sum for Girls") + 
+  annotate("rect", xmin=25, xmax=55, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "44 girls have a score of 25+.")
+```
+
+```{r include=FALSE} 
+nrow(scared_m[scared_m$SCARED_C_Sum >= 25, ]) #17
+```
+
+```{r SCARED Boys, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared_m, aes(x=SCARED_C_Sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Total Sum for Boys") + 
+  annotate("rect", xmin=25, xmax=42, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "17 boys have a score of 25+.")
+```
+
+44 girls and 17 boys have a score of 25+. As measured by the SCARED measure, A little over 25% of the SAND sample have significant levels of anxiety.
+
+```{r include=FALSE}
+citep(" 10.1097/00004583-199910000-00011")
+```
+
+```{r include=FALSE}
+#http://www.midss.org/content/screen-child-anxiety-related-disorders-scared
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cdi","mfq", "scared")])
+```
+
+## References
+
+Kovacs, M. (2011). Children's depression inventory (CDI2): Technical manual. North Tonawanda, NY: Multi-Health Systems, Inc.
+
+```{r Citations, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+#Manually citing the books above
+bibliography(style="html")
+```
