@@ -111,7 +111,11 @@ ysr <- ysr[, -c(2:137)]
 
 I found information for the CBCL and YSR in Room 1415. It appears to be a photo-copied version of a book (only the first five chapters), I think it's the *Manual for the ASEBA School-Age Forms & Profiles*, but I can't be 100% because there is no title/cover page for the book. It contained lots of information about its subscales and normative studies done.
 
-[Here is a pdf version for the CBCL subscales](http://www.aseba.org/forms/cbclprofile.pdf) and [here is a pdf version for the YSR subscales.](http://www.aseba.org/forms/ysrprofile.pdf). Both of the measures include many different kinds of subscales that I listed below. Whoever cleaned the CBCL and YSR only calculated the DSM-oriented subscales, so I only included those in analysis and did not calculate other subscales, although I could easily do so if needed.
+[Here is a pdf version for the CBCL subscales](http://www.aseba.org/forms/cbclprofile.pdf) and [here is a pdf version for the YSR subscales.](http://www.aseba.org/forms/ysrprofile.pdf). Both of the measures include many different kinds of subscales that I listed below. Whoever cleaned the CBCL and YSR only calculated the DSM-oriented subscales, so I only included those in analysis and did not calculate other subscales, although I could easily do so if needed. According to this book for both the CBCL and YSR DSM/Syndrome subscales, a score is considered clinical if its T score is 64 or greater and is considered borderline if its T score is between 60 and 63. I think the T-scoring process has to be made in reference to the normative sample though (M = 50, SD = 10). 
+
+```{r include=FALSE}
+citep("10.1016/j.rasd.2011.03.009") 
+```
 
 * Competence
     * Activites
@@ -145,6 +149,8 @@ I found information for the CBCL and YSR in Room 1415. It appears to be a photo-
 
 ## Child Behavior Checklist
 
+### SAND Sample CBCL Subscales
+
 ```{r SAND CBCL Barplot, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 Scores <- c((mean(cbcl$cbcl_anx_tot, na.rm=TRUE)), 
                  (mean(cbcl$cbcl_somatic_tot, na.rm=TRUE)), 
@@ -169,6 +175,8 @@ rm(Subscales)
 ```
 
 Please note that for the below plot, regarding the normative sample for the CBCL, I only included scores for participants aged 12-18.
+
+### CBCL SAND Sample vs. Normative
 
 ```{r SAND CBCL vs. Norm CBCL, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 cbcl_f <- cbcl[ which(cbcl$gender =='F'), ]
@@ -246,6 +254,56 @@ rm(df1_f)
 rm(df1_m)
 rm(cbcl_f)
 rm(cbcl_m)
+```
+
+### Scaling CBCL variables so mean = 50
+
+```{r Rescaling CBCL depression, include=FALSE}
+mean(cbcl$cbcl_dep_tot, na.rm=TRUE)
+cbcl$cbcl_dep_t <- (cbcl$cbcl_dep_tot*(50/(mean(cbcl$cbcl_dep_tot, na.rm=TRUE))))
+mean(cbcl$cbcl_dep_t, na.rm=TRUE)
+```
+
+```{r Rescaling CBCL anxiety, include=FALSE}
+mean(cbcl$cbcl_anx_tot, na.rm=TRUE)
+cbcl$cbcl_anx_t <- (cbcl$cbcl_anx_tot*(50/(mean(cbcl$cbcl_anx_tot, na.rm=TRUE))))
+mean(cbcl$cbcl_anx_t, na.rm=TRUE)
+```
+
+```{r Plotting CBCL depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL Depression") + 
+  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+```{r Plotting CBCL anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL Anxiety") + 
+  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+```{r CBCL Count Table, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+nrow(cbcl[cbcl$cbcl_dep_t <= 59, ]) #206
+nrow(cbcl[cbcl$cbcl_dep_t == 60 | cbcl$cbcl_dep_t == 61 | cbcl$cbcl_dep_t == 62 | cbcl$cbcl_dep_t == 63, ]) #3
+nrow(cbcl[cbcl$cbcl_dep_t >= 64, ]) #26
+
+nrow(cbcl[cbcl$cbcl_anx_t <= 59, ]) #195
+nrow(cbcl[cbcl$cbcl_anx_t == 60 | cbcl$cbcl_anx_t == 61 | cbcl$cbcl_anx_t == 62 | cbcl$cbcl_anx_t == 63, ]) #3
+nrow(cbcl[cbcl$cbcl_anx_t >= 64, ]) #31
+
+Criteria <- c("Normal", "Borderline", "Clinical")
+Depression <- c(206, 3, 26)
+Anxiety <- c(195, 3, 31)
+df <- data.frame(Criteria, Depression, Anxiety)
+rm(Criteria)
+rm(Depression)
+rm(Anxiety)
+
+df %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "SAND Sample & CBCL Cutoffs", font_size=2) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+rm(df)
 ```
 
 ## Youth Self-Report
@@ -351,4 +409,54 @@ rm(df1_f)
 rm(df1_m)
 rm(ysr_f)
 rm(ysr_m)
+```
+
+### Scaling YSR variables so mean = 50
+
+```{r Rescaling YSR depression, include=FALSE}
+mean(ysr$ysr_dep_tot, na.rm=TRUE)
+ysr$ysr_dep_t <- (ysr$ysr_dep_tot*(50/(mean(ysr$ysr_dep_tot, na.rm=TRUE))))
+mean(ysr$ysr_dep_t, na.rm=TRUE)
+```
+
+```{r Rescaling YSR anxiety, include=FALSE}
+mean(ysr$ysr_anx_tot, na.rm=TRUE)
+ysr$ysr_anx_t <- (ysr$ysr_anx_tot*(50/(mean(ysr$ysr_anx_tot, na.rm=TRUE))))
+mean(ysr$ysr_anx_t, na.rm=TRUE)
+```
+
+```{r Plotting YSR depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(ysr, aes(x=ysr_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("YSR Depression") + 
+  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+```{r Plotting YSR anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(ysr, aes(x=ysr_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("YSR Anxiety") + 
+  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+```{r YSR Count Table, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+nrow(ysr[ysr$ysr_dep_t <= 59, ]) #193
+nrow(ysr[ysr$ysr_dep_t == 60 | ysr$ysr_dep_t == 61 | ysr$ysr_dep_t == 62 | ysr$ysr_dep_t == 63, ]) #2
+nrow(ysr[ysr$ysr_dep_t >= 64, ]) #27
+
+nrow(ysr[ysr$ysr_anx_t <= 59, ]) #189
+nrow(ysr[ysr$ysr_anx_t == 60 | ysr$ysr_anx_t == 61 | ysr$ysr_anx_t == 62 | ysr$ysr_anx_t == 63, ]) #2
+nrow(ysr[ysr$ysr_anx_t >= 64, ]) #34
+
+Criteria <- c("Normal", "Borderline", "Clinical")
+Depression <- c(193, 2, 27)
+Anxiety <- c(189, 2, 34)
+df <- data.frame(Criteria, Depression, Anxiety)
+rm(Criteria)
+rm(Depression)
+rm(Anxiety)
+
+df %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "SAND Sample & YSR Cutoffs", font_size=2) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+rm(df)
 ```
