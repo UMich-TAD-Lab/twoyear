@@ -1,0 +1,145 @@
+---
+title: "CTQ"
+author: Alexa Kalaj
+date: "February 28, 2019"
+output: html_document
+editor_options:
+  chunk_output_type: console
+  ---
+  
+## Load in library
+
+```{r include=FALSE}
+library(car)
+library(ggplot2)
+library(MASS)
+library(Hmisc)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(plyr)
+library(summarytools)
+library(psych)
+```
+
+First, you should download your survey data from Redcap in the form of a csv file. Instructions are on the Github readme. 
+
+Here is a pdf about the SCARED for reference: https://sspediatricassociates.com/Forms-and-Policies/Forms/Behavioral,-Mental-Health-Assessment-Forms/SCARED-form-Parent-and-Child-version.aspx
+
+You should find a reference for your specific measure. To do this, you should first look at the Codebook (GoogleDrive -> Undergrad resources -> Codebook Materials). In there are multiple GoogleDocs that include links to Box that contain material-relevant pdfs. The GoogleDocs also contain citations for the original measure.
+
+If you are confused about any functions/commands used below, type question mark then the name of the command, e.g. ?library. This will provide a description and a few examples about how that function is used.
+
+# Pre-Analysis Cleaning for Two Year Data
+
+## Load in Two Year data
+
+Change the below syntax to fit your computer and where you put your data file, like Desktop or Documents. Replace scared_twoyear with whatever you want to call your dataset, e.g. data or nameofmeasure, just make sure you'll be able to tell that it's the two year data. 
+
+```{r}
+CTQchild_2yr <- read.csv("C:/Users/alexakal/Desktop/CTQchild_2yr.csv")
+```
+
+### Remove empty rows
+
+Replace scared_twoyear with whatever you want to call your dataset and replace scared1_1_2yr with whatever the first item of the dataset. The syntax removes all rows where there is NA for the first item, so theoretically, this should remove everyone who hasn't completed the Qualtrics survey first. This isn't perfect, since some people may have just happened to skip the first item, but this will do for preliminary statistics. 
+
+```{r}
+CTQchild_2yr <- CTQchild_2yr[!is.na(CTQchild_2yr$ctq1_2_2yr),]
+```
+
+## Re-scaling variables
+
+This requires a bit of foresight, but eventually you're going to want to compare the two year data with the original data. I know that the original SCARED data follows a 0-1-2 scale, but the two year data uses a 1-2-3 scale, so we're going to want to always alter the two year data to fit the original data. 
+
+There is probably an easier way to recode multiple variables at once, instead of recoding each variable at a time, so let me know if you find an alternative!
+
+```{r}
+CTQchild_2yr$ctq1_2_2yr <- car::recode(CTQchild_2yr$ctq1_2_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq1_5_2yr <- car::recode(CTQchild_2yr$ctq1_5_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq1_6_2yr <- car::recode(CTQchild_2yr$ctq1_6_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq1_7_2yr <- car::recode(CTQchild_2yr$ctq1_7_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq2_8_2yr <- car::recode(CTQchild_2yr$ctq2_8_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq2_10_2yr <- car::recode(CTQchild_2yr$ctq2_10_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq2_13_2yr <- car::recode(CTQchild_2yr$ctq2_13_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq3_16_2yr <- car::recode(CTQchild_2yr$ctq3_16_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq3_18_2yr <- car::recode(CTQchild_2yr$ctq3_18_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq3_19_2yr <- car::recode(CTQchild_2yr$ctq3_19_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq4_22_2yr <- car::recode(CTQchild_2yr$ctq4_22_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq4_26_2yr <- car::recode(CTQchild_2yr$ctq4_26_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+CTQchild_2yr$ctq4_28_2yr <- car::recode(CTQchild_2yr$ctq4_28_2yr, "1 = 0; 2 = 1; 3 = 2; 4 = 3; 5 = 4")
+```
+
+### Reverse coding
+
+Some items may need to be reverse-coded, but to my knowledge, SCARED has no items that need to be coded, but this is what you would do if you needed to. Please note that now, the SCARED uses a scale of 0-1-2. We'll use the same syntax for rescaling variable, but this time, we'll create a new re-coded variable while maintaining the old un-re-coded variable. 
+
+```{r}
+scared_twoyear$scared1_1_2yr_recode <- car::recode(scared_twoyear$scared1_1_2yr, "0 = 2; 2 = 0")
+
+print(scared_twoyear$scared1_1_2yr)
+print(scared_twoyear$scared1_1_2yr_recode)
+
+#Now let's remove the made-up recode variable
+
+scared_twoyear$scared1_1_2yr_recode <- NULL
+#You could also do this to remove the old un-coded variable that needed to be reverse coded
+```
+
+## Make a sum and a mean variable
+
+The below syntax creates two variables and adds them back to the dataset: the mean of all the items and the sum of all the items.
+
+```{r}
+names(CTQchild_2yr) #This prints the dataset's variables names so, which makes it so I don't totally have to write out each individual variable name
+
+ctq_vars_dummy <- cbind(CTQchild_2yr$ctq1_2_2yr, CTQchild_2yr$ctq1_5_2yr, CTQchild_2yr$ctq1_6_2yr, CTQchild_2yr$ctq1_7_2yr, CTQchild_2yr$ctq2_8_2yr, CTQchild_2yr$ctq2_10_2yr, CTQchild_2yr$ctq2_13_2yr, CTQchild_2yr$ctq3_16_2yr, CTQchild_2yr$ctq3_18_2yr, CTQchild_2yr$ctq3_19_2yr, CTQchild_2yr$ctq4_22_2yr, CTQchild_2yr$ctq4_26_2yr, CTQchild_2yr$ctq4_28_2yr)
+```
+
+```{r}
+CTQchild_2yr$ctq_total_mean <- rowMeans(ctq_vars_dummy, na.rm=TRUE)
+```
+
+```{r}
+CTQchild_2yr$ctq_total_sum <- rowSums(ctq_vars_dummy, na.rm=TRUE)
+```
+
+```{r}
+rm(ctq_vars_dummy)
+```
+
+## Calculate subscales
+
+SCARED has multiple subscales: social anxiety, general anxiety, panic disorder, etc. Below I calculate the Panic Disorder subscale. I'll bind all the items of that specific subscale, add them together, sum their rows, and put it back in the dataset with a new variable name. Then I remove the "binded" variables because we don't need that object anymore.
+
+```{r}
+panic_disorder_dummy <- cbind(scared_twoyear$scared1_1_2yr, scared_twoyear$scared1_6_2yr, scared_twoyear$scared2_9_2yr, scared_twoyear$scared2_12_2yr, scared_twoyear$scared3_15_2yr, scared_twoyear$scared3_18_2yr, scared_twoyear$scared4_19_2yr, scared_twoyear$scared4_22_2yr, scared_twoyear$scared4_24_2yr, scared_twoyear$scared5_27_2yr, scared_twoyear$scared5_30_2yr, scared_twoyear$scared6_34_2yr, scared_twoyear$scared6_28_2yr)
+
+scared_twoyear$panic_disorder <- rowSums(panic_disorder_dummy, na.rm=TRUE)
+
+rm(panic_disorder_dummy)
+```
+
+Depending on your measure, you might want to have a mean and a sum variable for each subscale. You would use rowSums() and rowMeans() respectively. The above chunk only makes a sum variable for the Panic Disorder subscale.
+
+Whoever is doing the SCARED dataset should do the other subscales here.
+
+# Descriptive statistics for two year data
+
+Now you can start to descriptive statistics. Below is a list of things that you might want to calculate for all the items. Make sure to be careful to not run statistics on the *entire* dataset, as the entire dataset includes id, scared_youth_paper_2yr, and scared_youth_complete, and those aren't meaningful variables.
+
+* Sum
+* Mean
+* Median
+* Std dev
+* Std error
+* Min/max/range
+* IQR
+* Kurtosis
+* Skewness
+
+Luckily, instead of writing out syntax for each statistic (e.g. mean(), sd(), etc.), there are funcitons that will write out a nice descriptive statistics table.
+
+```{r, results='asis'}
+summarytools::descr(scared_twoyear, style = "rmarkdown", na.rm=TRUE)
+```
