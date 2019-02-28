@@ -1,0 +1,354 @@
+---
+title: "Analyzing CBCL and YSR from Wave 15"
+author: "Julianna Calabrese"
+date: "February 28, 2019"
+output:
+  html_document:
+    toc: true
+    theme: united
+    highlight: tango
+editor_options:
+  chunk_output_type: console
+---
+
+```{r include=FALSE}
+library(mosaic)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(psych)
+library(nlme)
+library(plyr)
+library(Hmisc)
+library(rmarkdown)
+library(psych)
+library(corrr)
+library(corrplot)
+library(reshape2)
+library(scales)
+library(sjPlot)
+library(car)
+library(knitr)
+library(kableExtra)
+library(summarytools)
+library(DT)
+library(qdapTools)
+library(data.table)
+library(tibble)
+library(stats)
+library(reshape)
+library(yaml)
+library(shiny)
+library(scales)
+library(RColorBrewer)
+library(papaja)
+library(knitcitations)
+```
+
+```{r Load in data, include=FALSE}
+cbcl <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cbcl_ysr/cbcl.csv')
+ysr <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cbcl_ysr/ysr.csv')
+demo <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review/full_demo.csv')
+
+names(cbcl)[names(cbcl) == "ï..id"] <- "id"
+names(ysr)[names(ysr) == "ï..id"] <- "id"
+
+demo[demo=="77"] <- NA
+demo[demo=="88"] <- NA
+demo[demo=="-99"] <- NA
+
+cbcl[cbcl=="77"] <- NA
+cbcl[cbcl=="88"] <- NA
+cbcl[cbcl=="-99"] <- NA
+
+ysr[ysr=="77"] <- NA
+ysr[ysr=="88"] <- NA
+ysr[ysr=="-99"] <- NA
+
+cbcl <- merge(cbcl, demo, by="id")
+ysr <- merge(ysr, demo, by="id")
+rm(demo)
+
+names(cbcl)[names(cbcl) == "CBCL_Anx_Prob_Tot"] <- "cbcl_anx_tot"
+names(cbcl)[names(cbcl) == "CBCL_Som_Prob_Tot"] <- "cbcl_somatic_tot"
+names(cbcl)[names(cbcl) == "CBCL_ADHD_Prob_Tot"] <- "cbcl_adhd_tot"
+names(cbcl)[names(cbcl) == "CBCL_ODD_Prob_Tot"] <- "cbcl_odd_tot"
+names(cbcl)[names(cbcl) == "CBCL_Dep_Prob_Tot"] <- "cbcl_dep_tot"
+names(cbcl)[names(cbcl) == "CBCL_CD_Prob_Tot"] <- "cbcl_cd_tot"
+
+names(cbcl)[names(cbcl) == "CBCL_Anx_Prob_Avg"] <- "cbcl_anx_avg"
+names(cbcl)[names(cbcl) == "CBCL_Som_Prob_Avg"] <- "cbcl_somatic_avg"
+names(cbcl)[names(cbcl) == "CBCL_ADHD_Prob_Avg"] <- "cbcl_adhd_avg"
+names(cbcl)[names(cbcl) == "CBCL_ODD_Prob_Avg"] <- "cbcl_odd_avg"
+names(cbcl)[names(cbcl) == "CBCL_Dep_Prob_Avg"] <- "cbcl_dep_avg"
+names(cbcl)[names(cbcl) == "CBCL_CD_Prob_Avg"] <- "cbcl_cd_avg"
+
+names(ysr)[names(ysr) == "YSR_Anx_Prob_Tot"] <- "ysr_anx_tot"
+names(ysr)[names(ysr) == "YSR_Som_Prob_Tot"] <- "ysr_somatic_tot"
+names(ysr)[names(ysr) == "YSR_ADHD_Prob_Tot"] <- "ysr_adhd_tot"
+names(ysr)[names(ysr) == "YSR_ODD_Prob_Tot"] <- "ysr_odd_tot"
+names(ysr)[names(ysr) == "YSR_Dep_Prob_Tot"] <- "ysr_dep_tot"
+names(ysr)[names(ysr) == "YSR_CD_Prob_Tot"] <- "ysr_cd_tot"
+
+names(ysr)[names(ysr) == "YSR_Anx_Prob_Avg"] <- "ysr_anx_avg"
+names(ysr)[names(ysr) == "YSR_Som_Prob_Avg"] <- "ysr_somatic_avg"
+names(ysr)[names(ysr) == "YSR_ADHD_Prob_Avg"] <- "ysr_adhd_avg"
+names(ysr)[names(ysr) == "YSR_ODD_Prob_Avg"] <- "ysr_odd_avg"
+names(ysr)[names(ysr) == "YSR_Dep_Prob_Avg"] <- "ysr_dep_avg"
+names(ysr)[names(ysr) == "YSR_CD_Prob_Avg"] <- "ysr_cd_avg"
+
+which( colnames(cbcl)=="cbcl1_1") #2
+which( colnames(cbcl)=="cbcl_complete") #141
+cbcl <- cbcl[, -c(2:141)]
+
+which( colnames(ysr)=="ysr1_1") #2
+which( colnames(ysr)=="ysr_complete") #137
+ysr <- ysr[, -c(2:137)]
+```
+
+## Subscales
+
+I found information for the CBCL and YSR in Room 1415. It appears to be a photo-copied version of a book (only the first five chapters), I think it's the *Manual for the ASEBA School-Age Forms & Profiles*, but I can't be 100% because there is no title/cover page for the book. It contained lots of information about its subscales and normative studies done.
+
+[Here is a pdf version for the CBCL subscales](http://www.aseba.org/forms/cbclprofile.pdf) and [here is a pdf version for the YSR subscales.](http://www.aseba.org/forms/ysrprofile.pdf). Both of the measures include many different kinds of subscales that I listed below. Whoever cleaned the CBCL and YSR only calculated the DSM-oriented subscales, so I only included those in analysis and did not calculate other subscales, although I could easily do so if needed.
+
+* Competence
+    * Activites
+    * Social
+    * School/Academic Performance
+* Syndrome
+    * Anxious/Depressed
+    * Withdrawn/Depressed
+    * Somatic Complaints
+    * Social Problems
+    * Thought Problems
+    * Attention Problems
+    * Rule-Breaking Behavior
+    * Aggressive Behavior
+* Total Problems
+    * Internalizing
+    * Externalizing
+    * Total
+* **DSM-Oriented**
+    * Depressive Problems
+    * Anxiety Problems
+    * Somatic Problems
+    * Attention Deficit
+    * Oppositional Defiant Problems
+    * Conduct Problems
+* 2007 Scales 
+    * Sluggish Cognitive Tempo (CBCL only)
+    * Obsessive-Compulsive Problems
+    * Stress Problems
+    * Positive Qualities (YSR only)
+
+## Child Behavior Checklist
+
+```{r SAND CBCL Barplot, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Scores <- c((mean(cbcl$cbcl_anx_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_somatic_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_adhd_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_odd_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_dep_tot, na.rm=TRUE)),
+                 (mean(cbcl$cbcl_cd_tot, na.rm=TRUE)))
+Subscales <- c("Anxiety", "Somatic Problems", "ADHD", "ODD", "Depression", "CD")
+df <- data.frame(Scores, Subscales)
+rm(Scores)
+
+col <- rainbow(6)
+
+ggplot(data=df, aes(x=Subscales, y=Scores, fill=col)) + 
+  geom_bar(stat="identity") + ggtitle("CBCL SAND Sample DSM Total Subscales") + 
+  theme(legend.position = "right") + ylab("") + xlab("") +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + theme(legend.position = "none")
+
+rm(df)
+rm(col)
+rm(Subscales)
+```
+
+Please note that for the below plot, regarding the normative sample for the CBCL, I only included scores for participants aged 12-18.
+
+```{r SAND CBCL vs. Norm CBCL, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+cbcl_f <- cbcl[ which(cbcl$gender =='F'), ]
+cbcl_m <- cbcl[ which(cbcl$gender =='M'), ]
+
+Subscales <- c("Anxiety", "Somatic Problems", "ADHD", "ODD", "Depression", "CD", "Anxiety", "Somatic Problems", "ADHD", "ODD", "Depression", "CD")
+Gender <- c("Male", "Male", "Male", "Male", "Male", "Male", 
+            "Female", "Female", "Female", "Female", "Female", "Female")
+
+SAND <- c((mean(cbcl_m$cbcl_anx_avg, na.rm=TRUE)), 
+          (mean(cbcl_m$cbcl_somatic_avg, na.rm=TRUE)), 
+          (mean(cbcl_m$cbcl_adhd_avg, na.rm=TRUE)), 
+          (mean(cbcl_m$cbcl_odd_avg, na.rm=TRUE)), 
+          (mean(cbcl_m$cbcl_dep_avg, na.rm=TRUE)),
+          (mean(cbcl_m$cbcl_cd_avg, na.rm=TRUE)),
+          (mean(cbcl_f$cbcl_anx_avg, na.rm=TRUE)), 
+          (mean(cbcl_f$cbcl_somatic_avg, na.rm=TRUE)), 
+          (mean(cbcl_f$cbcl_adhd_avg, na.rm=TRUE)), 
+          (mean(cbcl_f$cbcl_odd_avg, na.rm=TRUE)), 
+          (mean(cbcl_f$cbcl_dep_avg, na.rm=TRUE)),
+          (mean(cbcl_f$cbcl_cd_avg, na.rm=TRUE)))
+
+Normative <- 0
+
+df <- data.frame(Subscales, Gender, SAND, Normative)
+
+df$Normative[df$Subscales == "Anxiety" & df$Gender == "Female"] <- 1.4
+df$Normative[df$Subscales == "Anxiety" & df$Gender == "Male"] <- 1.2
+
+df$Normative[df$Subscales == "Somatic Problems" & df$Gender == "Female"] <- 1
+df$Normative[df$Subscales == "Somatic Problems" & df$Gender == "Male"] <- 0.8
+
+df$Normative[df$Subscales == "ADHD" & df$Gender == "Female"] <- 2.3
+df$Normative[df$Subscales == "ADHD" & df$Gender == "Male"] <- 3.2
+
+df$Normative[df$Subscales == "ODD" & df$Gender == "Female"] <- 2.2
+df$Normative[df$Subscales == "ODD" & df$Gender == "Male"] <- 2.4
+
+df$Normative[df$Subscales == "Depression" & df$Gender == "Female"] <- 1.9
+df$Normative[df$Subscales == "Depression" & df$Gender == "Male"] <- 1.6
+
+df$Normative[df$Subscales == "CD" & df$Gender == "Female"] <- 1.8
+df$Normative[df$Subscales == "CD" & df$Gender == "Male"] <- 2.4
+
+df1 <- melt(df, id.vars=c("Subscales", "Gender"))
+names(df1)[names(df1) == "variable"] <- "Group"
+names(df1)[names(df1) == "value"] <- "Score"
+
+cbcl_f <- cbcl[ which(cbcl$gender =='F'), ]
+df1_f <- df1[ which(df1$Gender == 'Female'), ]
+df1_m <- df1[ which(df1$Gender == 'Male'), ]
+
+ggplot(data=df1, aes(x=Subscales, y=Score, fill=Group)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("CBCL: SAND vs. Normative Sample") + 
+  theme(legend.position = "right") + ylab("") + xlab("") + 
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8))
+
+ggplot(data=df1_f, aes(x=Subscales, y=Score, fill=Group)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("CBCL Only Female: SAND vs. Normative Sample") + 
+  theme(legend.position = "right") + ylab("") + xlab("") + 
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8))
+
+ggplot(data=df1_m, aes(x=Subscales, y=Score, fill=Group)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("CBCL Only Male: SAND vs. Normative Sample") + 
+  theme(legend.position = "right") + ylab("") + xlab("") + 
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8))
+
+rm(df)
+rm(Subscales)
+rm(Gender)
+rm(Normative)
+rm(SAND)
+rm(df1)
+rm(df1_f)
+rm(df1_m)
+rm(cbcl_f)
+rm(cbcl_m)
+```
+
+## Youth Self-Report
+
+```{r SAND YSR Barplot, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Scores <- c((mean(ysr$ysr_anx_tot, na.rm=TRUE)), 
+                 (mean(ysr$ysr_somatic_tot, na.rm=TRUE)), 
+                 (mean(ysr$ysr_adhd_tot, na.rm=TRUE)), 
+                 (mean(ysr$ysr_odd_tot, na.rm=TRUE)), 
+                 (mean(ysr$ysr_dep_tot, na.rm=TRUE)),
+                 (mean(ysr$ysr_cd_tot, na.rm=TRUE)))
+Subscales <- c("Anxiety", "Somatic Problems", "ADHD", "ODD", "Depression", "CD")
+df <- data.frame(Scores, Subscales)
+rm(Scores)
+
+col <- rainbow(6)
+
+ggplot(data=df, aes(x=Subscales, y=Scores, fill=col)) + 
+  geom_bar(stat="identity") + ggtitle("YSR SAND Sample DSM Total Subscales") + 
+  theme(legend.position = "right") + ylab("") + xlab("") +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + theme(legend.position = "none")
+
+rm(df)
+rm(col)
+rm(Subscales)
+```
+
+Please note that for the below plot, regarding the normative sample for the YSR, I only included scores for participants aged 11-18.
+
+```{r SAND YSR vs. Norm YSR, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ysr_f <- ysr[ which(ysr$gender =='F'), ]
+ysr_m <- ysr[ which(ysr$gender =='M'), ]
+
+Subscales <- c("Anxiety", "Somatic Problems", "ADHD", "ODD", "Depression", "CD", "Anxiety", "Somatic Problems", "ADHD", "ODD", "Depression", "CD")
+Gender <- c("Male", "Male", "Male", "Male", "Male", "Male", 
+            "Female", "Female", "Female", "Female", "Female", "Female")
+
+SAND <- c((mean(ysr_m$ysr_anx_avg, na.rm=TRUE)), 
+          (mean(ysr_m$ysr_somatic_avg, na.rm=TRUE)), 
+          (mean(ysr_m$ysr_adhd_avg, na.rm=TRUE)), 
+          (mean(ysr_m$ysr_odd_avg, na.rm=TRUE)), 
+          (mean(ysr_m$ysr_dep_avg, na.rm=TRUE)),
+          (mean(ysr_m$ysr_cd_avg, na.rm=TRUE)),
+          (mean(ysr_f$ysr_anx_avg, na.rm=TRUE)), 
+          (mean(ysr_f$ysr_somatic_avg, na.rm=TRUE)), 
+          (mean(ysr_f$ysr_adhd_avg, na.rm=TRUE)), 
+          (mean(ysr_f$ysr_odd_avg, na.rm=TRUE)), 
+          (mean(ysr_f$ysr_dep_avg, na.rm=TRUE)),
+          (mean(ysr_f$ysr_cd_avg, na.rm=TRUE)))
+
+Normative <- 0
+
+df <- data.frame(Subscales, Gender, SAND, Normative)
+
+df$Normative[df$Subscales == "Anxiety" & df$Gender == "Female"] <- 3
+df$Normative[df$Subscales == "Anxiety" & df$Gender == "Male"] <- 2.2
+
+df$Normative[df$Subscales == "Somatic Problems" & df$Gender == "Female"] <- 2
+df$Normative[df$Subscales == "Somatic Problems" & df$Gender == "Male"] <- 1.3
+
+df$Normative[df$Subscales == "ADHD" & df$Gender == "Female"] <- 4.4
+df$Normative[df$Subscales == "ADHD" & df$Gender == "Male"] <- 4.2
+
+df$Normative[df$Subscales == "ODD" & df$Gender == "Female"] <- 2.9
+df$Normative[df$Subscales == "ODD" & df$Gender == "Male"] <- 2.7
+
+df$Normative[df$Subscales == "Depression" & df$Gender == "Female"] <- 4.2
+df$Normative[df$Subscales == "Depression" & df$Gender == "Male"] <- 3.1
+
+df$Normative[df$Subscales == "CD" & df$Gender == "Female"] <- 2.8
+df$Normative[df$Subscales == "CD" & df$Gender == "Male"] <- 3.3
+
+df1 <- melt(df, id.vars=c("Subscales", "Gender"))
+names(df1)[names(df1) == "variable"] <- "Group"
+names(df1)[names(df1) == "value"] <- "Score"
+
+cbcl_f <- cbcl[ which(cbcl$gender =='F'), ]
+df1_f <- df1[ which(df1$Gender == 'Female'), ]
+df1_m <- df1[ which(df1$Gender == 'Male'), ]
+
+ggplot(data=df1, aes(x=Subscales, y=Score, fill=Group)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("YSR: SAND vs. Normative Sample") + 
+  theme(legend.position = "right") + ylab("") + xlab("") + 
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8))
+
+ggplot(data=df1_f, aes(x=Subscales, y=Score, fill=Group)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("YSR Only Female: SAND vs. Normative Sample") + 
+  theme(legend.position = "right") + ylab("") + xlab("") + 
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8))
+
+ggplot(data=df1_m, aes(x=Subscales, y=Score, fill=Group)) + 
+  geom_bar(stat="identity", position="dodge") + ggtitle("YSR Only Male: SAND vs. Normative Sample") + 
+  theme(legend.position = "right") + ylab("") + xlab("") + 
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8))
+
+rm(df)
+rm(Subscales)
+rm(Gender)
+rm(Normative)
+rm(SAND)
+rm(df1)
+rm(df1_f)
+rm(df1_m)
+rm(ysr_f)
+rm(ysr_m)
+```
