@@ -109,13 +109,15 @@ ysr <- ysr[, -c(2:137)]
 
 ## Subscales
 
-I found information for the CBCL and YSR in Room 1415. It appears to be a photo-copied version of a book (only the first five chapters), I think it's the *Manual for the ASEBA School-Age Forms & Profiles*, but I can't be 100% because there is no title/cover page for the book. It contained lots of information about its subscales and normative studies done.
+I found information for the CBCL and YSR in Room 1415. It appears to be a photo-copied version of a book (only the first five chapters), I think it's the *Manual for the ASEBA School-Age Forms & Profiles*, but I can't be 100% certain because there is no title/cover page for the book. It contained lots of information about its subscales and normative studies done.
 
-[Here is a pdf version for the CBCL subscales](http://www.aseba.org/forms/cbclprofile.pdf) and [here is a pdf version for the YSR subscales.](http://www.aseba.org/forms/ysrprofile.pdf). Both of the measures include many different kinds of subscales that I listed below. Whoever cleaned the CBCL and YSR only calculated the DSM-oriented subscales, so I only included those in analysis and did not calculate other subscales, although I could easily do so if needed. According to this book for both the CBCL and YSR DSM/Syndrome subscales, a score is considered clinical if its T score is 64 or greater and is considered borderline if its T score is between 60 and 63. I think the T-scoring process has to be made in reference to the normative sample though (M = 50, SD = 10). 
+[Here is a pdf version for the CBCL subscales](http://www.aseba.org/forms/cbclprofile.pdf) and [here is a pdf version for the YSR subscales.](http://www.aseba.org/forms/ysrprofile.pdf) Both of the measures include many different kinds of subscales, which are listed below. Whoever cleaned the CBCL and YSR Wave 15 data only calculated the DSM-oriented subscales, so I only included those in analysis and did not calculate other subscales, although I could easily do so if needed. According to this book for both the CBCL and YSR DSM/Syndrome subscales, a score is considered clinical if its T score is 64 or greater and is considered borderline if its T score is between 60 and 63. As far as I can tell, the T-scoring process has to be made in reference to the normative sample (M = 50, SD = 10), so I altered the data to fit that criteria. 
 
 ```{r include=FALSE}
 citep("10.1016/j.rasd.2011.03.009") 
 ```
+
+##### CBCL and YSR Subscales
 
 * Competence
     * Activites
@@ -174,9 +176,19 @@ rm(col)
 rm(Subscales)
 ```
 
-Please note that for the below plot, regarding the normative sample for the CBCL, I only included scores for participants aged 12-18.
+```{r Plotting CBCL depression total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_dep_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
+  xlab("Total Depression Score") + ylab("Count") + ggtitle("CBCL Depression Subscale")
+```
 
-### CBCL SAND Sample vs. Normative
+```{r Plotting CBCL anxiety total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_anx_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
+  xlab("Total Anxiety Score") + ylab("Count") + ggtitle("CBCL Anxiety Subscale")
+```
+
+### CBCL SAND Sample vs. Normative Sample
+
+Please note that for the below plot, regarding the normative sample for the CBCL, I only included scores for participants aged 12-18.
 
 ```{r SAND CBCL vs. Norm CBCL, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 cbcl_f <- cbcl[ which(cbcl$gender =='F'), ]
@@ -225,7 +237,6 @@ df1 <- melt(df, id.vars=c("Subscales", "Gender"))
 names(df1)[names(df1) == "variable"] <- "Group"
 names(df1)[names(df1) == "value"] <- "Score"
 
-cbcl_f <- cbcl[ which(cbcl$gender =='F'), ]
 df1_f <- df1[ which(df1$Gender == 'Female'), ]
 df1_m <- df1[ which(df1$Gender == 'Male'), ]
 
@@ -256,7 +267,7 @@ rm(cbcl_f)
 rm(cbcl_m)
 ```
 
-### Scaling CBCL variables so mean = 50
+### CBCL Clinical Significance
 
 ```{r Rescaling CBCL depression, include=FALSE}
 mean(cbcl$cbcl_dep_tot, na.rm=TRUE)
@@ -282,7 +293,7 @@ ggplot(cbcl, aes(x=cbcl_anx_t)) + geom_histogram(colour="white",fill="yellowgree
   annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
 ```
 
-```{r CBCL Count Table, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+```{r include=FALSE}
 nrow(cbcl[cbcl$cbcl_dep_t <= 59, ]) #206
 nrow(cbcl[cbcl$cbcl_dep_t == 60 | cbcl$cbcl_dep_t == 61 | cbcl$cbcl_dep_t == 62 | cbcl$cbcl_dep_t == 63, ]) #3
 nrow(cbcl[cbcl$cbcl_dep_t >= 64, ]) #26
@@ -290,7 +301,9 @@ nrow(cbcl[cbcl$cbcl_dep_t >= 64, ]) #26
 nrow(cbcl[cbcl$cbcl_anx_t <= 59, ]) #195
 nrow(cbcl[cbcl$cbcl_anx_t == 60 | cbcl$cbcl_anx_t == 61 | cbcl$cbcl_anx_t == 62 | cbcl$cbcl_anx_t == 63, ]) #3
 nrow(cbcl[cbcl$cbcl_anx_t >= 64, ]) #31
+```
 
+```{r CBCL Count Table, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 Criteria <- c("Normal", "Borderline", "Clinical")
 Depression <- c(206, 3, 26)
 Anxiety <- c(195, 3, 31)
@@ -307,6 +320,8 @@ rm(df)
 ```
 
 ## Youth Self-Report
+
+### SAND Sample YSR Subscales
 
 ```{r SAND YSR Barplot, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 Scores <- c((mean(ysr$ysr_anx_tot, na.rm=TRUE)), 
@@ -330,6 +345,18 @@ rm(df)
 rm(col)
 rm(Subscales)
 ```
+
+```{r Plotting YSR depression total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(ysr, aes(x=ysr_dep_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
+  xlab("Total Depression Score") + ylab("Count") + ggtitle("YSR Depression Subscale")
+```
+
+```{r Plotting YSR anxiety total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(ysr, aes(x=ysr_anx_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
+  xlab("Total Anxiety Score") + ylab("Count") + ggtitle("YSR Anxiety Subscale")
+```
+
+### YSR SAND Sample vs. Normative Sample
 
 Please note that for the below plot, regarding the normative sample for the YSR, I only included scores for participants aged 11-18.
 
@@ -380,7 +407,6 @@ df1 <- melt(df, id.vars=c("Subscales", "Gender"))
 names(df1)[names(df1) == "variable"] <- "Group"
 names(df1)[names(df1) == "value"] <- "Score"
 
-cbcl_f <- cbcl[ which(cbcl$gender =='F'), ]
 df1_f <- df1[ which(df1$Gender == 'Female'), ]
 df1_m <- df1[ which(df1$Gender == 'Male'), ]
 
@@ -411,7 +437,7 @@ rm(ysr_f)
 rm(ysr_m)
 ```
 
-### Scaling YSR variables so mean = 50
+### YSR Clinical Significance
 
 ```{r Rescaling YSR depression, include=FALSE}
 mean(ysr$ysr_dep_tot, na.rm=TRUE)
@@ -437,7 +463,7 @@ ggplot(ysr, aes(x=ysr_anx_t)) + geom_histogram(colour="white",fill="yellowgreen"
   annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
 ```
 
-```{r YSR Count Table, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+```{r include=FALSE}
 nrow(ysr[ysr$ysr_dep_t <= 59, ]) #193
 nrow(ysr[ysr$ysr_dep_t == 60 | ysr$ysr_dep_t == 61 | ysr$ysr_dep_t == 62 | ysr$ysr_dep_t == 63, ]) #2
 nrow(ysr[ysr$ysr_dep_t >= 64, ]) #27
@@ -445,7 +471,9 @@ nrow(ysr[ysr$ysr_dep_t >= 64, ]) #27
 nrow(ysr[ysr$ysr_anx_t <= 59, ]) #189
 nrow(ysr[ysr$ysr_anx_t == 60 | ysr$ysr_anx_t == 61 | ysr$ysr_anx_t == 62 | ysr$ysr_anx_t == 63, ]) #2
 nrow(ysr[ysr$ysr_anx_t >= 64, ]) #34
+```
 
+```{r  YSR Count Table, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 Criteria <- c("Normal", "Borderline", "Clinical")
 Depression <- c(193, 2, 27)
 Anxiety <- c(189, 2, 34)
