@@ -1,7 +1,7 @@
 ---
 title: "TaDLab's Guide to Making Pretty RMarkdown Documents"
 author: "Julianna Calabrese"
-date: "February 27, 2019"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
   html_document:
     toc: false
@@ -28,49 +28,39 @@ library(rmarkdown)
 library(datasets)
 library(sjPlot)
 library(kableExtra)
+library(pander)
 ```
 
 ## Introduction
 
-Before you start going through this document, you should have first gone through the RMarkdown document called "Learning_R.rmd", which can be found in the TaDLab's GoogleDrive and in the twoyear Github repository. 
+Before you start going through this document, you should have first gone through the RMarkdown document called "Learning_R.rmd", which can be found in the TaDLab's GoogleDrive and in the twoyear Github repository. This guide is best read when viewing both versions (RMarkdown and HTML) simultaneously, as you can see how the R syntax translates to HTML. 
 
-Even though R is a program for statistical analysis, it can be used to create scientific and nice-looking reports. RMarkdown files can be "knitted", aka converted, into HTML files or PDF files. Knitting won't alter the .rmd file, but rather make a wholly separate file based on the .rmd file. Since the RMarkdown-to-PDF conversion process involves LaTeX (a document system that I do not fully understand yet), this guide is going to focus on making HTML files with RMarkdown.
+Even though R is a program for statistical analysis, it can be used to create scientific and nice-looking reports. RMarkdown files can be "knitted", aka converted, into HTML files or PDF files. Knitting won't alter the .rmd file, but rather make a wholly separate file based on the .rmd file. This guide will focus on knitting HTML with RMarkdown.
 
-For your reference, [here is a cheatsheet for RMarkdown](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf), at least for almost everything that occurs outside of chunks. 
+For your reference, [here is a cheatsheet for RMarkdown](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf) for almost everything that occurs outside of chunks. 
 
 ## RMarkdown Basics
 
-RMarkdown files have two main parts: things that are inside chunks and things that are outside chunks. Inside of chunks, you can make a lot of things, like plots or tables. If you want to do anything math-y, it has to be inside a chunk or it just won't happen.
+In RMarkdown, things can either be inside of chunks or outside of chunks. Inside of chunks is where actual statistical analysis occurs, including randomly generating data and plotting variables.
 
 ```{r}
-summary(cars)
+labels <- c("Red", "Blue", "Yellow", "Green", "Pink")
+data <- data.frame(replicate(5,sample(0:10,5,rep=TRUE)))
+colnames(data) <- labels
+head(data)
 ```
 
 ```{r}
-plot(pressure)
+plot(data)
 ```
 
-Outside of chunks, you can do many MicrosoftWord-like things, such as writing text very plainly like this, or
+Outside of chunks, you can do many MicrosoftWord-like things, such write plain, *italicized*, **bolded**, ~~deleted~~, and `quoted` text. This is a good opportunity to talk about your code or explain the results of your statistical analysis in plain English. Other features allow you to make tables, create numbered lists, insert images or special characters, include mathematical proofs, and embed links. Additionally, you can also: 
 
-* make
-* bullet
-* points
-
-1. or
-2. make
-    + numbered
-    + lists
-
-or make | tables with 
---------- | ---------
-things | inside
-the | table
-
-[Here is a cheatsheet for RMarkdown](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf) that includes the stuff I have and haven't gone over. Also this is how you embed links, using [word word word](link to a website). 
+For your reference, [here is a cheatsheet for RMarkdown.](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
 
 ## Headers and chunk names
 
-Headers can be used while making RMarkdown documents and can be seen when knitted to HTML. Headers are always blue and are signified with hashtags. You can use between one and six hashtags to designate the "size" of the header with more hastags equalling smaller header sizes.
+Headers can be used while making RMarkdown documents and can be seen when knitted to HTML. Headers are always blue and are signified with hashtags. You can use between one and six hashtags to designate the "size" of the header with more hastags equalling smaller header sizes. You aren't required to put a space between the hashtag and your text, although it looks nicer in RMarkdown.
 
 # Example 1
 
@@ -86,97 +76,103 @@ Headers can be used while making RMarkdown documents and can be seen when knitte
 
 ####### Example 7
 
-If you look at the line at the bottom of the Source pane it should say "# Example 6" and then a little up arrow and a little down arrow. If you click on that, it'll show you the outline for this whole RMarkdown document. You can see the header for Examples 1 through 6, but can't see Example 7 since six hashtags is the limit for header sizes. The title of the outline will reflect where your cursor is. If you cursor is under the chunk "Example 6", then the outline will say "Example 6". Using headers can make it easy to organize things, like analyses on two separate datasets.
+In RMarkdown, if you look at the line at the bottom of the Source pane it should say `# Example 6` and then a little up arrow and a little down arrow. If you click on that, it'll show you the outline for this whole RMarkdown document. You can see the header for Examples 1 through 6, but can't see Example 7 since six hashtags is the limit for header sizes. If you cursor is under the Example 6 header, then the outline will say `Example 6`. Using headers can make it easy to organize things, like analyses on two separate datasets.
 
 Additionally, if you look at the outline, it will also say chunk names. Here is an example.
 
-```{r Iris dataset}
-head(iris)
+```{r Example dataset}
+head(data)
 ```
 
-If you look in the outline, you can see `Iris dataset` under "Example 6". If you don't name your chunks, it'll automatically label them "Chunk 1", "Chunk 2", etc. There is no particular reason to name chunks other than keeping track/organizing your document. While headers will appear in knitted HTML documents, chunk names will not. 
+If you look in the outline in RMarkdown, you can see `Example dataset` under the Example 6 header. If you don't name your chunks, it'll automatically label them "Chunk 1", "Chunk 2", etc. There is no particular reason to name chunks other than keeping track/organizing your document. While headers will appear in knitted HTML documents, chunk names will not. 
 
-It is important that you place chunk names in the right place, after the little r but between the brackets. You also can't have two chunks with the same name or else the file will halt knitting. Chunk names also go before chunk options, which is discussed below.
+It is important that you place chunk names in the right place, after the `r` but between the brackets. You also can't have two chunks with the same name or else the file will halt knitting. Chunk names also go before chunk options, which is discussed below.
 
 ## Chunk options
 
-When writing a RMarkdown document, you may do many "behind the scene" things, like re-coding variables. While it is important to the reader to know that you re-coded certain variables, they probably don't need to see the lines and lines of code where you do this. This is where chunk options come into play.
+When writing a RMarkdown document, you may do many "behind the scene" things like recoding or renaming variables. While it is important to the reader to know what kind of data wrangling techniques you utilized, they probably don't need to see the lines and lines of code where you do this. This is where chunk options come into play. Chunk options are specified after chunk names (if you choose you name your chunks).
 
-`include` is an option that says whether this chunk should be included in the HTML document at all. In your HTML document, it'll seem like you never wrote this code in the first place. Chunks will default to `include=TRUE` if nothing contradicting it is specified.
+### Include
+
+`include` is an option that says whether this chunk should be included in the HTML document at all. In your HTML document, it'll seem like you never wrote this code in the first place. Chunks will default to `include=TRUE` if nothing contradicting is specified.
 
 ```{r include=FALSE}
-plot(iris$Sepal.Length, iris$Sepal.Width)
+plot(data$Red, data$Blue)
 ```
 
 ```{r}
 # See? It disappeared!
 ```
 
+### Echo
+
 `echo` is an option that allows you to hide the code but show the output in a HTML document. Imagine if you wrote a lot of code to create a nice visualization, but the code is so messy it would distract the reader from the visualization. Therefore, you could use `echo=FALSE` to hide the code but show the visualization. Readers would not know how you created the visualization. Chunks will default to `echo=TRUE` if nothing contradicting it is specified.
 
 ```{r echo=FALSE}
-barplot(euro)
+counts <- table(data$Pink)
+barplot(counts)
 ```
 
-Similiarly, imagine you are doing statistical analyses and you end up with some warning messages. Warnings are different from errors: errors prevent the analysis from taking place since there is something flawed with the code, but warnings are messages that tell you something probably went wrong and you might want to fix it, but the code will ultimately follow through. 
+### Warnings, messages, and errors
+
+Similiarly, imagine you are doing statistical analyses and you end up with some warning messages. Warnings are different from errors: errors prevent the analysis from taking place since there is something flawed with the code, but warnings tell you something probably went wrong and you might want to fix it, but the code will ultimately follow through. Messages are different from warnings as they are usually harmless. Messages often tell you details about your analysis that you might not be aware of or that the command you're using is outdated. Warnings and messages will default to `TRUE` unless otherwise specified.
+
+In the below example, I am using the package `sjPlot` to create a correlation matrix based on randomly generated data. The syntax used will create a message and a warning: a message that indicates which correlation method is computed and a warning that redunant text was removed from the generated correlation matrix.
 
 ```{r warning=FALSE}
-data <- data.frame(replicate(10,sample(0:1,10,rep=TRUE)))
-sjp.corr(data)
-# Warning is supressed
+sjp.corr(data, decimals=1)
+# Warning is supressed, but message isn't
 ```
-
-Messages are different from warnings as they are usually harmless. Messages often tell you details about your analysis that you might not be aware of, like the correlation method used when creating a correlation matrix.
 
 ```{r message=FALSE}
-data <- data.frame(replicate(10,sample(0:1,10,rep=TRUE)))
-sjp.corr(data)
-# Message is suppressed
+sjp.corr(data, decimals=1)
+# Message is suppressed, but warning isn't
 ```
 
-If you wanted to hide your results but show the syntax, you would use the `results = 'hide'`. However, this only works for things like summary output and tables.
+Alternatively, you may want to showcase failed code. In that case, you would designate `error=TRUE`. This will allow the HTML to properly knit despite the error. In the chunk below, I'm attempting to find the mean of a variable that doesn't exist.
+
+```{r error=TRUE}
+mean(data$Orange)
+```
+
+### Hiding and showing results
+
+If you wanted to hide your results but show the syntax, you would use the `results = 'hide'`. However, this phrase only works for things like summary output and tables.
 
 ```{r results='hide'}
-summary(cars)
+summary(data)
 ```
 
 If you wanted to suppress a plot, you would use `fig.keep = 'none'`.
 
 ```{r fig.keep='none'}
-matrix <- matrix(rexp(200, rate=.1), ncol=20)
-barplot(matrix)
+plot(data$Red, data$Green)
 ```
 
-Additionally, you may find packages that require you to put `results = 'asis'` in your chunks. The package `summarytools` is a package that can make pretty tables out of descriptive statistics, but its output can look very different depending on your chunk options. The difference between the two chunks below can be seen when knitted to a HTML.
+For certain packages or commands, you are required you to put `results = 'asis'` in your chunks. The package `summarytools` is a package that can make pretty tables out of descriptive statistics, but its output can look very different depending on your chunk options. The difference between the two chunks below can be seen when knitted to a HTML.
 
 ```{r results='asis'}
-data <- data.frame(replicate(5,sample(0:1,10,rep=TRUE)))
 summarytools::descr(data, style = "rmarkdown", na.rm=TRUE)
 ```
 
 ```{r}
-data <- data.frame(replicate(5,sample(0:1,10,rep=TRUE)))
 summarytools::descr(data, style = "rmarkdown", na.rm=TRUE)
 ```
 
-```{r include=FALSE}
-rm(data)
-```
-
-Please note that chunk options only influence things when you knit files to HTML. If you just clicked "Run All" for the RMarkdown file, it would run everything and ignore the chunk options, since chunk options are only concerned with knitting. For example, if you included a warning=FALSE in every chunk, you'll still get warnings in RMarkdown. Those warnings just won't appear when the document is knitted into a HTML. 
+Please note that chunk options only influence things when you knit files to HTML. If you just clicked "Run All" for the RMarkdown file, it would run everything and ignore the chunk options, since chunk options are only concerned with knitting. For example, if you included a `warning=FALSE` in every chunk, you'll still get warnings in the R console. Those warnings just won't appear when the document is knitted into a HTML. 
 
 There are other chunk options that haven't been mentioned, but the above are the ones that you'll likely use the most. More information can be found [here](https://rmarkdown.rstudio.com/lesson-3.html) and [here](https://bookdown.org/yihui/rmarkdown/r-code.html).
 
 ## YAML headers and themes
 
-Your YAML header is that thing at the top that says your name, the date you made this document, and other things. The default options are:
+Your YAML header is the section at the top of the RMarkdown document that says your name, the date you made the document, and output type. The default options are:
 
 * Title
 * Author
 * Date (aka the day it was created)
 * Output type
 
-By default, output type will be "html_document". 
+Generally, the default output type will be "html_document". 
 
 You can include a table of contents to your document by adding `toc: true` under output. Table of contents are made up by your headers (not chunk names). If you put `toc_float: true`, your table of contents will float on the left side of the document. `toc_float: false` is the default and puts the table of contents at the top of the document. `toc_depth` specifies the threshold of whether headers should be included in the table of contents. If you put `toc_depth: 2`, then headers with three hashtags beside them will not be included in the table of contents.
 
@@ -186,40 +182,110 @@ If you wanted to add a theme to your HTML document, the YAML header would be the
 
 [Here is a gallery that shows the appearances of different themes.](http://www.datadreaming.org/post/r-markdown-theme-gallery/)
 
-## ggplot2
+## Visualization packages
 
-ggplot2 is a package that everyone loves and hates. You can use it to create beautiful visualizations but it can be difficult to learn.
+There are a number of R packages that can assist in visualization, but my favorites include `ggplot2` and `sjPlot`.
 
-[Here is an introduction to ggplot if you dare!](http://r-statistics.co/Complete-Ggplot2-Tutorial-Part1-With-R-Code.html)
+##ggplot2
 
-[Here is where I got the below visualizations.](http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html)
+[`ggplot2`](https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf) is a package that everyone loves and hates. You can use it to create beautiful visualizations but it can be difficult to learn. `ggplot2` is part of the [tidyverse](https://www.tidyverse.org/packages/), which includes data wrangling packages like `dplyr` and `tidyr`. 
 
-```{r ggplot2 example 1}
-theme_set(theme_classic())
-g <- ggplot(mpg, aes(manufacturer))
-g + geom_bar(aes(fill=class), width = 0.5) + 
-  theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
-  labs(title="Histogram on Categorical Variable", 
-       subtitle="Manufacturer across Vehicle Classes")
-rm(g)
+[Here is an introduction to ggplot2 if you dare!](http://r-statistics.co/Complete-Ggplot2-Tutorial-Part1-With-R-Code.html)
+
+```{r Generating more random data}
+# Randomly generating data 
+
+Clarity <- replicate(1,sample(0:10,100,rep=TRUE))
+Size <- replicate(1,sample(0:100,100,rep=TRUE))
+Sharpness <- replicate(1,sample(0:3,100,rep=TRUE))
+Color <- c("Red", "Blue", "Yellow", "Green", "Pink")
+Color <- sample(Color, 100, replace=TRUE)
+Hue <- c("Light", "Light", "Dark", "Light", "Dark")
+Hue <- sample(Hue, 100, replace=TRUE)
+more_data <- data.frame(Clarity, Size, Sharpness, Color, Hue)
+head(more_data)
+```
+
+```{r Creating a variable so Color is associated with an actual color}
+# Assigning colors to values
+
+more_data$order <- 0
+more_data$order[more_data$Color == "Blue"] <- "#00BFC4"
+more_data$order[more_data$Color == "Green"] <- "#00BA38"
+more_data$order[more_data$Color == "Pink"] <- "#F564E3"
+more_data$order[more_data$Color == "Red"] <- "#F8766D"
+more_data$order[more_data$Color == "Yellow"] <- "#ffdd00"
+
+jcolors <- more_data$order
+names(jcolors) <- more_data$Color
+head(jcolors)
+```
+
+```{r ggplot2 example1}
+theme_set(theme_gray())
+ggplot(data=more_data, aes(x=Color, y=Size, fill=Hue)) + 
+  geom_bar(stat = 'identity', position = 'dodge') + 
+  theme(legend.position = "none") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Gemstone Barplot by Color")
+```
+
+```{r ggplot2 example2}
+theme_set(theme_gray())
+ggplot(data=more_data, aes(x=Hue, y=Size, fill=Color)) + 
+  geom_bar(stat = 'identity', position = "dodge") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Gemstone Barplot by Hue") +
+  scale_fill_manual(values = jcolors)
+```
+
+```{r ggplot2 example3}
+theme_set(theme_minimal())
+ggplot(more_data,aes(x=Clarity,fill=Color)) + 
+  geom_density(alpha=0.2,lwd=0.2) +
+  ggtitle("Gemstone Density Plot") +
+  scale_fill_manual(values = jcolors)
+```
+
+```{r ggplot2 example 4}
+theme_set(theme_gray())
+ggplot(more_data, aes(x=Sharpness, y=Size)) + 
+  geom_point(aes(color=Color, fill=Color), shape=23, size=4) + 
+  scale_fill_manual(values = jcolors) + 
+  scale_color_manual(values = jcolors)+
+  ggtitle("Gemstone Dot Plot")
+```
+
+## sjPlot
+
+[`sjPlot`](https://cran.r-project.org/web/packages/sjPlot/sjPlot.pdf) is a package that easily makes HTML tables for regression models with the function `tab_model`. If you know any HTML or CSS, you can use that to further tweak table appearances. 
+
+You can learn more about `tab_model` [here](https://strengejacke.github.io/sjPlot/articles/tab_model_estimates.html)
+
+```{r}
+mod1 <- lm(Size ~ Clarity, data=more_data)
+mod2 <- lm(Size ~ Clarity + Sharpness, data=more_data)
+```
+
+```{r warning=FALSE, message=FALSE}
+tab_model(mod1, mod2)
 ```
 
 ```{r}
-options(scipen=999)  # turn-off scientific notation like 1e+48
-library(ggplot2)
-theme_set(theme_bw())  # pre-set the bw theme.
-data("midwest", package = "ggplot2")
-gg <- ggplot(midwest, aes(x=area, y=poptotal)) + 
-  geom_point(aes(col=state, size=popdensity)) + 
-  geom_smooth(method="loess", se=F) + 
-  xlim(c(0, 0.1)) + 
-  ylim(c(0, 500000)) + 
-  labs(subtitle="Area Vs Population", 
-       y="Population", 
-       x="Area", 
-       title="Scatterplot", 
-       caption = "Source: midwest")
-plot(gg)
-rm(gg)
-rm(midwest)
+predlabels <- c("Intercept", "Clarity", "Sharpness")
+
+dvlabels <- c("Clarity", "Clarity + Sharpness")
+
+colorder <- c("est", "se", "stat", "p")
+
+tab_model(mod1, mod2,
+          auto.label=FALSE, pred.labels=predlabels, dv.labels=dvlabels, 
+          string.pred=" ", col.order=colorder,
+          title = "Predicting Size",
+          show.ci=FALSE, show.df=FALSE, show.obs=FALSE,
+          show.est=TRUE, show.se=TRUE, show.std=FALSE, show.stat=TRUE, 
+          string.se="Standard Error", string.stat="T",
+          p.threshold = 0.05, p.style=c("numeric"),
+          digits = 2, digits.p = 3, emph.p = TRUE, wrap.labels=25)
 ```
+
