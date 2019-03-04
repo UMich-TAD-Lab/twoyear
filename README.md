@@ -13,6 +13,12 @@
 | SRD Child | Diane | &#9744; |
 | SUB Child | none | 2yr data hasn't been uploaded to Redcap yet |
 
+## Useful Guides
+
+[A basic introduction to R](https://jrcalabrese.github.io/Learning_R.html)
+
+[The TaDLab's Guide to Making Pretty RMarkdown Documents](https://jrcalabrese.github.io/pretty_r_guide.html)
+
 
 ## How to download two-year data from Redcap
 
