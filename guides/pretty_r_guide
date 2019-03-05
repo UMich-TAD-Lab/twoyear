@@ -184,13 +184,13 @@ If you wanted to add a theme to your HTML document, the YAML header would be the
 
 ## Visualization packages
 
-There are a number of R packages that can assist in visualization, but my favorites include `ggplot2` and `sjPlot`.
+There are a number of R packages that can assist in visualization, but my favorites include `ggplot2`, `sjPlot`, and `kableExtra`.
 
-##ggplot2
+### ggplot2
 
 [`ggplot2`](https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf) is a package that everyone loves and hates. You can use it to create beautiful visualizations but it can be difficult to learn. `ggplot2` is part of the [tidyverse](https://www.tidyverse.org/packages/), which includes data wrangling packages like `dplyr` and `tidyr`. 
 
-[Here is an introduction to ggplot2 if you dare!](http://r-statistics.co/Complete-Ggplot2-Tutorial-Part1-With-R-Code.html)
+[Here is an introduction to `ggplot2`.](http://r-statistics.co/Complete-Ggplot2-Tutorial-Part1-With-R-Code.html)
 
 ```{r Generating more random data}
 # Randomly generating data 
@@ -256,11 +256,11 @@ ggplot(more_data, aes(x=Sharpness, y=Size)) +
   ggtitle("Gemstone Dot Plot")
 ```
 
-## sjPlot
+### sjPlot
 
 [`sjPlot`](https://cran.r-project.org/web/packages/sjPlot/sjPlot.pdf) is a package that easily makes HTML tables for regression models with the function `tab_model`. If you know any HTML or CSS, you can use that to further tweak table appearances. 
 
-You can learn more about `tab_model` [here](https://strengejacke.github.io/sjPlot/articles/tab_model_estimates.html)
+[You can learn more about `tab_model` here.](https://strengejacke.github.io/sjPlot/articles/tab_model_estimates.html)
 
 ```{r}
 mod1 <- lm(Size ~ Clarity, data=more_data)
@@ -289,3 +289,38 @@ tab_model(mod1, mod2,
           digits = 2, digits.p = 3, emph.p = TRUE, wrap.labels=25)
 ```
 
+### kableExtra
+
+[`kableExtra`](https://cran.r-project.org/web/packages/kableExtra/kableExtra.pdf), in conjunction with the `knitr` and `kable` packages, can create format dataframes into nice-looking tables for HTML and LaTeX output. 
+
+[You can learn more about `kableExtra` here.](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html)
+
+```{r}
+rm(list=setdiff(ls(), "more_data"))
+
+more_data$order <- NULL
+
+Clarity <- aggregate(Clarity~Color, data=more_data, mean)
+Size <- aggregate(Size~Color, data=more_data, mean)
+Sharpness <- aggregate(Sharpness~Color, data=more_data, mean)
+
+even_more_data <- merge(Clarity, Size, by = 'Color')
+even_more_data <- merge(even_more_data, Sharpness, by = 'Color')
+```
+
+```{r results = 'asis'}
+even_more_data %>%
+  kable() %>%
+  kable_styling
+```
+
+```{r results = 'asis'}
+even_more_data %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "Gemstones by Colors") %>%
+  kable_styling(full_width = F, position = "left") %>%
+  row_spec(1:1, background = "#00BFC4") %>% # Blue
+  row_spec(2:2, background = "#00BA38") %>% # Green
+  row_spec(3:3, background = "#F564E3") %>% # Pink
+  row_spec(4:4, background = "#F8766D") %>% # Red
+  row_spec(5:5, background = "#ffdd00") # Yellow
+```
