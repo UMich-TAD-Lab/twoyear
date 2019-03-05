@@ -2,7 +2,7 @@
 
 ## Current Assignments
 
-| Measure  | Undergrad | Status |
+| Measure  | Assignee | Status |
 | --- | --- | --- |
 | APQ Child | Paulina | &#9744; |
 | ALES Child | none | unable to be completed since Wave 15 ALES data has not been cleaned yet |
