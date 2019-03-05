@@ -19,6 +19,7 @@
 
 [The TaDLab's Guide to Making Pretty RMarkdown Documents](https://jrcalabrese.github.io/pretty_r_guide.html)
 
+[The Basics of Data Wrangling](https://jrcalabrese.github.io/data_wrangling.html)
 
 ## How to download two-year data from Redcap
 
