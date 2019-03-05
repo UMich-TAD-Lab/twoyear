@@ -13,6 +13,8 @@
 | SRD Child | Diane | &#9744; |
 | SUB Child | none | 2yr data hasn't been uploaded to Redcap yet |
 | CBCL Parent | Julianna | &#9744; |
+| CTS Parent | none | &#9744; |
+| NQ Parent | none | &#9744; |
 
 ## Useful Guides
 
