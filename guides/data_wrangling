@@ -5,7 +5,8 @@ date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
   html_document:
     toc: true
-    toc_float: true
+    toc_float:
+      collapsed: true
     theme: united
     highlight: tango
   pdf_document: default
@@ -29,7 +30,9 @@ library(Stat2Data)
 
 ## Introduction to Data Wrangling
 
-Definitions!
+Data wrangling is the process of reformatting raw data so it can be used in data analysis. Sometimes we need to zero-mean data, rename variables, remove outliers, deal with NA values, and a whole host of things before we can start investigating. Data wrangling is an important step of the data analysis process since many crucial decisions are made here that affect the results later on.
+
+If you aren't familiar with a function used below, just type `?function` to learn more about it. 
 
 ## Load in your data
 
@@ -42,40 +45,106 @@ head(airquality)
 
 ## Test for cells with missing values
 
-When a value is blank or missing, R will interpret this cell as NA. 
+When a value is blank or missing, R will interpret this cell as NA. The below syntax will print `TRUE` or `FALSE` for every cell depending on if it's NA or not.
 
 ```{r}
-head(is.na(airquality))
+head(is.na(airquality)) 
 ```
 
-That's not a good way of absorbing information.
+Since that's not a good way of absorbing information, we can use `colSums()` to count the number of NAs for each column. 
 
 ```{r}
 colSums(is.na(airquality))
 ```
 
-That's better!
+Which rows in Ozone and Solar.R have NA values?
 
 ```{r}
 which(is.na(airquality$Ozone))
 which(is.na(airquality$Solar.R))
 ```
 
-Remember, `na.rm=TRUE` is your friend!
+When dealing with missing values, remember that the argument `na.rm=TRUE` is your friend. You may not want to remove every observation with an NA value, since that's about a fourth of the entire dataset, so you can just specify that for certain analyses that we pretend that the NA aren't really there at all. `na.rm = TRUE` specifies that we should remove any NA values for that analysis.
 
-## Rescaling or reverse-coding variables 
+```{r}
+mean(airquality$Ozone)
 
-### Rescale
+# See? It doesn't work. You can't find the average for a missing value.
+```
 
-We can use a function in the `weathermetrics` to convert the `Temp` variable from Fahrenheit to Celsuis.
+```{r}
+mean(airquality$Ozone, na.rm=TRUE)
+
+# Now it works!
+```
+
+## Find outliers
+
+Boxplots are useful ways to visually find outliers. It looks like there are two outliers in Ozone and one outlier in Wind. We can also use the `psych` package to plot outliers.
+
+```{r}
+boxplot(airquality)
+```
+
+```{r}
+outlier <- psych::outlier(airquality, na.rm=TRUE)
+```
+
+We can remove outliers by writing a function ([source here](https://datascienceplus.com/identify-describe-plot-and-removing-the-outliers-from-the-dataset/)).
+
+```{r}
+outlierKD <- function(dt, var) {
+  var_name <- eval(substitute(var),eval(dt))
+  tot <- sum(!is.na(var_name))
+  na1 <- sum(is.na(var_name))
+  m1 <- mean(var_name, na.rm = T)
+  par(mfrow=c(2, 2), oma=c(0,0,3,0))
+  boxplot(var_name, main="With outliers")
+  hist(var_name, main="With outliers", xlab=NA, ylab=NA)
+  outlier <- boxplot.stats(var_name)$out
+  mo <- mean(outlier)
+  var_name <- ifelse(var_name %in% outlier, NA, var_name)
+  boxplot(var_name, main="Without outliers")
+  hist(var_name, main="Without outliers", xlab=NA, ylab=NA)
+  title("Outlier Check", outer=TRUE)
+  na2 <- sum(is.na(var_name))
+  message("Outliers identified: ", na2 - na1, " from ", tot, " observations")
+  message("Proportion (%) of outliers: ", (na2 - na1) / tot*100)
+  message("Mean of the outliers: ", mo)
+  m2 <- mean(var_name, na.rm = T)
+  message("Mean without removing outliers: ", m1)
+  message("Mean if we remove outliers: ", m2)
+  response <- readline(prompt="Do you want to remove outliers and to replace with NA? [yes/no]: ")
+  if(response == "y" | response == "yes"){
+    dt[as.character(substitute(var))] <- invisible(var_name)
+    assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
+    message("Outliers successfully removed", "\n")
+    return(invisible(dt))
+  } else{
+    message("Nothing changed", "\n")
+    return(invisible(var_name))
+  }
+}
+```
+
+```{r}
+outlierKD(airquality, Ozone)
+```
+
+```{r}
+outlierKD(airquality, Ozone)
+```
+
+## Rescaling variables 
+
+We can use a function in the `weathermetrics` to convert the `Temp` variable from Fahrenheit to Celsuis. The below syntax creates a separate variable called `TempC` and adds it back to the dataset. 
 
 ```{r}
 library(weathermetrics)
+data(airquality)
 airquality$TempC <- fahrenheit.to.celsius(airquality$Temp, round = 2)
 head(airquality)
 ```
-
-### Reverse-coding
 
 Let's imagine that `airquality` has a variable called `Sunny` where 1 meant Not Sunny, 2 meant Somewhat Sunny, and 3 meant Very Sunny. This is a 3-point Likert scale. 
 
@@ -84,7 +153,7 @@ airquality$Sunny <- replicate(1,sample(1:3,153,rep=TRUE))
 head(airquality)
 ```
 
-Now, say we wanted to change this 1-3 scale to a 0-2 scale.
+Now, say we wanted to change this 1-3 scale to a 0-2 scale. This something you might have to do often when managing survey data. 
 
 ```{r}
 library(car)
@@ -110,7 +179,7 @@ head(Temp_day)
 
 ## Rename columns
 
-Let's say I wanted to rename `Sunny` to `Sun`.
+The below syntax renames `Sunny` to `Sun`.
 
 ```{r}
 names(airquality)[names(airquality) == "Sunny"] <- "Sun"
@@ -130,7 +199,7 @@ nrow(airquality)
 
 ## Remove rows with any NA values
 
-Let's say I wanted to remove any rows that contained a missing value.
+Now I want to remove any rows that contained a missing value.
 
 ```{r}
 data(airquality)
@@ -140,7 +209,7 @@ nrow(airquality)
 
 ## Remove rows based on row numbers
 
-Let's say I want to remove row 53, just because.
+Let's say that row 53 contains an error and I want to remove it. 
 
 ```{r}
 data(airquality)
@@ -150,7 +219,7 @@ nrow(airquality)
 
 ## Remove columns
 
-### Remove column 
+#### Remove column based on name
 
 Let's say I wanted to remove the `Day` column entirely.
 
@@ -159,7 +228,7 @@ airquality$Day <- NULL
 head(airquality)
 ```
 
-### Remove column with any NA values
+#### Remove column with any NA values
 
 ```{r}
 data(airquality)
@@ -167,7 +236,7 @@ airquality <- airquality[ , colSums(is.na(airquality)) == 0]
 head(airquality)
 ```
 
-### Remove column based on column number
+#### Remove column based on column number
 
 Similiarly, I can use a very similiar syntax to remove column 6, which is Day.
 
@@ -223,9 +292,10 @@ rm(list=setdiff(ls(), "airquality"))
 
 ## Descriptive statistics
 
-Finally, "data cleaning" usually includes basic descriptive statistics to see if the data is skewed or if there is a large number of outliers. 
+Finally, data cleaning usually includes basic descriptive statistics to see if the data is skewed or if there is a large number of outliers. 
 
 ```{r results = 'asis'}
+data(airquality)
 summarytools::descr(airquality, style = "rmarkdown")
 ```
 
