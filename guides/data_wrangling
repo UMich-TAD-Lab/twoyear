@@ -7,6 +7,7 @@ output:
     toc: true
     toc_float:
       collapsed: true
+    toc_depth: 3
     theme: united
     highlight: tango
   pdf_document: default
@@ -34,8 +35,6 @@ Data wrangling is the process of reformatting raw data so it can be used in data
 
 If you aren't familiar with a function used below, just type `?function` to learn more about it. 
 
-## Load in your data
-
 This guide will use the dataset `airquality` from the base R package `datasets`. 
 
 ```{r}
@@ -43,7 +42,7 @@ data(airquality)
 head(airquality)
 ```
 
-## Test for cells with missing values
+## Find missing values
 
 When a value is blank or missing, R will interpret this cell as NA. The below syntax will print `TRUE` or `FALSE` for every cell depending on if it's NA or not.
 
@@ -80,59 +79,20 @@ mean(airquality$Ozone, na.rm=TRUE)
 
 ## Find outliers
 
-Boxplots are useful ways to visually find outliers. It looks like there are two outliers in Ozone and one outlier in Wind. We can also use the `psych` package to plot outliers.
+Boxplots and histograms are useful ways to visually find outliers. It looks like there are two outliers in Ozone and one outlier in Wind. We can also use the `psych` package to plot outliers.
 
 ```{r}
 boxplot(airquality)
 ```
 
 ```{r}
+hist(airquality$Ozone)
+
+hist(airquality$Wind)
+```
+
+```{r}
 outlier <- psych::outlier(airquality, na.rm=TRUE)
-```
-
-We can remove outliers by writing a function ([source here](https://datascienceplus.com/identify-describe-plot-and-removing-the-outliers-from-the-dataset/)).
-
-```{r}
-outlierKD <- function(dt, var) {
-  var_name <- eval(substitute(var),eval(dt))
-  tot <- sum(!is.na(var_name))
-  na1 <- sum(is.na(var_name))
-  m1 <- mean(var_name, na.rm = T)
-  par(mfrow=c(2, 2), oma=c(0,0,3,0))
-  boxplot(var_name, main="With outliers")
-  hist(var_name, main="With outliers", xlab=NA, ylab=NA)
-  outlier <- boxplot.stats(var_name)$out
-  mo <- mean(outlier)
-  var_name <- ifelse(var_name %in% outlier, NA, var_name)
-  boxplot(var_name, main="Without outliers")
-  hist(var_name, main="Without outliers", xlab=NA, ylab=NA)
-  title("Outlier Check", outer=TRUE)
-  na2 <- sum(is.na(var_name))
-  message("Outliers identified: ", na2 - na1, " from ", tot, " observations")
-  message("Proportion (%) of outliers: ", (na2 - na1) / tot*100)
-  message("Mean of the outliers: ", mo)
-  m2 <- mean(var_name, na.rm = T)
-  message("Mean without removing outliers: ", m1)
-  message("Mean if we remove outliers: ", m2)
-  response <- readline(prompt="Do you want to remove outliers and to replace with NA? [yes/no]: ")
-  if(response == "y" | response == "yes"){
-    dt[as.character(substitute(var))] <- invisible(var_name)
-    assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
-    message("Outliers successfully removed", "\n")
-    return(invisible(dt))
-  } else{
-    message("Nothing changed", "\n")
-    return(invisible(var_name))
-  }
-}
-```
-
-```{r}
-outlierKD(airquality, Ozone)
-```
-
-```{r}
-outlierKD(airquality, Ozone)
 ```
 
 ## Rescaling variables 
@@ -161,7 +121,7 @@ airquality$Sunny <- car::recode(airquality$Sunny, "1 = 0; 2 = 1; 3 = 2")
 head(airquality)
 ```
 
-## Make sum/mean variables
+## Make new variables
 
 Let's say we wanted the average of Temp for every month. `aggregate` is an extremely useful function provided by the `stats` package.
 
@@ -188,7 +148,7 @@ head(airquality)
 
 ## Remove rows
 
-## Remove rows based on condition
+### Remove rows based on condition
 
 Please note that `airquality` in its original form starts out with 153 rows. Let's say I wanted to remove every observation that occured in the month of May.
 
@@ -197,7 +157,7 @@ airquality <- airquality[!(airquality$Month==5),]
 nrow(airquality)
 ```
 
-## Remove rows with any NA values
+### Remove rows with any NA values
 
 Now I want to remove any rows that contained a missing value.
 
@@ -207,7 +167,7 @@ airquality <- airquality[complete.cases(airquality), ]
 nrow(airquality)
 ```
 
-## Remove rows based on row numbers
+### Remove rows based on row numbers
 
 Let's say that row 53 contains an error and I want to remove it. 
 
@@ -219,7 +179,7 @@ nrow(airquality)
 
 ## Remove columns
 
-#### Remove column based on name
+### Remove column based on name
 
 Let's say I wanted to remove the `Day` column entirely.
 
@@ -228,7 +188,7 @@ airquality$Day <- NULL
 head(airquality)
 ```
 
-#### Remove column with any NA values
+### Remove column with any NA values
 
 ```{r}
 data(airquality)
@@ -236,7 +196,7 @@ airquality <- airquality[ , colSums(is.na(airquality)) == 0]
 head(airquality)
 ```
 
-#### Remove column based on column number
+### Remove column based on column number
 
 Similiarly, I can use a very similiar syntax to remove column 6, which is Day.
 
@@ -299,4 +259,11 @@ data(airquality)
 summarytools::descr(airquality, style = "rmarkdown")
 ```
 
-For more information about how to make the above table look prettier, go through the [`pretty_r_guide.rmd`](https://github.com/UMich-TAD-Lab/twoyear/blob/master/guides/pretty_r_guide) on Github or you can find a link to the HTML [here.](https://jrcalabrese.github.io/pretty_r_guide.html)
+```{r}
+# Skewness and Kurtosis
+
+qqnorm(airquality$Ozone)
+qqline(airquality$Ozone)
+```
+
+For more information about how to make the above table and plot look prettier, go through the [`pretty_r_guide.rmd`](https://github.com/UMich-TAD-Lab/twoyear/blob/master/guides/pretty_r_guide) on Github or you can find a link to the HTML [here.](https://jrcalabrese.github.io/pretty_r_guide.html)
