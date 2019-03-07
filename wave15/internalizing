@@ -1,0 +1,472 @@
+---
+title: "Internalizing Symptoms"
+author: "Julianna Calabrese"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    theme: united
+    highlight: tango
+editor_options:
+  chunk_output_type: console
+---
+
+```{r Library, include=FALSE}
+library(mosaic)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(psych)
+library(nlme)
+library(plyr)
+library(Hmisc)
+library(rmarkdown)
+library(psych)
+library(corrr)
+library(corrplot)
+library(reshape2)
+library(scales)
+library(sjPlot)
+library(car)
+library(knitr)
+library(kableExtra)
+library(summarytools)
+library(DT)
+library(qdapTools)
+library(data.table)
+library(tibble)
+library(stats)
+library(reshape)
+library(yaml)
+library(shiny)
+library(scales)
+library(RColorBrewer)
+library(papaja)
+library(knitcitations)
+```
+
+* ISEL Child
+* SCARED Child
+* MFQ Child
+* YSR Child
+* CBCL Parent
+* Teen Demo
+* Demographic Data
+
+```{r Cleaning Demographic Data, include=FALSE}
+demo <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review/full_demo.csv')
+
+demo[demo=="77"] <- NA
+demo[demo=="88"] <- NA
+demo[demo=="-99"] <- NA
+
+which( colnames(demo)=="hispanic") #2
+which( colnames(demo)=="missingrace") #8
+demo <- demo[, -c(2:8)]
+demo$racenum <- NULL
+demo$mo_income <- NULL
+demo$age <- NULL
+demo$ageyears <- NULL
+demo$intakedate <- NULL
+demo$teenbirthday <- NULL
+names(demo)[names(demo) == "gender"] <- "Gender"
+names(demo)[names(demo) == "race"] <- "Race"
+
+teen <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/internalizing/teen.csv', na.strings=c("","NA"))
+
+teen[teen=="77"] <- NA
+teen[teen=="88"] <- NA
+teen[teen=="-99"] <- NA
+
+names(teen)[names(teen) == "teendem12a"] <- "children"
+names(teen)[names(teen) == "teendem12b"] <- "children_amount"
+names(teen)[names(teen) == "teendem12c"] <- "children_ages"
+
+teen$children <- car::recode(teen$children, "2 = 0")
+
+#demo <- merge(demo, teen, by = "id")
+rm(teen)
+```
+
+```{r Cleaning CBCL Parent Original, include=FALSE}
+cbcl_original <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cbcl_ysr/cbcl.csv')
+
+names(cbcl_original)[names(cbcl_original) == "ï..id"] <- "id"
+
+cbcl_original[cbcl_original=="77"] <- NA
+cbcl_original[cbcl_original=="88"] <- NA
+cbcl_original[cbcl_original=="-99"] <- NA
+
+names(cbcl_original)[names(cbcl_original) == "CBCL_Anx_Prob_Tot"] <- "cbcl_original_anx_tot"
+names(cbcl_original)[names(cbcl_original) == "CBCL_Som_Prob_Tot"] <- "cbcl_original_somatic_tot"
+names(cbcl_original)[names(cbcl_original) == "CBCL_ADHD_Prob_Tot"] <- "cbcl_original_adhd_tot"
+names(cbcl_original)[names(cbcl_original) == "CBCL_ODD_Prob_Tot"] <- "cbcl_original_odd_tot"
+names(cbcl_original)[names(cbcl_original) == "CBCL_Dep_Prob_Tot"] <- "cbcl_original_dep_tot"
+names(cbcl_original)[names(cbcl_original) == "CBCL_CD_Prob_Tot"] <- "cbcl_original_cd_tot"
+
+names(cbcl_original)[names(cbcl_original) == "CBCL_Anx_Prob_Avg"] <- "cbcl_original_anx_avg"
+names(cbcl_original)[names(cbcl_original) == "CBCL_Som_Prob_Avg"] <- "cbcl_original_somatic_avg"
+names(cbcl_original)[names(cbcl_original) == "CBCL_ADHD_Prob_Avg"] <- "cbcl_original_adhd_avg"
+names(cbcl_original)[names(cbcl_original) == "CBCL_ODD_Prob_Avg"] <- "cbcl_original_odd_avg"
+names(cbcl_original)[names(cbcl_original) == "CBCL_Dep_Prob_Avg"] <- "cbcl_original_dep_avg"
+names(cbcl_original)[names(cbcl_original) == "CBCL_CD_Prob_Avg"] <- "cbcl_original_cd_avg"
+
+which( colnames(cbcl_original)=="cbcl_original1_1") #2
+which( colnames(cbcl_original)=="cbcl_original_complete") #141
+cbcl_original <- cbcl_original[, -c(2:141)]
+```
+
+```{r Cleaning CBCL 2yr, include=FALSE}
+cbcl_2yr <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/internalizing/cbcl_2yr.csv')
+
+# Remove people who haven't completed the follow-up survey yet
+cbcl_2yr <- cbcl_2yr[!is.na(cbcl_2yr$cbcl1_1_2yr),]
+
+# Replace 88s and -99s with NA
+cbcl_2yr[cbcl_2yr == 88] <- NA
+cbcl_2yr[cbcl_2yr == -99] <- NA
+
+# No need to re-scale, both datasets use a 1-3 scale
+
+# Calculate subscales
+
+## Depression 
+
+depression <- cbind(cbcl_2yr$cbcl1_5_2yr, cbcl_2yr$cbcl3_14, cbcl_2yr$cbcl3_18, cbcl_2yr$cbcl4_24, cbcl_2yr$cbcl6_35, cbcl_2yr$cbcl8_50, cbcl_2yr$cbcl8_52, cbcl_2yr$cbcl12_81, cbcl_2yr$cbcl12_82, cbcl_2yr$cbcl14_97, cbcl_2yr$cbcl16_105, cbcl_2yr$cbcl16_107, cbcl_2yr$cbcl16_108)
+cbcl_2yr$cbcl_2yr_dep_tot <- rowSums(depression, na.rm=TRUE)
+cbcl_2yr$cbcl_2yr_dep_avg <- rowMeans(depression, na.rm=TRUE)
+rm(depression)
+
+## Anxiety
+
+anxiety <- cbind(cbcl_2yr$cbcl2_11, cbcl_2yr$cbcl5_29, cbcl_2yr$cbcl5_30, cbcl_2yr$cbcl5_31, cbcl_2yr$cbcl7_43, cbcl_2yr$cbcl7_45, cbcl_2yr$cbcl7_48, cbcl_2yr$cbcl11_76, cbcl_2yr$cbcl17_115)
+cbcl_2yr$cbcl_2yr_anx_tot <- rowSums(anxiety, na.rm=TRUE)
+cbcl_2yr$cbcl_2yr_anx_avg <- rowMeans(anxiety, na.rm=TRUE)
+rm(anxiety)
+
+## Somatic Problems
+
+somatic <- cbind(cbcl_2yr$cbcl8_54, cbcl_2yr$cbcl8_55, cbcl_2yr$cbcl9_56, cbcl_2yr$cbcl9_57, cbcl_2yr$cbcl9_58, cbcl_2yr$cbcl9_59, cbcl_2yr$cbcl9_60)
+cbcl_2yr$cbcl_2yr_som_tot <- rowSums(somatic, na.rm=TRUE)
+cbcl_2yr$cbcl_2yr_som_avg <- rowMeans(somatic, na.rm=TRUE)
+rm(somatic)
+
+## ADHD 
+
+adhd <- cbind(cbcl_2yr$cbcl1_4, cbcl_2yr$cbcl2_8, cbcl_2yr$cbcl2_10, cbcl_2yr$cbcl6_41, cbcl_2yr$cbcl12_83, cbcl_2yr$cbcl15_98, cbcl_2yr$cbcl16_109)
+cbcl_2yr$cbcl_2yr_adhd_tot <- rowSums(adhd, na.rm=TRUE)
+cbcl_2yr$cbcl_2yr_adhd_avg <- rowMeans(adhd, na.rm=TRUE)
+rm(adhd)
+
+## ODD
+
+odd <- cbind(cbcl_2yr$cbcl1_3, cbcl_2yr$cbcl4_22, cbcl_2yr$cbcl4_23, cbcl_2yr$cbcl14_91, cbcl_2yr$cbcl15_100)
+cbcl_2yr$cbcl_2yr_odd_tot <- rowSums(odd, na.rm=TRUE)
+cbcl_2yr$cbcl_2yr_odd_avg <- rowMeans(odd, na.rm=TRUE)
+rm(odd)
+
+## CD
+
+cd <- cbind(cbcl_2yr$cbcl3_15, cbcl_2yr$cbcl3_16, cbcl_2yr$cbcl4_21, cbcl_2yr$cbcl4_26, cbcl_2yr$cbcl5_28, cbcl_2yr$cbcl6_37, cbcl_2yr$cbcl6_39, cbcl_2yr$cbcl5_43, cbcl_2yr$cbcl9_62, cbcl_2yr$cbcl11_72, cbcl_2yr$cbcl12_77, cbcl_2yr$cbcl13_86, cbcl_2yr$cbcl13_87, cbcl_2yr$cbcl14_95, cbcl_2yr$cbcl15_102, cbcl_2yr$cbcl16_106, cbcl_2yr$cbcl16_111)
+cbcl_2yr$cbcl_2yr_cd_tot <- rowSums(cd, na.rm=TRUE)
+cbcl_2yr$cbcl_2yr_cd_avg <- rowMeans(cd, na.rm=TRUE)
+rm(cd)
+
+# Remove individual items
+
+which( colnames(cbcl_2yr)=="cbcl1_1_2yr") #2
+which( colnames(cbcl_2yr)=="cbcl2yr_complete") #140
+cbcl_2yr <- cbcl_2yr[, -c(2:140)]
+```
+
+```{r Cleaning MFQ Original, include=FALSE}
+mfq_original <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review/mfq.csv')
+names(mfq_original)[names(mfq_original) == "ï..id"] <- "id"
+
+mfq_original[mfq_original=="77"] <- NA
+mfq_original[mfq_original=="88"] <- NA
+mfq_original[mfq_original=="-99"] <- NA
+
+which( colnames(mfq_original)=="mfqc1_1") #2
+which( colnames(mfq_original)=="mfqc6_34") #35
+mfq_original <- mfq_original[, -c(2:35)]
+mfq_original$LN_transformation <- NULL
+
+names(mfq_original)[names(mfq_original) == "MFQ_C_Mean"] <- "mfq_original_mean"
+names(mfq_original)[names(mfq_original) == "MFQ_C_Sum"] <- "mfq_original_sum"
+```
+
+```{r Cleaning MFQ 2yr, include=FALSE}
+mfq_2yr <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/internalizing/mfq_2yr.csv')
+names(mfq_2yr)[names(mfq_2yr) == "ï..id"] <- "id"
+
+
+# Remove people who haven't completed 2yr survey yet
+mfq_2yr <- mfq_2yr[!is.na(mfq_2yr$mfqc1_1_2yr),]
+
+# Remove NA values
+
+mfq_2yr[mfq_2yr=="77"] <- NA
+mfq_2yr[mfq_2yr=="88"] <- NA
+mfq_2yr[mfq_2yr=="-99"] <- NA
+
+# Create a mean and sum variable
+
+mfq <- cbind(mfq_2yr$mfqc1_1_2yr, mfq_2yr$mfqc1_2_2yr, mfq_2yr$mfqc1_3_2yr, mfq_2yr$mfqc1_4_2yr, mfq_2yr$mfqc1_5_2yr, mfq_2yr$mfqc1_6_2yr, mfq_2yr$mfqc2_7_2yr, mfq_2yr$mfqc2_8_2yr, mfq_2yr$mfqc2_9_2yr, mfq_2yr$mfqc2_10_2yr, mfq_2yr$mfqc2_11_2yr, mfq_2yr$mfqc2_12_2yr, mfq_2yr$mfqc3_13_2yr, mfq_2yr$mfqc3_14_2yr, mfq_2yr$mfqc3_15_2yr, mfq_2yr$mfqc4_20_2yr, mfq_2yr$mfqc4_21_2yr, mfq_2yr$mfqc4_22_2yr, mfq_2yr$mfqc4_23_2yr, mfq_2yr$mfqc4_24_2yr, mfq_2yr$mfqc5_25_2yr, mfq_2yr$mfqc5_26_2yr, mfq_2yr$mfqc5_27_2yr, mfq_2yr$mfqc5_28_2yr, mfq_2yr$mfqc5_29_2yr, mfq_2yr$mfqc6_30_2yr, mfq_2yr$mfqc6_31_2yr, mfq_2yr$mfqc6_32_2yr, mfq_2yr$mfqc6_33_2yr, mfq_2yr$mfqc6_34_2yr)
+mfq_2yr$mfq_2yr_sum <- rowSums(mfq, na.rm=TRUE)
+mfq_2yr$mfq_2yr_mean <- rowMeans(mfq, na.rm=TRUE)
+rm(mfq)
+
+# Remove individual items
+
+which( colnames(mfq_2yr)=="mfqc1_1_2yr") #2
+which( colnames(mfq_2yr)=="mfqyouth2yr_complete") #33
+mfq_2yr <- mfq_2yr[, -c(2:33)]
+```
+
+```{r Cleaning SCARED Original, include=FALSE}
+scared_original <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review/scared.csv')
+names(scared_original)[names(scared_original) == "ï..id"] <- "id"
+
+scared_original[scared_original=="77"] <- NA
+scared_original[scared_original=="88"] <- NA
+scared_original[scared_original=="-99"] <- NA
+
+which( colnames(scared_original)=="scared1_1") #2
+which( colnames(scared_original)=="scared6_38") #39
+scared_original <- scared_original[, -c(2:39)]
+scared_original$LN_transformation <- NULL
+
+names(scared_original)[names(scared_original) == "SCARED_C_Sum"] <- "scared_original_sum"
+names(scared_original)[names(scared_original) == "SCARED_C_Mean"] <- "scared_original_mean"
+names(scared_original)[names(scared_original) == "SCARED_C_GAD_Sum"] <- "scared_original_gad_sum"
+names(scared_original)[names(scared_original) == "SCARED_C_GAD_Mean"] <- "scared_original_gad_mean"
+names(scared_original)[names(scared_original) == "SCARED_C_SepAnx_Sum"] <- "scared_original_sepanx_sum"
+names(scared_original)[names(scared_original) == "SCARED_C_SepAnx_Mean"] <- "scared_original_sepanx_mean"
+names(scared_original)[names(scared_original) == "SCARED_C_SocAnx_Sum"] <- "scared_original_socanx_sum"
+names(scared_original)[names(scared_original) == "SCARED_C_SocAnx_Mean"] <- "scared_original_socanx_mean"
+names(scared_original)[names(scared_original) == "SCARED_C_SchlAvoid_Sum"] <- "scared_original_school_sum"
+names(scared_original)[names(scared_original) == "SCARED_C_SchlAvoid_Mean"] <- "scared_original_school_mean"
+names(scared_original)[names(scared_original) == "SCARED_C_Panic_Sum"] <- "scared_original_panic_sum"
+names(scared_original)[names(scared_original) == "SCARED_C_Panic_Mean"] <- "scared_original_panic_mean"
+```
+
+```{r Cleaning SCARED 2yr, include=FALSE}
+scared_2yr <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/internalizing/scared_2yr.csv')
+names(scared_2yr)[names(scared_2yr) == "ï..id"] <- "id"
+
+# Remove people who haven't completed survey yet
+scared_2yr <- scared_2yr[!is.na(scared_2yr$scared1_1_2yr),]
+
+# Replace 88s and -99s with NAs
+
+scared_2yr[scared_2yr=="77"] <- NA
+scared_2yr[scared_2yr=="88"] <- NA
+scared_2yr[scared_2yr=="-99"] <- NA
+
+# Calculate subscales
+
+## Panic Disorder
+scared_2yr_panic <- cbind(scared_2yr$scared1_1_2yr, scared_2yr$scared1_6_2yr, scared_2yr$scared2_9_2yr, scared_2yr$scared2_12_2yr, scared_2yr$scared3_15_2yr, scared_2yr$scared3_18_2yr, scared_2yr$scared4_19_2yr, scared_2yr$scared4_23_2yr, scared_2yr$scared4_24_2yr, scared_2yr$scared5_27_2yr, scared_2yr$scared5_30_2yr, scared_2yr$scared6_34_2yr, scared_2yr$scared6_38_2yr)
+scared_2yr$scared_2yr_panic_sum <- rowSums(scared_2yr_panic, na.rm=TRUE)
+scared_2yr$scared_2yr_panic_mean <- rowMeans(scared_2yr_panic, na.rm=TRUE)
+rm(scared_2yr_panic)
+
+## GAD
+
+scared_2yr_gad <- cbind(scared_2yr$scared1_5_2yr, scared_2yr$scared2_7_2yr, scared_2yr$scared3_14_2yr, scared_2yr$scared4_21_2yr, scared_2yr$scared4_22_2yr, scared_2yr$scared5_28_2yr, scared_2yr$scared6_33_2yr, scared_2yr$scared6_35_2yr, scared_2yr$scared6_37_2yr)
+scared_2yr$scared_2yr_gad_sum <- rowSums(scared_2yr_gad, na.rm=TRUE)
+scared_2yr$scared_2yr_gad_mean <- rowMeans(scared_2yr_gad, na.rm=TRUE)
+rm(scared_2yr_gad)
+
+## Separation Anxiety
+
+scared_2yr_sepanx <- cbind(scared_2yr$scared1_4_2yr, scared_2yr$scared2_8_2yr, scared_2yr$scared3_13_2yr, scared_2yr$scared3_16_2yr, scared_2yr$scared4_20_2yr, scared_2yr$scared5_25_2yr, scared_2yr$scared5_29_2yr, scared_2yr$scared6_31_2yr)
+scared_2yr$scared_2yr_sepanx_sum <- rowSums(scared_2yr_sepanx, na.rm=TRUE)
+scared_2yr$scared_2yr_sepanx_mean <- rowMeans(scared_2yr_sepanx, na.rm=TRUE)
+rm(scared_2yr_sepanx)
+
+## Social Anxiety
+
+scared_2yr_socanx <- cbind(scared_2yr$scared1_3_2yr, scared_2yr$scared2_10_2yr, scared_2yr$scared5_26_2yr, scared_2yr$scared6_32_2yr)
+scared_2yr$scared_2yr_socanx_sum <- rowSums(scared_2yr_socanx, na.rm=TRUE)
+scared_2yr$scared_2yr_socanx_mean <- rowMeans(scared_2yr_socanx, na.rm=TRUE)
+rm(scared_2yr_socanx)
+
+## School Avoidance
+
+scared_2yr_school <- cbind(scared_2yr$scared1_2_2yr, scared_2yr$scared2_11_2yr, scared_2yr$scared3_17_2yr, scared_2yr$scared6_36_2yr)
+scared_2yr$scared_2yr_school_sum <- rowSums(scared_2yr_school, na.rm=TRUE)
+scared_2yr$scared_2yr_school_sum <- rowMeans(scared_2yr_school, na.rm=TRUE)
+rm(scared_2yr_school)
+
+# Remove individual items
+
+which( colnames(scared_2yr)=="scared1_1") #2
+which( colnames(scared_2yr)=="scared_youth_complete") #41
+scared_2yr <- scared_2yr[, -c(2:41)]
+```
+
+```{r Cleaning ISEL Child Original, include=FALSE}
+#http://www.midss.org/sites/default/files/interpersonal_support_evaluation_list_and_scoring_isel.pdf
+
+#http://www.psy.cmu.edu/~scohen/ISEL12score.html
+
+isel <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/internalizing/isel.csv')
+names(isel)[names(isel) == "ï..id"] <- "id"
+
+# Replace 88s and -99s with NAs
+
+isel[isel=="77"] <- NA
+isel[isel=="88"] <- NA
+isel[isel=="-99"] <- NA
+isel[isel=="NaN"] <- NA
+
+# Reverse code some items
+
+isel$iselc1_1 <- car::recode(isel$iselc1_1, "1 = 4; 2 = 3; 3 = 2; 4 = 1")
+isel$iselc1_2 <- car::recode(isel$iselc1_2, "1 = 4; 2 = 3; 3 = 2; 4 = 1")
+isel$iselc2_7 <- car::recode(isel$iselc2_7, "1 = 4; 2 = 3; 3 = 2; 4 = 1")
+isel$iselc3_11 <- car::recode(isel$iselc3_11, "1 = 4; 2 = 3; 3 = 2; 4 = 1")
+isel$iselc3_12 <- car::recode(isel$iselc3_12, "1 = 4; 2 = 3; 3 = 2; 4 = 1")
+
+# Calculate subscales
+
+appraisal <- cbind(isel$iselc1_2, isel$iselc1_4, isel$iselc2_6, isel$iselc3_11)
+isel$isel_app_sum <- rowSums(appraisal, na.rm=TRUE)
+isel$isel_app_mean <- rowMeans(appraisal, na.rm=TRUE)
+rm(appraisal)
+
+belonging <- cbind(isel$iselc1_1, isel$iselc2_5, isel$iselc2_7, isel$iselc3_9)
+isel$isel_bel_sum <- rowSums(belonging, na.rm=TRUE)
+isel$isel_bel_mean <- rowMeans(belonging, na.rm=TRUE)
+rm(belonging)
+
+tangible <- cbind(isel$iselc1_3, isel$iselc2_8, isel$iselc3_10, isel$iselc3_12)
+isel$isel_tan_sum <- rowSums(tangible, na.rm=TRUE)
+isel$isel_tan_mean <- rowMeans(tangible, na.rm=TRUE)
+rm(tangible)
+
+total <- cbind(isel$iselc1_1, isel$iselc1_2, isel$iselc1_3, isel$iselc1_4, isel$iselc2_5, isel$iselc2_6, isel$iselc2_7, isel$iselc2_8, isel$iselc3_9, isel$iselc3_10, isel$iselc3_11, isel$iselc3_12)
+isel$isel_tot_sum <- rowSums(total, na.rm=TRUE)
+isel$isel_tot_mean <- rowMeans(total, na.rm=TRUE)
+rm(total)
+
+# Remove individual items
+which( colnames(isel)=="iselc1_1") #2
+which( colnames(isel)=="iselc3_12") #13
+isel <- isel[, -c(2:13)]
+
+# Remove NaN rows
+isel <- isel[!(isel$isel_tot_mean=="NaN"),]
+```
+
+```{r YSR Original Cleaning, include=FALSE}
+ysr <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cbcl_ysr/ysr.csv')
+names(ysr)[names(ysr) == "ï..id"] <- "id"
+
+ysr[ysr=="77"] <- NA
+ysr[ysr=="88"] <- NA
+ysr[ysr=="-99"] <- NA
+
+names(ysr)[names(ysr) == "YSR_Anx_Prob_Tot"] <- "ysr_anx_tot"
+names(ysr)[names(ysr) == "YSR_Som_Prob_Tot"] <- "ysr_somatic_tot"
+names(ysr)[names(ysr) == "YSR_ADHD_Prob_Tot"] <- "ysr_adhd_tot"
+names(ysr)[names(ysr) == "YSR_ODD_Prob_Tot"] <- "ysr_odd_tot"
+names(ysr)[names(ysr) == "YSR_Dep_Prob_Tot"] <- "ysr_dep_tot"
+names(ysr)[names(ysr) == "YSR_CD_Prob_Tot"] <- "ysr_cd_tot"
+
+names(ysr)[names(ysr) == "YSR_Anx_Prob_Avg"] <- "ysr_anx_avg"
+names(ysr)[names(ysr) == "YSR_Som_Prob_Avg"] <- "ysr_somatic_avg"
+names(ysr)[names(ysr) == "YSR_ADHD_Prob_Avg"] <- "ysr_adhd_avg"
+names(ysr)[names(ysr) == "YSR_ODD_Prob_Avg"] <- "ysr_odd_avg"
+names(ysr)[names(ysr) == "YSR_Dep_Prob_Avg"] <- "ysr_dep_avg"
+names(ysr)[names(ysr) == "YSR_CD_Prob_Avg"] <- "ysr_cd_avg"
+
+which( colnames(ysr)=="ysr1_1") #2
+which( colnames(ysr)=="ysr_complete") #137
+ysr <- ysr[, -c(2:137)]
+```
+
+```{r Final cleaning up, include=FALSE}
+isel <- merge(isel, demo, by = "id")
+
+ysr <- merge(ysr, demo, by = "id")
+
+scared <- merge(scared_2yr, scared_original, by = "id")
+scared <- merge(scared, demo, by = "id")
+rm(scared_2yr)
+rm(scared_original)
+
+cbcl <- merge(cbcl_original, cbcl_2yr, by = "id")
+cbcl <- merge(cbcl, demo, by = "id")
+rm(cbcl_original)
+rm(cbcl_2yr)
+
+mfq <- merge(mfq_original, mfq_2yr, by = "id")
+mfq <- merge(mfq, demo, by = "id")
+rm(mfq_original)
+rm(mfq_2yr)
+
+rm(demo)
+```
+
+## Interpersonal Support Evaluation List (Short Version)
+
+```{r ggplot color generator, include=FALSE}
+#show_col(hue_pal()(4))
+```
+
+```{r}
+ggplot(data=isel,aes(x=isel_tot_sum,fill=Gender)) + 
+  geom_density(alpha=0.2,lwd=0.2) +
+  ggtitle("ISEL by Gender") + xlab("Total Sum") + ylab("")
+```
+
+## Correlation Matrix
+
+```{r}
+corr_vars <- data.frame(cp_long$angerC, cp_long$fearC, cp_long$happinessC, cp_long$sadnessC, cp_long$painC, cp_long$ctqsumC, cp_long$emosumC, cp_long$ThreatZSum, cp_long$DepZSum, cp_long$ThreatCompc, cp_long$DepCompc, cp_long$ThreatDepInt, cp_long$Responder)
+
+corr_vars <- data.frame()
+
+names(corr_vars) <- gsub(pattern = "cp_long._*", replacement = "", x = names(corr_vars))
+
+corr_data <- stats::cor(corr_vars)
+
+labels <- c("Anger", "Fear", "Happiness", "Sadness", "Pain", "CTQ Total", "CTQ Emo", "ThreatZSum", "DepZSum", "ThreapCompc", "DepCompc", "ThreatDepInt", "Responder")
+
+set_theme(axis.title.size = 0, geom.label.size = 4.5, axis.textsize.x = 1, axis.textsize.y = 1, axis.angle.x = 90)
+
+sjp.corr(corr_data, corr.method=c("spearman"),title="Correlation Matrix", na.deletion = "pairwise", sort.corr=FALSE, show.values=TRUE, decimals=2, axis.labels = labels)
+
+rm(corr_vars)
+rm(corr_data)
+rm(labels)
+```
+
+```{r}
+cbcl1 <- cbcl[c(1:25)]
+isel1 <- isel[c(1:9)]
+mfq1 <- mfq[c(1:5)]
+scared1 <- scared[c(1:22)]
+ysr1 <- ysr[c(1:13)]
+
+cbcl1 <- cbcl1 %>% dplyr::select(matches('_tot'))
+ysr1 <- ysr1 %>% dplyr::select(matches('_tot'))
+
+here <- merge(cbcl1,isel1,by="id")
+here <- merge(here,mfq1,by="id")
+here <- merge(here,scared1,by="id")
+
+corr_vars <- merge(here,ysr1,by="id")
+
+rm(cbcl1)
+rm(isel1)
+rm(mfq1)
+rm(scared1)
+rm(ysr1)
+rm(here)
+```
+
