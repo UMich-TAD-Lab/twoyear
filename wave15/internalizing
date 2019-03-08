@@ -143,8 +143,8 @@ rm(anxiety)
 ## Somatic Problems
 
 somatic <- cbind(cbcl_2yr$cbcl8_54, cbcl_2yr$cbcl8_55, cbcl_2yr$cbcl9_56, cbcl_2yr$cbcl9_57, cbcl_2yr$cbcl9_58, cbcl_2yr$cbcl9_59, cbcl_2yr$cbcl9_60)
-cbcl_2yr$cbcl_2yr_som_tot <- rowSums(somatic, na.rm=TRUE)
-cbcl_2yr$cbcl_2yr_som_avg <- rowMeans(somatic, na.rm=TRUE)
+cbcl_2yr$cbcl_2yr_somatic_tot <- rowSums(somatic, na.rm=TRUE)
+cbcl_2yr$cbcl_2yr_somatic_avg <- rowMeans(somatic, na.rm=TRUE)
 rm(somatic)
 
 ## ADHD 
@@ -600,18 +600,6 @@ cbcl$cbcl_original_dep_t <- (cbcl$cbcl_original_dep_tot*(50/(mean(cbcl$cbcl_orig
 mean(cbcl$cbcl_original_dep_t, na.rm=TRUE)
 ```
 
-```{r Plotting CBCL Wave 15 anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(cbcl, aes(x=cbcl_original_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL Wave 15 Anxiety") + 
-  annotate("rect", xmin=64, xmax=84, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
-```
-
-```{r Plotting CBCL Wave 15 depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(cbcl, aes(x=cbcl_original_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL Wave 15 Depression") + 
-  annotate("rect", xmin=64, xmax=88, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
-```
-
 ```{r include=FALSE}
 ### Things that are not clinical significance are below!
 ```
@@ -667,18 +655,6 @@ cbcl$cbcl_2yr_dep_t <- (cbcl$cbcl_2yr_dep_tot*(50/(mean(cbcl$cbcl_2yr_dep_tot, n
 mean(cbcl$cbcl_2yr_dep_t, na.rm=TRUE)
 ```
 
-```{r Plotting SAND CBCL 2yr anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include-FALSE}
-ggplot(cbcl, aes(x=cbcl_2yr_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL 2yr Anxiety") + 
-  annotate("rect", xmin=64, xmax=94, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
-```
-
-```{r Plotting CBCL 2yr depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
-ggplot(cbcl, aes(x=cbcl_2yr_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL 2yr Depression") + 
-  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
-```
-
 ```{r include=FALSE}
 ### Things that are not clinical significance are below!
 ```
@@ -720,6 +696,44 @@ ggplot(cbcl, aes(x=cbcl_2yr_anx_tot)) + geom_histogram(colour="white",fill="ligh
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
+### Wave 15 vs. Follow-Up
+
+```{r W15 vs 2yr CBCL Anxiety, echo=FALSE, message=FALSE, warning=FALSE}
+df1 <- data.frame(cbcl$id, cbcl$cbcl_original_anx_tot, cbcl$cbcl_2yr_anx_tot)
+df2 <- melt(df1, id.vars="cbcl.id")
+
+names(df2)[names(df2) == "variable"] <- "Year"
+
+levels(df2$Year)[levels(df2$Year)=="cbcl.cbcl_original_anx_tot"] <- "Wave 15"
+levels(df2$Year)[levels(df2$Year)=="cbcl.cbcl_2yr_anx_tot"] <- "Follow-Up"
+
+ggplot(data=df2,aes(x=value,fill=Year)) + 
+  geom_density(alpha=0.2,lwd=0.2) +
+  ggtitle("CBCL Anxiety: W15 vs. 2yr") + xlab("Total Sum") + ylab("")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+```{r W15 vs 2yr CBCL Anxiety, echo=FALSE, message=FALSE, warning=FALSE}
+df1 <- data.frame(cbcl$id, cbcl$cbcl_original_dep_tot, cbcl$cbcl_2yr_dep_tot)
+df2 <- melt(df1, id.vars="cbcl.id")
+
+names(df2)[names(df2) == "variable"] <- "Year"
+
+levels(df2$Year)[levels(df2$Year)=="cbcl.cbcl_original_dep_tot"] <- "Wave 15"
+levels(df2$Year)[levels(df2$Year)=="cbcl.cbcl_2yr_dep_tot"] <- "Follow-Up"
+
+ggplot(data=df2,aes(x=value,fill=Year)) + 
+  geom_density(alpha=0.2,lwd=0.2) +
+  ggtitle("CBCL Depression: W15 vs. 2yr") + xlab("Total Sum") + ylab("")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
 ## Youth Self-Report: Anxiety and Depression
 
 ### Wave 15
@@ -734,18 +748,6 @@ mean(ysr$ysr_anx_t, na.rm=TRUE)
 mean(ysr$ysr_dep_tot, na.rm=TRUE)
 ysr$ysr_dep_t <- (ysr$ysr_dep_tot*(50/(mean(ysr$ysr_dep_tot, na.rm=TRUE))))
 mean(ysr$ysr_dep_t, na.rm=TRUE)
-```
-
-```{r Plotting SAND YSR anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
-ggplot(ysr, aes(x=ysr_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("YSR Wave 15 Anxiety") + 
-  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
-```
-
-```{r Plotting YSR depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
-ggplot(ysr, aes(x=ysr_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("YSR Wave 15 Depression") + 
-  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
 ```
 
 ```{r include=FALSE}
