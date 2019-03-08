@@ -882,7 +882,7 @@ ggplot(mfq, aes(x=mfq_2yr_sum)) +
   geom_histogram(colour="white",fill="yellowgreen")  + xlab("Total Score") + 
   ylab("Count") +
   ggtitle("MFQ Total Sum") + 
-  annotate("rect", xmin=29, xmax=87, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=29, xmax=59, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
   labs(caption = "Clinical cut-off according to Daviss et al., 2006")
 ```
 
