@@ -588,22 +588,6 @@ sjp.corr(corr_data, corr.method=c("spearman"), title="A Very Large Correlation M
 
 ### Wave 15
 
-```{r Rescaling CBCL Wave 15 anxiety, include=FALSE}
-mean(cbcl$cbcl_original_anx_tot, na.rm=TRUE)
-cbcl$cbcl_original_anx_t <- (cbcl$cbcl_original_anx_tot*(50/(mean(cbcl$cbcl_original_anx_tot, na.rm=TRUE))))
-mean(cbcl$cbcl_original_anx_t, na.rm=TRUE)
-```
-
-```{r Rescaling CBCL Wave 15 depression, include=FALSE}
-mean(cbcl$cbcl_original_dep_tot, na.rm=TRUE)
-cbcl$cbcl_original_dep_t <- (cbcl$cbcl_original_dep_tot*(50/(mean(cbcl$cbcl_original_dep_tot, na.rm=TRUE))))
-mean(cbcl$cbcl_original_dep_t, na.rm=TRUE)
-```
-
-```{r include=FALSE}
-### Things that are not clinical significance are below!
-```
-
 ```{r SAND CBCL Original Barplot, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 Scores <- c((mean(cbcl$cbcl_original_anx_tot, na.rm=TRUE)), 
                  (mean(cbcl$cbcl_original_somatic_tot, na.rm=TRUE)), 
@@ -642,22 +626,6 @@ rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
 ### Follow-up
-
-```{r Rescaling CBCL 2yr anxiety, include=FALSE}
-mean(cbcl$cbcl_2yr_anx_tot, na.rm=TRUE)
-cbcl$cbcl_2yr_anx_t <- (cbcl$cbcl_2yr_anx_tot*(50/(mean(cbcl$cbcl_2yr_anx_tot, na.rm=TRUE))))
-mean(cbcl$cbcl_2yr_anx_t, na.rm=TRUE)
-```
-
-```{r Rescaling CBCL 2yr depression, include=FALSE}
-mean(cbcl$cbcl_2yr_dep_tot, na.rm=TRUE)
-cbcl$cbcl_2yr_dep_t <- (cbcl$cbcl_2yr_dep_tot*(50/(mean(cbcl$cbcl_2yr_dep_tot, na.rm=TRUE))))
-mean(cbcl$cbcl_2yr_dep_t, na.rm=TRUE)
-```
-
-```{r include=FALSE}
-### Things that are not clinical significance are below!
-```
 
 ```{r SAND CBCL 2yr Barplot, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 Scores <- c((mean(cbcl$cbcl_2yr_anx_tot, na.rm=TRUE)), 
@@ -716,7 +684,7 @@ ggplot(data=df2,aes(x=value,fill=Year)) +
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
-```{r W15 vs 2yr CBCL Anxiety, echo=FALSE, message=FALSE, warning=FALSE}
+```{r W15 vs 2yr CBCL Depression, echo=FALSE, message=FALSE, warning=FALSE}
 df1 <- data.frame(cbcl$id, cbcl$cbcl_original_dep_tot, cbcl$cbcl_2yr_dep_tot)
 df2 <- melt(df1, id.vars="cbcl.id")
 
@@ -737,22 +705,6 @@ rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ## Youth Self-Report: Anxiety and Depression
 
 ### Wave 15
-
-```{r Rescaling YSR anxiety, include=FALSE}
-mean(ysr$ysr_anx_tot, na.rm=TRUE)
-ysr$ysr_anx_t <- (ysr$ysr_anx_tot*(50/(mean(ysr$ysr_anx_tot, na.rm=TRUE))))
-mean(ysr$ysr_anx_t, na.rm=TRUE)
-```
-
-```{r Rescaling YSR depression, include=FALSE}
-mean(ysr$ysr_dep_tot, na.rm=TRUE)
-ysr$ysr_dep_t <- (ysr$ysr_dep_tot*(50/(mean(ysr$ysr_dep_tot, na.rm=TRUE))))
-mean(ysr$ysr_dep_t, na.rm=TRUE)
-```
-
-```{r include=FALSE}
-### Things that are not clinical significance are below!
-```
 
 ```{r SAND YSR Barplot, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 Scores <- c((mean(ysr$ysr_anx_tot, na.rm=TRUE)), 
@@ -803,120 +755,6 @@ rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ggplot(data=isel,aes(x=isel_tot_sum,fill=Gender)) + 
   geom_density(alpha=0.2,lwd=0.2) +
   ggtitle("ISEL by Gender") + xlab("Total Sum") + ylab("")
-```
-
-```{r include=FALSE}
-rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
-```
-
-## Mood and Feelings Questionnaire
-
-### Wave 15
-
-```{r MFQ Wave 15 Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
-col <- c("mediumorchid3", "cyan3")
-ggplot(mfq, aes(Gender, mfq_original_sum)) + geom_boxplot(fill=col) + ylab("MFQ Wave 15 Total") + xlab("Gender")
-```
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(mfq, aes(x=mfq_original_sum)) + 
-  geom_histogram(colour="white",fill="yellowgreen")  + xlab("Total Score") + 
-  ylab("Count") +
-  ggtitle("MFQ Total Sum") + 
-  annotate("rect", xmin=29, xmax=48, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  labs(caption = "Clinical cut-off according to Daviss et al., 2006")
-```
-
-```{r include=FALSE}
-rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
-```
-
-### Follow-Up
-
-```{r MFQ 2yr Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
-col <- c("mediumorchid3", "cyan3")
-ggplot(mfq, aes(Gender, mfq_2yr_sum)) + geom_boxplot(fill=col) + ylab("MFQ 2yr Total") + xlab("Gender")
-```
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(mfq, aes(x=mfq_2yr_sum)) + 
-  geom_histogram(colour="white",fill="yellowgreen")  + xlab("Total Score") + 
-  ylab("Count") +
-  ggtitle("MFQ Total Sum") + 
-  annotate("rect", xmin=29, xmax=87, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  labs(caption = "Clinical cut-off according to Daviss et al., 2006")
-```
-
-```{r include=FALSE}
-rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
-```
-
-## Screen for Child Anxiety-Related Disorders
-
-### Wave 15
-
-```{r include=FALSE}
-scared_f <- scared[ which(scared$Gender =='F'), ]
-scared_m <- scared[ which(scared$Gender =='M'), ]
-```
-
-```{r include=FALSE} 
-nrow(scared_f[scared_f$scared_original_sum >= 25, ]) #44
-```
-
-```{r SCARED Wave 15 Girls, echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(scared_f, aes(x=scared_original_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Girls") + 
-  annotate("rect", xmin=25, xmax=55, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  labs(caption = "44 girls have a score of 25+.")
-```
-
-```{r include=FALSE} 
-nrow(scared_m[scared_m$scared_original_sum >= 25, ]) #17
-```
-
-```{r SCARED Wave 15 Boys, echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(scared_m, aes(x=scared_original_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Boys") + 
-  annotate("rect", xmin=25, xmax=42, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  labs(caption = "17 boys have a score of 25+.")
-```
-
-```{r include=FALSE}
-#http://www.midss.org/content/screen-child-anxiety-related-disorders-scared
-```
-
-```{r include=FALSE}
-rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
-```
-
-### Follow-Up
-
-```{r include=FALSE}
-scared_f <- scared[ which(scared$Gender =='F'), ]
-scared_m <- scared[ which(scared$Gender =='M'), ]
-```
-
-```{r include=FALSE} 
-nrow(scared_f[scared_f$scared_2yr_sum >= 25, ]) #44
-```
-
-```{r SCARED 2yr Girls, echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(scared_f, aes(x=scared_2yr_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Girls") + 
-  annotate("rect", xmin=25, xmax=55, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  labs(caption = "44 girls have a score of 25+.")
-```
-
-```{r include=FALSE} 
-nrow(scared_m[scared_m$scared_2yr_sum >= 25, ]) #17
-```
-
-```{r SCARED 2yr Boys, echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(scared_m, aes(x=scared_2yr_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Boys") + 
-  annotate("rect", xmin=25, xmax=42, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  labs(caption = "17 boys have a score of 25+.")
-```
-
-```{r include=FALSE}
-#http://www.midss.org/content/screen-child-anxiety-related-disorders-scared
 ```
 
 ```{r include=FALSE}
@@ -984,7 +822,7 @@ cdi_count$Female[cdi_count$Criteria == "Average or Lower"] <- average_girl
 cdi_count$Male[cdi_count$Criteria == "Average or Lower"] <- average_boy
 ```
 
-```{r CDI Count Table, echo=FALSE, warning=FALSE, message=FALSE}
+```{r CDI Count Table, echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 cdi_count %>%
   kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "SAND Sample & CDI Cutoffs") %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
@@ -1004,6 +842,160 @@ ggplot(cdi_m, aes(x=cdi_sum)) + geom_histogram(colour="white",fill="cyan3")  + x
   annotate("rect", xmin=16, xmax=19, ymin=0, ymax=Inf, alpha=0.4, fill="red") +
   annotate("rect", xmin=13, xmax=16, ymin=0, ymax=Inf, alpha=0.2, fill="red") +
   annotate("rect", xmin=0, xmax=13, ymin=0, ymax=Inf, alpha=0.0, fill="red")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+## Mood and Feelings Questionnaire
+
+### Wave 15
+
+```{r MFQ Wave 15 Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
+col <- c("mediumorchid3", "cyan3")
+ggplot(mfq, aes(Gender, mfq_original_sum)) + geom_boxplot(fill=col) + ylab("MFQ Wave 15 Total") + xlab("Gender")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(mfq, aes(x=mfq_original_sum)) + 
+  geom_histogram(colour="white",fill="yellowgreen")  + xlab("Total Score") + 
+  ylab("Count") +
+  ggtitle("MFQ Total Sum") + 
+  annotate("rect", xmin=29, xmax=48, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "Clinical cut-off according to Daviss et al., 2006")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+### Follow-Up
+
+```{r MFQ 2yr Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
+col <- c("mediumorchid3", "cyan3")
+ggplot(mfq, aes(Gender, mfq_2yr_sum)) + geom_boxplot(fill=col) + ylab("MFQ 2yr Total") + xlab("Gender")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(mfq, aes(x=mfq_2yr_sum)) + 
+  geom_histogram(colour="white",fill="yellowgreen")  + xlab("Total Score") + 
+  ylab("Count") +
+  ggtitle("MFQ Total Sum") + 
+  annotate("rect", xmin=29, xmax=87, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "Clinical cut-off according to Daviss et al., 2006")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+### Wave 15 vs. Follow-Up
+
+```{r W15 vs 2yr MFQ, echo=FALSE, message=FALSE, warning=FALSE}
+df1 <- data.frame(mfq$id, mfq$mfq_original_sum, mfq$mfq_2yr_sum)
+df2 <- melt(df1, id.vars="mfq.id")
+
+names(df2)[names(df2) == "variable"] <- "Year"
+
+levels(df2$Year)[levels(df2$Year)=="mfq.mfq_original_sum"] <- "Wave 15"
+levels(df2$Year)[levels(df2$Year)=="mfq.mfq_2yr_sum"] <- "Follow-Up"
+
+ggplot(data=df2,aes(x=value,fill=Year)) + 
+  geom_density(alpha=0.2,lwd=0.2) +
+  ggtitle("MFQ: W15 vs. 2yr") + xlab("Total Sum") + ylab("")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+## Screen for Child Anxiety-Related Disorders
+
+### Wave 15
+
+```{r include=FALSE}
+scared_f <- scared[ which(scared$Gender =='F'), ]
+scared_m <- scared[ which(scared$Gender =='M'), ]
+```
+
+```{r include=FALSE} 
+nrow(scared_f[scared_f$scared_original_sum >= 25, ]) #44
+```
+
+```{r SCARED Wave 15 Girls, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared_f, aes(x=scared_original_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Girls") + 
+  annotate("rect", xmin=25, xmax=55, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "44 girls have a score of 25+.")
+```
+
+```{r include=FALSE} 
+nrow(scared_m[scared_m$scared_original_sum >= 25, ]) #17
+```
+
+```{r SCARED Wave 15 Boys, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared_m, aes(x=scared_original_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Boys") + 
+  annotate("rect", xmin=25, xmax=40, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "17 boys have a score of 25+.")
+```
+
+```{r include=FALSE}
+#http://www.midss.org/content/screen-child-anxiety-related-disorders-scared
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+### Follow-Up
+
+```{r include=FALSE}
+scared_f <- scared[ which(scared$Gender =='F'), ]
+scared_m <- scared[ which(scared$Gender =='M'), ]
+```
+
+```{r include=FALSE} 
+nrow(scared_f[scared_f$scared_2yr_sum >= 25, ]) #44
+```
+
+```{r SCARED 2yr Girls, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared_f, aes(x=scared_2yr_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Girls") + 
+  annotate("rect", xmin=25, xmax=65, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "44 girls have a score of 25+.")
+```
+
+```{r include=FALSE} 
+nrow(scared_m[scared_m$scared_2yr_sum >= 25, ]) #17
+```
+
+```{r SCARED 2yr Boys, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared_m, aes(x=scared_2yr_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Boys") + 
+  annotate("rect", xmin=25, xmax=50, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "17 boys have a score of 25+.")
+```
+
+```{r include=FALSE}
+#http://www.midss.org/content/screen-child-anxiety-related-disorders-scared
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+### Wave 15 vs. Follow-Up
+
+```{r W15 vs 2yr SCARED, echo=FALSE, message=FALSE, warning=FALSE}
+df1 <- data.frame(scared$id, scared$scared_original_sum, scared$scared_2yr_sum)
+df2 <- melt(df1, id.vars="scared.id")
+
+names(df2)[names(df2) == "variable"] <- "Year"
+
+levels(df2$Year)[levels(df2$Year)=="scared.scared_original_sum"] <- "Wave 15"
+levels(df2$Year)[levels(df2$Year)=="scared.scared_2yr_sum"] <- "Follow-Up"
+
+ggplot(data=df2,aes(x=value,fill=Year)) + 
+  geom_density(alpha=0.2,lwd=0.2) +
+  ggtitle("SCARED: W15 vs. 2yr") + xlab("Total Sum") + ylab("")
 ```
 
 ```{r include=FALSE}
