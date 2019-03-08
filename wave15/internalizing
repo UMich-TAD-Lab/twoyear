@@ -44,6 +44,7 @@ library(scales)
 library(RColorBrewer)
 library(papaja)
 library(knitcitations)
+library(GPArotation)
 ```
 
 * ISEL Child
@@ -97,6 +98,8 @@ names(cbcl_original)[names(cbcl_original) == "ï..id"] <- "id"
 cbcl_original[cbcl_original=="77"] <- NA
 cbcl_original[cbcl_original=="88"] <- NA
 cbcl_original[cbcl_original=="-99"] <- NA
+
+# Doesn't need to be re-scaled, both Wave 15 and 2yr CBCL datasets use a 1-3 scale!
 
 names(cbcl_original)[names(cbcl_original) == "CBCL_Anx_Prob_Tot"] <- "cbcl_original_anx_tot"
 names(cbcl_original)[names(cbcl_original) == "CBCL_Som_Prob_Tot"] <- "cbcl_original_somatic_tot"
@@ -211,6 +214,39 @@ mfq_2yr[mfq_2yr=="77"] <- NA
 mfq_2yr[mfq_2yr=="88"] <- NA
 mfq_2yr[mfq_2yr=="-99"] <- NA
 
+# Rescale from 1-3 to 0-2
+
+mfq_2yr$mfqc1_1_2yr <- car::recode(mfq_2yr$mfqc1_1_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc1_2_2yr <- car::recode(mfq_2yr$mfqc1_2_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc1_3_2yr <- car::recode(mfq_2yr$mfqc1_3_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc1_4_2yr <- car::recode(mfq_2yr$mfqc1_4_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc1_5_2yr <- car::recode(mfq_2yr$mfqc1_5_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc1_6_2yr <- car::recode(mfq_2yr$mfqc1_6_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc2_7_2yr <- car::recode(mfq_2yr$mfqc2_7_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc2_8_2yr <- car::recode(mfq_2yr$mfqc2_8_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc2_9_2yr <- car::recode(mfq_2yr$mfqc2_9_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc2_10_2yr <- car::recode(mfq_2yr$mfqc2_10_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc2_11_2yr <- car::recode(mfq_2yr$mfqc2_11_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc2_12_2yr <- car::recode(mfq_2yr$mfqc2_12_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc3_13_2yr <- car::recode(mfq_2yr$mfqc3_13_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc3_14_2yr <- car::recode(mfq_2yr$mfqc3_14_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc3_15_2yr <- car::recode(mfq_2yr$mfqc3_15_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc4_20_2yr <- car::recode(mfq_2yr$mfqc4_20_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc4_21_2yr <- car::recode(mfq_2yr$mfqc4_21_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc4_22_2yr <- car::recode(mfq_2yr$mfqc4_22_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc4_23_2yr <- car::recode(mfq_2yr$mfqc4_23_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc4_24_2yr <- car::recode(mfq_2yr$mfqc4_24_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc5_25_2yr <- car::recode(mfq_2yr$mfqc5_25_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc5_26_2yr <- car::recode(mfq_2yr$mfqc5_26_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc5_27_2yr <- car::recode(mfq_2yr$mfqc5_27_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc5_28_2yr <- car::recode(mfq_2yr$mfqc5_28_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc5_29_2yr <- car::recode(mfq_2yr$mfqc5_29_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc6_30_2yr <- car::recode(mfq_2yr$mfqc6_30_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc6_31_2yr <- car::recode(mfq_2yr$mfqc6_31_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc6_32_2yr <- car::recode(mfq_2yr$mfqc6_32_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc6_33_2yr <- car::recode(mfq_2yr$mfqc6_33_2yr, "1 = 0; 2 = 1; 3 = 2")
+mfq_2yr$mfqc6_34_2yr <- car::recode(mfq_2yr$mfqc6_34_2yr, "1 = 0; 2 = 1; 3 = 2")
+
 # Create a mean and sum variable
 
 mfq <- cbind(mfq_2yr$mfqc1_1_2yr, mfq_2yr$mfqc1_2_2yr, mfq_2yr$mfqc1_3_2yr, mfq_2yr$mfqc1_4_2yr, mfq_2yr$mfqc1_5_2yr, mfq_2yr$mfqc1_6_2yr, mfq_2yr$mfqc2_7_2yr, mfq_2yr$mfqc2_8_2yr, mfq_2yr$mfqc2_9_2yr, mfq_2yr$mfqc2_10_2yr, mfq_2yr$mfqc2_11_2yr, mfq_2yr$mfqc2_12_2yr, mfq_2yr$mfqc3_13_2yr, mfq_2yr$mfqc3_14_2yr, mfq_2yr$mfqc3_15_2yr, mfq_2yr$mfqc4_20_2yr, mfq_2yr$mfqc4_21_2yr, mfq_2yr$mfqc4_22_2yr, mfq_2yr$mfqc4_23_2yr, mfq_2yr$mfqc4_24_2yr, mfq_2yr$mfqc5_25_2yr, mfq_2yr$mfqc5_26_2yr, mfq_2yr$mfqc5_27_2yr, mfq_2yr$mfqc5_28_2yr, mfq_2yr$mfqc5_29_2yr, mfq_2yr$mfqc6_30_2yr, mfq_2yr$mfqc6_31_2yr, mfq_2yr$mfqc6_32_2yr, mfq_2yr$mfqc6_33_2yr, mfq_2yr$mfqc6_34_2yr)
@@ -265,6 +301,47 @@ scared_2yr[scared_2yr=="77"] <- NA
 scared_2yr[scared_2yr=="88"] <- NA
 scared_2yr[scared_2yr=="-99"] <- NA
 
+# Rescale
+
+scared_2yr$scared1_1_2yr <- car::recode(scared_2yr$scared1_1_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared1_2_2yr <- car::recode(scared_2yr$scared1_2_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared1_3_2yr <- car::recode(scared_2yr$scared1_3_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared1_4_2yr <- car::recode(scared_2yr$scared1_4_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared1_5_2yr <- car::recode(scared_2yr$scared1_5_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared1_6_2yr <- car::recode(scared_2yr$scared1_6_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared2_7_2yr <- car::recode(scared_2yr$scared2_7_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared2_8_2yr <- car::recode(scared_2yr$scared2_8_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared2_9_2yr <- car::recode(scared_2yr$scared2_9_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared2_10_2yr <- car::recode(scared_2yr$scared2_10_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared2_11_2yr <- car::recode(scared_2yr$scared2_11_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared2_12_2yr <- car::recode(scared_2yr$scared2_12_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared3_13_2yr <- car::recode(scared_2yr$scared3_13_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared3_14_2yr <- car::recode(scared_2yr$scared3_14_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared3_15_2yr <- car::recode(scared_2yr$scared3_15_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared3_16_2yr <- car::recode(scared_2yr$scared3_16_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared3_17_2yr <- car::recode(scared_2yr$scared3_17_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared3_18_2yr <- car::recode(scared_2yr$scared3_18_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared4_19_2yr <- car::recode(scared_2yr$scared4_19_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared4_20_2yr <- car::recode(scared_2yr$scared4_20_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared4_21_2yr <- car::recode(scared_2yr$scared4_21_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared4_22_2yr <- car::recode(scared_2yr$scared4_22_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared4_23_2yr <- car::recode(scared_2yr$scared4_23_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared4_24_2yr <- car::recode(scared_2yr$scared4_24_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared5_25_2yr <- car::recode(scared_2yr$scared5_25_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared5_26_2yr <- car::recode(scared_2yr$scared5_26_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared5_27_2yr <- car::recode(scared_2yr$scared5_27_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared5_28_2yr <- car::recode(scared_2yr$scared5_28_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared5_29_2yr <- car::recode(scared_2yr$scared5_29_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared5_30_2yr <- car::recode(scared_2yr$scared5_30_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared6_31_2yr <- car::recode(scared_2yr$scared6_31_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared6_32_2yr <- car::recode(scared_2yr$scared6_32_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared6_33_2yr <- car::recode(scared_2yr$scared6_33_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared6_34_2yr <- car::recode(scared_2yr$scared6_34_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared6_35_2yr <- car::recode(scared_2yr$scared6_35_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared6_36_2yr <- car::recode(scared_2yr$scared6_36_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared6_37_2yr <- car::recode(scared_2yr$scared6_37_2yr, "1 = 0; 2 = 1; 3 = 2")
+scared_2yr$scared6_38_2yr <- car::recode(scared_2yr$scared6_38_2yr, "1 = 0; 2 = 1; 3 = 2")
+
 # Calculate subscales
 
 ## Panic Disorder
@@ -300,6 +377,13 @@ scared_2yr_school <- cbind(scared_2yr$scared1_2_2yr, scared_2yr$scared2_11_2yr, 
 scared_2yr$scared_2yr_school_sum <- rowSums(scared_2yr_school, na.rm=TRUE)
 scared_2yr$scared_2yr_school_sum <- rowMeans(scared_2yr_school, na.rm=TRUE)
 rm(scared_2yr_school)
+
+## SCARED Total
+
+scared_vars <- cbind(scared_2yr$scared1_1_2yr, scared_2yr$scared1_2_2yr, scared_2yr$scared1_3_2yr, scared_2yr$scared1_4_2yr, scared_2yr$scared1_5_2yr, scared_2yr$scared1_6_2yr, scared_2yr$scared2_7_2yr, scared_2yr$scared2_8_2yr, scared_2yr$scared2_9_2yr, scared_2yr$scared2_10_2yr, scared_2yr$scared2_11_2yr, scared_2yr$scared2_12_2yr, scared_2yr$scared3_13_2yr, scared_2yr$scared3_14_2yr, scared_2yr$scared3_15_2yr, scared_2yr$scared3_16_2yr, scared_2yr$scared3_17_2yr, scared_2yr$scared3_18_2yr, scared_2yr$scared4_19_2yr, scared_2yr$scared4_20_2yr, scared_2yr$scared4_21_2yr, scared_2yr$scared4_22_2yr, scared_2yr$scared4_23_2yr, scared_2yr$scared4_24_2yr, scared_2yr$scared5_25_2yr, scared_2yr$scared5_26_2yr, scared_2yr$scared5_27_2yr, scared_2yr$scared5_28_2yr, scared_2yr$scared5_29_2yr, scared_2yr$scared5_30_2yr, scared_2yr$scared6_31_2yr, scared_2yr$scared6_32_2yr, scared_2yr$scared6_33_2yr, scared_2yr$scared6_34_2yr, scared_2yr$scared6_35_2yr, scared_2yr$scared6_36_2yr, scared_2yr$scared6_37_2yr, scared_2yr$scared6_38_2yr)
+scared_2yr$scared_2yr_mean <- rowMeans(scared_vars, na.rm=TRUE)
+scared_2yr$scared_2yr_sum <- rowSums(scared_vars, na.rm=TRUE)
+rm(scared_vars)
 
 # Remove individual items
 
@@ -389,10 +473,56 @@ which( colnames(ysr)=="ysr_complete") #137
 ysr <- ysr[, -c(2:137)]
 ```
 
+```{r CDI Original Cleaning, include=FALSE}
+cdi <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review/cdi.csv')
+names(cdi)[names(cdi) == "ï..id"] <- "id"
+
+cdi[cdi=="77"] <- NA
+cdi[cdi=="88"] <- NA
+cdi[cdi=="-99"] <- NA
+
+# Calculate subscales
+
+neg_mood_dummy <- cbind(cdi$cdic1, cdi$cdic26, cdi$cdic27, cdi$cdic9, cdi$cdic10_recode, cdi$cdic15_recode, cdi$cdic16_recode, cdi$cdic17, cdi$cdic18_recode)
+cdi$cdi_neg_mood <- rowSums(neg_mood_dummy, na.rm=TRUE)
+rm(neg_mood_dummy)
+
+neg_selfesteem_dummy <- cbind(cdi$cdic2_recode, cdi$cdic24_recode, cdi$cdic6, cdi$cdic7_recode, cdi$cdic8_recode, cdi$cdic13_recode)
+cdi$cdi_neg_selfesteem <- rowSums(neg_selfesteem_dummy, na.rm=TRUE)
+rm(neg_selfesteem_dummy)
+
+ineffect_dummy <- cbind(cdi$cdic3, cdi$cdic4, cdi$cdic20, cdi$cdic22, cdi$cdic23, cdi$cdic28, cdi$cdic12, cdi$cdic14)
+cdi$cdi_ineffect <- rowSums(ineffect_dummy, na.rm=TRUE)
+rm(ineffect_dummy)
+
+inter_prob_dummy <- cbind(cdi$cdic5_recode, cdi$cdic21_recode, cdi$cdic25_recode, cdi$cdic11_recode, cdi$cdic19)
+cdi$cdi_inter_prob <- rowSums(inter_prob_dummy, na.rm=TRUE)
+rm(inter_prob_dummy)
+
+emo_prob_dummy <- cbind(cdi$cdic1, cdi$cdic26, cdi$cdic27, cdi$cdic9, cdi$cdic10_recode, cdi$cdic15_recode, cdi$cdic16_recode, cdi$cdic17, cdi$cdic18_recode, cdi$cdic2_recode, cdi$cdic24_recode, cdi$cdic6, cdi$cdic7_recode, cdi$cdic8_recode, cdi$cdic13_recode)
+cdi$cdi_emo_prob <- rowSums(emo_prob_dummy, na.rm=TRUE)
+rm(emo_prob_dummy)
+
+func_prob_dummy <- cbind(cdi$cdic3, cdi$cdic4, cdi$cdic20, cdi$cdic22, cdi$cdic23, cdi$cdic28, cdi$cdic12, cdi$cdic14, cdi$cdic3, cdi$cdic4, cdi$cdic20, cdi$cdic22, cdi$cdic23, cdi$cdic28, cdi$cdic12, cdi$cdic14)
+cdi$cdi_func_prob <- rowSums(func_prob_dummy, na.rm=TRUE)
+rm(func_prob_dummy)
+
+# Rename sum/mean variables
+
+names(cdi)[names(cdi) == "CDIchild_Tot_Avg"] <- "cdi_mean"
+names(cdi)[names(cdi) == "CDIchild_Tot_Sum"] <- "cdi_sum"
+
+# Remove individual items
+
+which( colnames(cdi)=="cdic1") #2
+which( colnames(cdi)=="cdic25_recode") #42
+cdi <- cdi[, -c(2:42)]
+```
+
 ```{r Final cleaning up, include=FALSE}
 isel <- merge(isel, demo, by = "id")
-
 ysr <- merge(ysr, demo, by = "id")
+cdi <- merge(cdi, demo, by = "id")
 
 scared <- merge(scared_2yr, scared_original, by = "id")
 scared <- merge(scared, demo, by = "id")
@@ -412,61 +542,314 @@ rm(mfq_2yr)
 rm(demo)
 ```
 
-## Interpersonal Support Evaluation List (Short Version)
-
-```{r ggplot color generator, include=FALSE}
-#show_col(hue_pal()(4))
-```
-
-```{r}
-ggplot(data=isel,aes(x=isel_tot_sum,fill=Gender)) + 
-  geom_density(alpha=0.2,lwd=0.2) +
-  ggtitle("ISEL by Gender") + xlab("Total Sum") + ylab("")
-```
-
 ## Correlation Matrix
 
-```{r}
-corr_vars <- data.frame(cp_long$angerC, cp_long$fearC, cp_long$happinessC, cp_long$sadnessC, cp_long$painC, cp_long$ctqsumC, cp_long$emosumC, cp_long$ThreatZSum, cp_long$DepZSum, cp_long$ThreatCompc, cp_long$DepCompc, cp_long$ThreatDepInt, cp_long$Responder)
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.asp=1, fig.width=10}
+isel1 <- isel[c(1, 8)]
+mfq1 <- mfq[c(1,2,4)]
+scared1 <- scared[c(1,13,12)]
 
-corr_vars <- data.frame()
 
-names(corr_vars) <- gsub(pattern = "cp_long._*", replacement = "", x = names(corr_vars))
-
-corr_data <- stats::cor(corr_vars)
-
-labels <- c("Anger", "Fear", "Happiness", "Sadness", "Pain", "CTQ Total", "CTQ Emo", "ThreatZSum", "DepZSum", "ThreapCompc", "DepCompc", "ThreatDepInt", "Responder")
-
-set_theme(axis.title.size = 0, geom.label.size = 4.5, axis.textsize.x = 1, axis.textsize.y = 1, axis.angle.x = 90)
-
-sjp.corr(corr_data, corr.method=c("spearman"),title="Correlation Matrix", na.deletion = "pairwise", sort.corr=FALSE, show.values=TRUE, decimals=2, axis.labels = labels)
-
-rm(corr_vars)
-rm(corr_data)
-rm(labels)
-```
-
-```{r}
 cbcl1 <- cbcl[c(1:25)]
-isel1 <- isel[c(1:9)]
-mfq1 <- mfq[c(1:5)]
-scared1 <- scared[c(1:22)]
-ysr1 <- ysr[c(1:13)]
-
 cbcl1 <- cbcl1 %>% dplyr::select(matches('_tot'))
+cbcl1$id <- cbcl$id
+
+ysr1 <- ysr[c(1:13)]
 ysr1 <- ysr1 %>% dplyr::select(matches('_tot'))
+ysr1$id <- ysr$id
+
+cdi1 <- cdi[c(1,2)]
 
 here <- merge(cbcl1,isel1,by="id")
 here <- merge(here,mfq1,by="id")
 here <- merge(here,scared1,by="id")
+here <- merge(here,ysr1,by="id")
 
-corr_vars <- merge(here,ysr1,by="id")
+corr_vars <- merge(here,cdi1,by="id")
 
 rm(cbcl1)
 rm(isel1)
 rm(mfq1)
 rm(scared1)
 rm(ysr1)
+rm(cdi1)
 rm(here)
+
+corr_vars$id <- NULL
+corr_data <- stats::cor(corr_vars, use = "pairwise.complete.obs")
+
+labels <- c(
+  "CBCL W15 Anx", "CBCL W15 Som", "CBCL W15 ADHD", "CBCL W15 ODD", "CBCL W15 Dep", "CBCL W15 CD", 
+  "CBCL 2yr Dep", "CBCL 2yr Anx", "CBCL 2yr Som", "CBCL 2yr ADHD", "CBCL 2yr ODD", "CBCL 2yr CD", 
+  "ISEL W15", 
+  "MFQ W15", "MFQ 2yr", 
+  "SCARED W15", "SCARED 2yr", 
+  "YSR W15 Dep", "YSR W15 Anx", "YSR W15 Som", "YSR W15 ADHD", "YSR W15 ODD", "YSR W15 CD",
+  "CDI W15")
+
+set_theme(axis.title.size = 0, geom.label.size = 4.5, axis.textsize.x = 1, axis.textsize.y = 1, axis.angle.x = 90)
+
+sjp.corr(corr_data, corr.method=c("spearman"), title="A Very LargeCorrelation Matrix", na.deletion = "pairwise", sort.corr=FALSE, show.values=TRUE, decimals=2, axis.labels=labels)
 ```
 
+## Factor Analysis
+
+I recently learned how to do this, so I don't know if this is a proper thing to do, but I just wanted to test it out anyway. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.asp=1, fig.align="left"}
+test <- principal(corr_vars, nfactors = 5)
+#test
+
+fa.graph(test,
+        rank.direction = 'LR',
+        simple = F,
+        digits = 2,
+        labels = labels,
+        main = "Factor Analysis",
+       out.file = 'C:/Users/jrcala/Desktop/monks_task/internalizing/test.gv')
+
+DiagrammeR::grViz('C:/Users/jrcala/Desktop/monks_task/internalizing/test.gv')
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+sjt.fa(corr_vars, title = "Factor Analysis", var.labels = labels)
+```
+
+```{r include=FALSE}
+rm(corr_vars)
+rm(corr_data)
+rm(labels)
+rm(test)
+```
+
+## Child Behavior Checklist: Anxiety and Depression
+
+### Wave 15
+
+```{r Rescaling CBCL Wave 15 anxiety, include=FALSE}
+mean(cbcl$cbcl_original_anx_tot, na.rm=TRUE)
+cbcl$cbcl_original_anx_t <- (cbcl$cbcl_anx_tot*(50/(mean(cbcl$cbcl_original_anx_tot, na.rm=TRUE))))
+mean(cbcl$cbcl_original_anx_t, na.rm=TRUE)
+```
+
+```{r Rescaling CBCL Wave 15 depression, include=FALSE}
+mean(cbcl$cbcl_original_dep_tot, na.rm=TRUE)
+cbcl$cbcl_original_dep_t <- (cbcl$cbcl_dep_tot*(50/(mean(cbcl$cbcl_original_dep_tot, na.rm=TRUE))))
+mean(cbcl$cbcl_original_dep_t, na.rm=TRUE)
+```
+
+```{r Plotting CBCL Wave 15 anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_original_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL Wave 15 Anxiety") + 
+  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+```{r Plotting CBCL Wave 15 depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_original_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL Wave 15 Depression") + 
+  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+### Follow-up
+
+```{r Rescaling CBCL 2yr anxiety, include=FALSE}
+mean(cbcl$cbcl_2yr_anx_tot, na.rm=TRUE)
+cbcl$cbcl_2yr_anx_t <- (cbcl$cbcl_anx_tot*(50/(mean(cbcl$cbcl_2yr_anx_tot, na.rm=TRUE))))
+mean(cbcl$cbcl_2yr_anx_t, na.rm=TRUE)
+```
+
+```{r Rescaling CBCL 2yr depression, include=FALSE}
+mean(cbcl$cbcl_2yr_dep_tot, na.rm=TRUE)
+cbcl$cbcl_2yr_dep_t <- (cbcl$cbcl_dep_tot*(50/(mean(cbcl$cbcl_2yr_dep_tot, na.rm=TRUE))))
+mean(cbcl$cbcl_2yr_dep_t, na.rm=TRUE)
+```
+
+```{r Plotting CBCL 2yr anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_2yr_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL 2yr Anxiety") + 
+  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+```{r Plotting CBCL 2yr depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_2yr_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL 2yr Depression") + 
+  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+## Youth Self-Report: Anxiety and Depression
+
+```{r Rescaling YSR anxiety, include=FALSE}
+mean(ysr$ysr_original_anx_tot, na.rm=TRUE)
+ysr$ysr_original_anx_t <- (ysr$ysr_original_anx_tot*(50/(mean(ysr$ysr_original_anx_tot, na.rm=TRUE))))
+mean(ysr$ysr_original_anx_t, na.rm=TRUE)
+```
+
+```{r Rescaling YSR depression, include=FALSE}
+mean(ysr$ysr_original_dep_tot, na.rm=TRUE)
+ysr$ysr_original_dep_t <- (ysr$ysr_dep_tot*(50/(mean(ysr$ysr_original_dep_tot, na.rm=TRUE))))
+mean(ysr$ysr_original_dep_t, na.rm=TRUE)
+```
+
+```{r Plotting YSR anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(ysr, aes(x=ysr_original_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("YSR Wave 15 Anxiety") + 
+  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+```{r Plotting YSR depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(ysr, aes(x=ysr_original_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("YSR Wave 15 Depression") + 
+  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+### Wave 15
+
+## Interpersonal Support Evaluation List (Short Version)
+
+### Wave 15
+
+```{r ggplot color generator, include=FALSE}
+#show_col(hue_pal()(4))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(data=isel,aes(x=isel_tot_sum,fill=Gender)) + 
+  geom_density(alpha=0.2,lwd=0.2) +
+  ggtitle("ISEL by Gender") + xlab("Total Sum") + ylab("")
+```
+
+## Mood and Feelings Questionnaire
+
+## Wave 15
+
+```{r MFQ Wave 15 Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
+col <- c("mediumorchid3", "cyan3")
+ggplot(mfq, aes(Gender, mfq_original_sum)) + geom_boxplot(fill=col) + ylab("MFQ Wave 15 Total") + xlab("Gender")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(mfq, aes(x=mfq_original_sum)) + 
+  geom_histogram(colour="white",fill="yellowgreen")  + xlab("Total Score") + 
+  ylab("Count") +
+  ggtitle("MFQ Total Sum") + 
+  annotate("rect", xmin=29, xmax=48, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "Clinical cut-off according to Daviss et al., 2006")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+## Follow-Up
+
+```{r MFQ Wave 15 Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
+col <- c("mediumorchid3", "cyan3")
+ggplot(mfq, aes(Gender, mfq_2yr_sum)) + geom_boxplot(fill=col) + ylab("MFQ 2yr Total") + xlab("Gender")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(mfq, aes(x=mfq_2yr_sum)) + 
+  geom_histogram(colour="white",fill="yellowgreen")  + xlab("Total Score") + 
+  ylab("Count") +
+  ggtitle("MFQ Total Sum") + 
+  annotate("rect", xmin=29, xmax=87, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "Clinical cut-off according to Daviss et al., 2006")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+## Follow-Up
+
+## Screen for Child Anxiety-Related Disorders
+
+
+## Youth Self-Report
+
+## Children's Depression Inventory
+
+### Wave 15
+
+```{r results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+df <- data.frame(cdi$Gender, cdi$cdi_neg_mood, cdi$cdi_neg_selfesteem, cdi$cdi_ineffect, cdi$cdi_inter_prob, cdi$cdi_emo_prob, cdi$cdi_func_prob)
+names(df) <- substring(names(df),5,99)
+df1 <- melt(df, id.vars="Gender")
+labels <- c("Negative Mood", "Negative Self-Esteem", "Ineffectiveness", "Interpersonal Problems", "Emotional Problems", "Functional Problems")
+
+ggplot(data=df1, aes(x=variable, y=value, fill=Gender)) + 
+  stat_summary(fun.y = sum,geom = "bar", color = "black",position = "dodge") + 
+  ggtitle("CDI Wave 15 Subscales") + 
+  theme(legend.position = "right") + ylab("Subscale Total") + xlab("") +
+  scale_x_discrete(labels=labels) +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) 
+rm(df)
+rm(df1)
+rm(labels)
+```
+
+```{r Making CDI datasets, include=FALSE}
+cdi_info <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/cdi/cdi_info.csv')
+cdi_f <- cdi[ which(cdi$Gender =='F'), ]
+cdi_m <- cdi[ which(cdi$Gender =='M'), ]
+```
+
+```{r include=FALSE}
+very_elevated_girl <- nrow(cdi_f[cdi_f$cdi_sum >= 24, ])
+very_elevated_boy <- nrow(cdi_m[cdi_m$cdi_sum >= 19, ])
+
+elevated_girl <- nrow(cdi_f[cdi_f$cdi_sum == 20 | cdi_f$cdi_sum == 21 | cdi_f$cdi_sum == 22 | cdi_f$cdi_sum == 23, ])
+elevated_boy <- nrow(cdi_m[cdi_m$cdi_sum == 16 | cdi_m$cdi_sum == 17 | cdi_m$cdi_sum == 18, ])
+
+high_average_girl <- nrow(cdi_f[cdi_f$cdi_sum == 19 | cdi_f$cdi_sum == 18 | cdi_f$cdi_sum == 17 | cdi_f$cdi_sum == 16, ])
+high_average_boy <- nrow(cdi_m[cdi_m$cdi_sum == 13 | cdi_m$cdi_sum == 14 | cdi_m$cdi_sum == 15, ])
+
+average_girl <- nrow(cdi_f[cdi_f$cdi_sum <= 15, ])
+average_boy <- nrow(cdi_m[cdi_m$cdi_sum <= 12, ])
+```
+
+```{r include=FALSE}
+Criteria <- c("Very Elevated", "Elevated", "High Average", "Average or Lower", "Very Elevated", "Elevated", "High Average", "Average or Lower")
+Gender <- c("Male", "Male", "Male", "Male", "Female", "Female", "Female", "Female")
+Count <- 0            
+cdi_count <- data.frame(Criteria, Gender, Count)
+cdi_count <- dcast(cdi_count, Criteria ~ Gender)
+
+cdi_count$Female[cdi_count$Criteria == "Very Elevated"] <- very_elevated_girl
+cdi_count$Male[cdi_count$Criteria == "Very Elevated"] <- very_elevated_boy
+
+cdi_count$Female[cdi_count$Criteria == " Elevated"] <- elevated_girl
+cdi_count$Male[cdi_count$Criteria == "Elevated"] <- elevated_boy
+
+cdi_count$Female[cdi_count$Criteria == "High Average"] <- high_average_girl
+cdi_count$Male[cdi_count$Criteria == "High Average"] <- high_average_boy
+
+cdi_count$Female[cdi_count$Criteria == "Average or Lower"] <- average_girl
+cdi_count$Male[cdi_count$Criteria == "Average or Lower"] <- average_boy
+```
+
+```{r CDI Count Table, echo=FALSE, warning=FALSE, message=FALSE}
+cdi_count %>%
+  kable("html",digits=2, format.args = list(decimal.mark = ".", big.mark = ","),caption = "SAND Sample & CDI Cutoffs") %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+```{r CDI Girls, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cdi_f, aes(x=cdi_sum)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("CDI Total Sum for Girls") + 
+  annotate("rect", xmin=24, xmax=39, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=20, xmax=24, ymin=0, ymax=Inf, alpha=0.4, fill="red") +
+  annotate("rect", xmin=15, xmax=20, ymin=0, ymax=Inf, alpha=0.2, fill="red") +
+  annotate("rect", xmin=0, xmax=14, ymin=0, ymax=Inf, alpha=0.0, fill="red")
+```
+
+```{r CDI Boys, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cdi_m, aes(x=cdi_sum)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("CDI Total Sum for Boys") + 
+  annotate("rect", xmin=19, xmax=31, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=16, xmax=19, ymin=0, ymax=Inf, alpha=0.4, fill="red") +
+  annotate("rect", xmin=13, xmax=16, ymin=0, ymax=Inf, alpha=0.2, fill="red") +
+  annotate("rect", xmin=0, xmax=13, ymin=0, ymax=Inf, alpha=0.0, fill="red")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
