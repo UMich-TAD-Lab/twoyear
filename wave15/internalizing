@@ -47,14 +47,6 @@ library(knitcitations)
 library(GPArotation)
 ```
 
-* ISEL Child
-* SCARED Child
-* MFQ Child
-* YSR Child
-* CBCL Parent
-* Teen Demo
-* Demographic Data
-
 ```{r Cleaning Demographic Data, include=FALSE}
 demo <- read.csv(file='C:/Users/jrcala/Desktop/monks_task/lit_review/full_demo.csv')
 
@@ -589,37 +581,7 @@ labels <- c(
 
 set_theme(axis.title.size = 0, geom.label.size = 4.5, axis.textsize.x = 1, axis.textsize.y = 1, axis.angle.x = 90)
 
-sjp.corr(corr_data, corr.method=c("spearman"), title="A Very LargeCorrelation Matrix", na.deletion = "pairwise", sort.corr=FALSE, show.values=TRUE, decimals=2, axis.labels=labels)
-```
-
-## Factor Analysis
-
-I recently learned how to do this, so I don't know if this is a proper thing to do, but I just wanted to test it out anyway. 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.asp=1, fig.align="left"}
-test <- principal(corr_vars, nfactors = 5)
-#test
-
-fa.graph(test,
-        rank.direction = 'LR',
-        simple = F,
-        digits = 2,
-        labels = labels,
-        main = "Factor Analysis",
-       out.file = 'C:/Users/jrcala/Desktop/monks_task/internalizing/test.gv')
-
-DiagrammeR::grViz('C:/Users/jrcala/Desktop/monks_task/internalizing/test.gv')
-```
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-sjt.fa(corr_vars, title = "Factor Analysis", var.labels = labels)
-```
-
-```{r include=FALSE}
-rm(corr_vars)
-rm(corr_data)
-rm(labels)
-rm(test)
+sjp.corr(corr_data, corr.method=c("spearman"), title="A Very Large Correlation Matrix", na.deletion = "pairwise", sort.corr=FALSE, show.values=TRUE, decimals=2, axis.labels=labels)
 ```
 
 ## Child Behavior Checklist: Anxiety and Depression
@@ -628,81 +590,204 @@ rm(test)
 
 ```{r Rescaling CBCL Wave 15 anxiety, include=FALSE}
 mean(cbcl$cbcl_original_anx_tot, na.rm=TRUE)
-cbcl$cbcl_original_anx_t <- (cbcl$cbcl_anx_tot*(50/(mean(cbcl$cbcl_original_anx_tot, na.rm=TRUE))))
+cbcl$cbcl_original_anx_t <- (cbcl$cbcl_original_anx_tot*(50/(mean(cbcl$cbcl_original_anx_tot, na.rm=TRUE))))
 mean(cbcl$cbcl_original_anx_t, na.rm=TRUE)
 ```
 
 ```{r Rescaling CBCL Wave 15 depression, include=FALSE}
 mean(cbcl$cbcl_original_dep_tot, na.rm=TRUE)
-cbcl$cbcl_original_dep_t <- (cbcl$cbcl_dep_tot*(50/(mean(cbcl$cbcl_original_dep_tot, na.rm=TRUE))))
+cbcl$cbcl_original_dep_t <- (cbcl$cbcl_original_dep_tot*(50/(mean(cbcl$cbcl_original_dep_tot, na.rm=TRUE))))
 mean(cbcl$cbcl_original_dep_t, na.rm=TRUE)
 ```
 
 ```{r Plotting CBCL Wave 15 anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cbcl, aes(x=cbcl_original_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL Wave 15 Anxiety") + 
-  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=64, xmax=84, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
   annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
 ```
 
 ```{r Plotting CBCL Wave 15 depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(cbcl, aes(x=cbcl_original_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL Wave 15 Depression") + 
-  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=64, xmax=88, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
   annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
+```
+
+```{r include=FALSE}
+### Things that are not clinical significance are below!
+```
+
+```{r SAND CBCL Original Barplot, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Scores <- c((mean(cbcl$cbcl_original_anx_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_original_somatic_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_original_adhd_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_original_odd_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_original_dep_tot, na.rm=TRUE)),
+                 (mean(cbcl$cbcl_original_cd_tot, na.rm=TRUE)))
+Subscales <- c("Anxiety", "Somatic Problems", "ADHD", "ODD", "Depression", "CD")
+df <- data.frame(Scores, Subscales)
+rm(Scores)
+
+col <- rainbow(6)
+
+ggplot(data=df, aes(x=Subscales, y=Scores, fill=col)) + 
+  geom_bar(stat="identity") + ggtitle("CBCL SAND Sample DSM Total Subscales") + 
+  theme(legend.position = "right") + ylab("") + xlab("") +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + theme(legend.position = "none")
+
+rm(df)
+rm(col)
+rm(Subscales)
+```
+
+```{r Plotting CBCL Original depression total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_original_dep_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
+  xlab("Total Depression Score") + ylab("Count") + ggtitle("CBCL Depression Subscale")
+```
+
+```{r Plotting CBCL Original anxiety total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_original_anx_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
+  xlab("Total Anxiety Score") + ylab("Count") + ggtitle("CBCL Anxiety Subscale")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
 ### Follow-up
 
 ```{r Rescaling CBCL 2yr anxiety, include=FALSE}
 mean(cbcl$cbcl_2yr_anx_tot, na.rm=TRUE)
-cbcl$cbcl_2yr_anx_t <- (cbcl$cbcl_anx_tot*(50/(mean(cbcl$cbcl_2yr_anx_tot, na.rm=TRUE))))
+cbcl$cbcl_2yr_anx_t <- (cbcl$cbcl_2yr_anx_tot*(50/(mean(cbcl$cbcl_2yr_anx_tot, na.rm=TRUE))))
 mean(cbcl$cbcl_2yr_anx_t, na.rm=TRUE)
 ```
 
 ```{r Rescaling CBCL 2yr depression, include=FALSE}
 mean(cbcl$cbcl_2yr_dep_tot, na.rm=TRUE)
-cbcl$cbcl_2yr_dep_t <- (cbcl$cbcl_dep_tot*(50/(mean(cbcl$cbcl_2yr_dep_tot, na.rm=TRUE))))
+cbcl$cbcl_2yr_dep_t <- (cbcl$cbcl_2yr_dep_tot*(50/(mean(cbcl$cbcl_2yr_dep_tot, na.rm=TRUE))))
 mean(cbcl$cbcl_2yr_dep_t, na.rm=TRUE)
 ```
 
-```{r Plotting CBCL 2yr anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+```{r Plotting SAND CBCL 2yr anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include-FALSE}
 ggplot(cbcl, aes(x=cbcl_2yr_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL 2yr Anxiety") + 
-  annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  annotate("rect", xmin=64, xmax=94, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
   annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
 ```
 
-```{r Plotting CBCL 2yr depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+```{r Plotting CBCL 2yr depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 ggplot(cbcl, aes(x=cbcl_2yr_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("CBCL 2yr Depression") + 
   annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
   annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
 ```
 
+```{r include=FALSE}
+### Things that are not clinical significance are below!
+```
+
+```{r SAND CBCL 2yr Barplot, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Scores <- c((mean(cbcl$cbcl_2yr_anx_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_2yr_somatic_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_2yr_adhd_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_2yr_odd_tot, na.rm=TRUE)), 
+                 (mean(cbcl$cbcl_2yr_dep_tot, na.rm=TRUE)),
+                 (mean(cbcl$cbcl_2yr_cd_tot, na.rm=TRUE)))
+Subscales <- c("Anxiety", "Somatic Problems", "ADHD", "ODD", "Depression", "CD")
+df <- data.frame(Scores, Subscales)
+rm(Scores)
+
+col <- rainbow(6)
+
+ggplot(data=df, aes(x=Subscales, y=Scores, fill=col)) + 
+  geom_bar(stat="identity") + ggtitle("CBCL SAND Sample DSM Total Subscales") + 
+  theme(legend.position = "right") + ylab("") + xlab("") +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + theme(legend.position = "none")
+
+rm(df)
+rm(col)
+rm(Subscales)
+```
+
+```{r Plotting CBCL 2yr depression total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_2yr_dep_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
+  xlab("Total Depression Score") + ylab("Count") + ggtitle("CBCL Depression Subscale")
+```
+
+```{r Plotting CBCL 2yr anxiety total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(cbcl, aes(x=cbcl_2yr_anx_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
+  xlab("Total Anxiety Score") + ylab("Count") + ggtitle("CBCL Anxiety Subscale")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
 ## Youth Self-Report: Anxiety and Depression
 
+### Wave 15
+
 ```{r Rescaling YSR anxiety, include=FALSE}
-mean(ysr$ysr_original_anx_tot, na.rm=TRUE)
-ysr$ysr_original_anx_t <- (ysr$ysr_original_anx_tot*(50/(mean(ysr$ysr_original_anx_tot, na.rm=TRUE))))
-mean(ysr$ysr_original_anx_t, na.rm=TRUE)
+mean(ysr$ysr_anx_tot, na.rm=TRUE)
+ysr$ysr_anx_t <- (ysr$ysr_anx_tot*(50/(mean(ysr$ysr_anx_tot, na.rm=TRUE))))
+mean(ysr$ysr_anx_t, na.rm=TRUE)
 ```
 
 ```{r Rescaling YSR depression, include=FALSE}
-mean(ysr$ysr_original_dep_tot, na.rm=TRUE)
-ysr$ysr_original_dep_t <- (ysr$ysr_dep_tot*(50/(mean(ysr$ysr_original_dep_tot, na.rm=TRUE))))
-mean(ysr$ysr_original_dep_t, na.rm=TRUE)
+mean(ysr$ysr_dep_tot, na.rm=TRUE)
+ysr$ysr_dep_t <- (ysr$ysr_dep_tot*(50/(mean(ysr$ysr_dep_tot, na.rm=TRUE))))
+mean(ysr$ysr_dep_t, na.rm=TRUE)
 ```
 
-```{r Plotting YSR anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(ysr, aes(x=ysr_original_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("YSR Wave 15 Anxiety") + 
+```{r Plotting SAND YSR anxiety, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
+ggplot(ysr, aes(x=ysr_anx_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("YSR Wave 15 Anxiety") + 
   annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
   annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
 ```
 
-```{r Plotting YSR depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(ysr, aes(x=ysr_original_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("YSR Wave 15 Depression") + 
+```{r Plotting YSR depression, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
+ggplot(ysr, aes(x=ysr_dep_t)) + geom_histogram(colour="white",fill="yellowgreen",binwidth=3)  + xlab("T Scores") + ylab("Count") + ggtitle("YSR Wave 15 Depression") + 
   annotate("rect", xmin=64, xmax=101, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
   annotate("rect", xmin=60, xmax=64, ymin=0, ymax=Inf, alpha=0.4, fill="red")
 ```
 
-### Wave 15
+```{r include=FALSE}
+### Things that are not clinical significance are below!
+```
+
+```{r SAND YSR Barplot, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+Scores <- c((mean(ysr$ysr_anx_tot, na.rm=TRUE)), 
+                 (mean(ysr$ysr_somatic_tot, na.rm=TRUE)), 
+                 (mean(ysr$ysr_adhd_tot, na.rm=TRUE)), 
+                 (mean(ysr$ysr_odd_tot, na.rm=TRUE)), 
+                 (mean(ysr$ysr_dep_tot, na.rm=TRUE)),
+                 (mean(ysr$ysr_cd_tot, na.rm=TRUE)))
+Subscales <- c("Anxiety", "Somatic Problems", "ADHD", "ODD", "Depression", "CD")
+df <- data.frame(Scores, Subscales)
+rm(Scores)
+
+col <- rainbow(6)
+
+ggplot(data=df, aes(x=Subscales, y=Scores, fill=col)) + 
+  geom_bar(stat="identity") + ggtitle("YSR SAND Sample DSM Total Subscales") + 
+  theme(legend.position = "right") + ylab("") + xlab("") +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + theme(legend.position = "none")
+
+rm(df)
+rm(col)
+rm(Subscales)
+```
+
+```{r Plotting YSR depression total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(ysr, aes(x=ysr_dep_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
+  xlab("Total Depression Score") + ylab("Count") + ggtitle("YSR Depression Subscale")
+```
+
+```{r Plotting YSR anxiety total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(ysr, aes(x=ysr_anx_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
+  xlab("Total Anxiety Score") + ylab("Count") + ggtitle("YSR Anxiety Subscale")
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
 
 ## Interpersonal Support Evaluation List (Short Version)
 
@@ -718,9 +803,13 @@ ggplot(data=isel,aes(x=isel_tot_sum,fill=Gender)) +
   ggtitle("ISEL by Gender") + xlab("Total Sum") + ylab("")
 ```
 
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
 ## Mood and Feelings Questionnaire
 
-## Wave 15
+### Wave 15
 
 ```{r MFQ Wave 15 Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
 col <- c("mediumorchid3", "cyan3")
@@ -740,9 +829,9 @@ ggplot(mfq, aes(x=mfq_original_sum)) +
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
-## Follow-Up
+### Follow-Up
 
-```{r MFQ Wave 15 Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
+```{r MFQ 2yr Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
 col <- c("mediumorchid3", "cyan3")
 ggplot(mfq, aes(Gender, mfq_2yr_sum)) + geom_boxplot(fill=col) + ylab("MFQ 2yr Total") + xlab("Gender")
 ```
@@ -760,12 +849,77 @@ ggplot(mfq, aes(x=mfq_2yr_sum)) +
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
-## Follow-Up
-
 ## Screen for Child Anxiety-Related Disorders
 
+### Wave 15
 
-## Youth Self-Report
+```{r include=FALSE}
+scared_f <- scared[ which(scared$Gender =='F'), ]
+scared_m <- scared[ which(scared$Gender =='M'), ]
+```
+
+```{r include=FALSE} 
+nrow(scared_f[scared_f$scared_original_sum >= 25, ]) #44
+```
+
+```{r SCARED Wave 15 Girls, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared_f, aes(x=scared_original_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Girls") + 
+  annotate("rect", xmin=25, xmax=55, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "44 girls have a score of 25+.")
+```
+
+```{r include=FALSE} 
+nrow(scared_m[scared_m$scared_original_sum >= 25, ]) #17
+```
+
+```{r SCARED Wave 15 Boys, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared_m, aes(x=scared_original_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Boys") + 
+  annotate("rect", xmin=25, xmax=42, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "17 boys have a score of 25+.")
+```
+
+```{r include=FALSE}
+#http://www.midss.org/content/screen-child-anxiety-related-disorders-scared
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+### Follow-Up
+
+```{r include=FALSE}
+scared_f <- scared[ which(scared$Gender =='F'), ]
+scared_m <- scared[ which(scared$Gender =='M'), ]
+```
+
+```{r include=FALSE} 
+nrow(scared_f[scared_f$scared_2yr_sum >= 25, ]) #44
+```
+
+```{r SCARED 2yr Girls, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared_f, aes(x=scared_2yr_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Girls") + 
+  annotate("rect", xmin=25, xmax=55, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "44 girls have a score of 25+.")
+```
+
+```{r include=FALSE} 
+nrow(scared_m[scared_m$scared_2yr_sum >= 25, ]) #17
+```
+
+```{r SCARED 2yr Boys, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(scared_m, aes(x=scared_2yr_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Boys") + 
+  annotate("rect", xmin=25, xmax=42, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
+  labs(caption = "17 boys have a score of 25+.")
+```
+
+```{r include=FALSE}
+#http://www.midss.org/content/screen-child-anxiety-related-disorders-scared
+```
+
+```{r include=FALSE}
+rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
 
 ## Children's Depression Inventory
 
