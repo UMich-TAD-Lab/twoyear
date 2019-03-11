@@ -10,7 +10,7 @@
 | MFQ Child | Nisha | &#9744; |
 | NQ Child | none | &#9744; |
 | SCARED Child | Diane | &#9744; |
-| SRD Child | Diane | &#9744; |
+| SRD Child | none | &#9744; |
 | SUB Child | none | 2yr data hasn't been uploaded to Redcap yet |
 | CBCL Parent | Julianna | &#9744; |
 | CTS Parent | none | &#9744; |
