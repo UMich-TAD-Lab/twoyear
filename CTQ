@@ -143,3 +143,17 @@ Luckily, instead of writing out syntax for each statistic (e.g. mean(), sd(), et
 ```{r, results='asis'}
 summarytools::descr(scared_twoyear, style = "rmarkdown", na.rm=TRUE)
 ```
+
+You can also visualize the data.
+
+```{r}
+hist(CTQchild_2yr$ctq_total_sum)
+hist(CTQchild_2yr$ctq_total_mean)
+```
+Feel free to try out any stats you want or to visually improve the look of your tables or visualizations. Once you've done a bunch of statistics and you want to see how it all looks, click the *Knit* button at the top (next to the ball of yarn) and choose "Knit to HTML". Knitting or clicking "Run All" in the *Run* drop-down menu is a good test to see if there are any errors in your code. 
+
+# Comparing Wave 15 and Two Year data
+
+First, follow the instructions on the Github readme to download the original Wave 15 data for your measure. Once you've done that, read in your data.
+
+## Load in Wave 15 data
