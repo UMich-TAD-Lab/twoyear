@@ -1,10 +1,12 @@
 ---
-title: "Internalizing Symptoms"
+title: "Internalizing Symptoms and Social Support"
 author: "Julianna Calabrese"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
   html_document:
     toc: true
+    toc_float: true
+    toc_depth: 4
     theme: united
     highlight: tango
 editor_options:
@@ -45,6 +47,8 @@ library(RColorBrewer)
 library(papaja)
 library(knitcitations)
 library(GPArotation)
+library(broom)
+library(purrr)
 ```
 
 ```{r Cleaning Demographic Data, include=FALSE}
@@ -584,7 +588,7 @@ set_theme(axis.title.size = 0, geom.label.size = 4.5, axis.textsize.x = 1, axis.
 sjp.corr(corr_data, corr.method=c("spearman"), title="A Very Large Correlation Matrix", na.deletion = "pairwise", sort.corr=FALSE, show.values=TRUE, decimals=2, axis.labels=labels)
 ```
 
-## Child Behavior Checklist: Anxiety and Depression
+## CBCL
 
 ### Wave 15
 
@@ -611,12 +615,12 @@ rm(col)
 rm(Subscales)
 ```
 
-```{r Plotting CBCL Original depression total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+```{r Plotting CBCL Original depression total, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 ggplot(cbcl, aes(x=cbcl_original_dep_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
   xlab("Total Depression Score") + ylab("Count") + ggtitle("CBCL Depression Subscale")
 ```
 
-```{r Plotting CBCL Original anxiety total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+```{r Plotting CBCL Original anxiety total, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 ggplot(cbcl, aes(x=cbcl_original_anx_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
   xlab("Total Anxiety Score") + ylab("Count") + ggtitle("CBCL Anxiety Subscale")
 ```
@@ -650,12 +654,12 @@ rm(col)
 rm(Subscales)
 ```
 
-```{r Plotting CBCL 2yr depression total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+```{r Plotting CBCL 2yr depression total, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 ggplot(cbcl, aes(x=cbcl_2yr_dep_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
   xlab("Total Depression Score") + ylab("Count") + ggtitle("CBCL Depression Subscale")
 ```
 
-```{r Plotting CBCL 2yr anxiety total, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+```{r Plotting CBCL 2yr anxiety total, results='asis', echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 ggplot(cbcl, aes(x=cbcl_2yr_anx_tot)) + geom_histogram(colour="white",fill="lightcoral", binwidth=1) + 
   xlab("Total Anxiety Score") + ylab("Count") + ggtitle("CBCL Anxiety Subscale")
 ```
@@ -665,6 +669,21 @@ rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
 ### Wave 15 vs. Follow-Up
+
+```{r W15 vs 2yr CBCL Anxiety Boxplot, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+df <- data.frame(cbcl$cbcl_original_anx_tot, cbcl$cbcl_2yr_anx_tot, cbcl$id)
+names(df) <- substring(names(df),6,99)
+df <- melt(df, id.vars="id")
+levels(df$variable)[levels(df$variable) == "cbcl_original_anx_tot"] <- "CBCL Wave 15 Anxiety"
+levels(df$variable)[levels(df$variable) == "cbcl_2yr_anx_tot"] <- "CBCL 2yr Anxiety"
+
+ggplot(df, aes(x=variable, y=value, fill=variable))+ 
+  stat_boxplot(geom='errorbar', linetype=1, width=0.5) +  #whiskers
+  geom_boxplot(outlier.shape=1) +    
+  stat_summary(fun.y=mean, geom="point", size=2) +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + 
+  theme(legend.position = "none") + ggtitle("CBCL Anxiety Wave 15 vs. 2yr")
+```
 
 ```{r W15 vs 2yr CBCL Anxiety, echo=FALSE, message=FALSE, warning=FALSE}
 df1 <- data.frame(cbcl$id, cbcl$cbcl_original_anx_tot, cbcl$cbcl_2yr_anx_tot)
@@ -682,6 +701,21 @@ ggplot(data=df2,aes(x=value,fill=Year)) +
 
 ```{r include=FALSE}
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
+```
+
+```{r W15 vs 2yr CBCL Depression Boxplot, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+df <- data.frame(cbcl$cbcl_original_dep_tot, cbcl$cbcl_2yr_dep_tot, cbcl$id)
+names(df) <- substring(names(df),6,99)
+df <- melt(df, id.vars="id")
+levels(df$variable)[levels(df$variable) == "cbcl_original_dep_tot"] <- "CBCL Wave 15 Depression"
+levels(df$variable)[levels(df$variable) == "cbcl_2yr_dep_tot"] <- "CBCL 2yr Depression"
+
+ggplot(df, aes(x=variable, y=value, fill=variable))+ 
+  stat_boxplot(geom='errorbar', linetype=1, width=0.5) +  #whiskers
+  geom_boxplot(outlier.shape=1) +    
+  stat_summary(fun.y=mean, geom="point", size=2) +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + 
+  theme(legend.position = "none") + ggtitle("CBCL Dep Wave 15 vs. 2yr")
 ```
 
 ```{r W15 vs 2yr CBCL Depression, echo=FALSE, message=FALSE, warning=FALSE}
@@ -702,7 +736,7 @@ ggplot(data=df2,aes(x=value,fill=Year)) +
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
-## Youth Self-Report: Anxiety and Depression
+## YSR
 
 ### Wave 15
 
@@ -743,12 +777,12 @@ ggplot(ysr, aes(x=ysr_anx_tot)) + geom_histogram(colour="white",fill="lightcoral
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
-## Interpersonal Support Evaluation List (Short Version)
+## ISEL
 
 ### Wave 15
 
 ```{r ggplot color generator, include=FALSE}
-#show_col(hue_pal()(4))
+show_col(hue_pal()(2))
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -761,7 +795,7 @@ ggplot(data=isel,aes(x=isel_tot_sum,fill=Gender)) +
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
-## Children's Depression Inventory
+## CDI
 
 ### Wave 15
 
@@ -848,11 +882,11 @@ ggplot(cdi_m, aes(x=cdi_sum)) + geom_histogram(colour="white",fill="cyan3")  + x
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
-## Mood and Feelings Questionnaire
+## MFQ
 
 ### Wave 15
 
-```{r MFQ Wave 15 Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
+```{r MFQ Wave 15 Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 col <- c("mediumorchid3", "cyan3")
 ggplot(mfq, aes(Gender, mfq_original_sum)) + geom_boxplot(fill=col) + ylab("MFQ Wave 15 Total") + xlab("Gender")
 ```
@@ -872,9 +906,24 @@ rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 
 ### Follow-Up
 
-```{r MFQ 2yr Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE}
+```{r MFQ 2yr Boxplot by gender, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 col <- c("mediumorchid3", "cyan3")
 ggplot(mfq, aes(Gender, mfq_2yr_sum)) + geom_boxplot(fill=col) + ylab("MFQ 2yr Total") + xlab("Gender")
+```
+
+```{r W15 vs 2yr MFQ, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+df <- data.frame(mfq$mfq_original_sum, mfq$mfq_2yr_sum, mfq$id)
+names(df) <- substring(names(df),5,99)
+df <- melt(df, id.vars="id")
+levels(df$variable)[levels(df$variable) == "mfq_original_sum"] <- "MFQ Wave 15"
+levels(df$variable)[levels(df$variable) == "mfq_2yr_sum"] <- "MFQ 2yr"
+
+ggplot(df, aes(x=variable, y=value, fill=variable))+ 
+  stat_boxplot(geom='errorbar', linetype=1, width=0.5) +  #whiskers
+  geom_boxplot(outlier.shape=1) +    
+  stat_summary(fun.y=mean, geom="point", size=2) +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + 
+  theme(legend.position = "none") + ggtitle("MFQ Wave 15 vs. 2yr")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -892,7 +941,7 @@ rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 
 ### Wave 15 vs. Follow-Up
 
-```{r W15 vs 2yr MFQ, echo=FALSE, message=FALSE, warning=FALSE}
+```{r W15 vs 2yr MFQ Density, echo=FALSE, message=FALSE, warning=FALSE}
 df1 <- data.frame(mfq$id, mfq$mfq_original_sum, mfq$mfq_2yr_sum)
 df2 <- melt(df1, id.vars="mfq.id")
 
@@ -910,7 +959,7 @@ ggplot(data=df2,aes(x=value,fill=Year)) +
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
 
-## Screen for Child Anxiety-Related Disorders
+## SCARED
 
 ### Wave 15
 
@@ -925,8 +974,7 @@ nrow(scared_f[scared_f$scared_original_sum >= 25, ]) #44
 
 ```{r SCARED Wave 15 Girls, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(scared_f, aes(x=scared_original_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Girls") + 
-  annotate("rect", xmin=25, xmax=55, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  labs(caption = "44 girls have a score of 25+.")
+  annotate("rect", xmin=25, xmax=55, ymin=0, ymax=Inf, alpha=0.6, fill="red")
 ```
 
 ```{r include=FALSE} 
@@ -935,8 +983,7 @@ nrow(scared_m[scared_m$scared_original_sum >= 25, ]) #17
 
 ```{r SCARED Wave 15 Boys, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(scared_m, aes(x=scared_original_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Boys") + 
-  annotate("rect", xmin=25, xmax=40, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  labs(caption = "17 boys have a score of 25+.")
+  annotate("rect", xmin=25, xmax=40, ymin=0, ymax=Inf, alpha=0.6, fill="red")
 ```
 
 ```{r include=FALSE}
@@ -960,8 +1007,7 @@ nrow(scared_f[scared_f$scared_2yr_sum >= 25, ]) #44
 
 ```{r SCARED 2yr Girls, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(scared_f, aes(x=scared_2yr_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="mediumorchid3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Girls") + 
-  annotate("rect", xmin=25, xmax=65, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  labs(caption = "44 girls have a score of 25+.")
+  annotate("rect", xmin=25, xmax=65, ymin=0, ymax=Inf, alpha=0.6, fill="red")
 ```
 
 ```{r include=FALSE} 
@@ -970,8 +1016,7 @@ nrow(scared_m[scared_m$scared_2yr_sum >= 25, ]) #17
 
 ```{r SCARED 2yr Boys, echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(scared_m, aes(x=scared_2yr_sum, na.rm=TRUE)) + geom_histogram(colour="white",fill="cyan3")  + xlab("Total Score") + ylab("Count") + ggtitle("SCARED Wave 15 Sum for Boys") + 
-  annotate("rect", xmin=25, xmax=50, ymin=0, ymax=Inf, alpha=0.6, fill="red") +
-  labs(caption = "17 boys have a score of 25+.")
+  annotate("rect", xmin=25, xmax=50, ymin=0, ymax=Inf, alpha=0.6, fill="red")
 ```
 
 ```{r include=FALSE}
@@ -984,7 +1029,22 @@ rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 
 ### Wave 15 vs. Follow-Up
 
-```{r W15 vs 2yr SCARED, echo=FALSE, message=FALSE, warning=FALSE}
+```{r W15 vs 2yr SCARED, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+df <- data.frame(scared$scared_original_sum, scared$scared_2yr_sum, scared$id)
+names(df) <- substring(names(df),8,99)
+df <- melt(df, id.vars="id")
+levels(df$variable)[levels(df$variable) == "scared_original_sum"] <- "SCARED Wave 15"
+levels(df$variable)[levels(df$variable) == "scared_2yr_sum"] <- "SCARED 2yr"
+
+ggplot(df, aes(x=variable, y=value, fill=variable))+ 
+  stat_boxplot(geom='errorbar', linetype=1, width=0.5) +  #whiskers
+  geom_boxplot(outlier.shape=1) +    
+  stat_summary(fun.y=mean, geom="point", size=2) +
+  theme(axis.text.x=element_text(size=10, angle=30, vjust=.8, hjust=0.8)) + 
+  theme(legend.position = "none") + ggtitle("SCARED SCARED Wave 15 vs. 2yr")
+```
+
+```{r W15 vs 2yr SCARED Density, echo=FALSE, message=FALSE, warning=FALSE}
 df1 <- data.frame(scared$id, scared$scared_original_sum, scared$scared_2yr_sum)
 df2 <- melt(df1, id.vars="scared.id")
 
@@ -1001,3 +1061,154 @@ ggplot(data=df2,aes(x=value,fill=Year)) +
 ```{r include=FALSE}
 rm(list=ls()[! ls() %in% c("cbcl", "cdi", "isel", "mfq", "scared", "ysr")])
 ```
+
+## Does ISEL predict things well?
+
+### YSR Depression
+
+```{r echo=FALSE, results = 'asis', include=FALSE}
+data <- merge(ysr, isel, by = "id")
+data$ysr_dep_totC <- data$ysr_dep_tot - mean(data$ysr_dep_tot)
+data$isel_tot_sumC <- data$isel_tot_sum - mean(data$isel_tot_sum)
+mod1 <- lm(ysr_dep_totC ~ isel_tot_sumC, data=data)
+
+labels <- c("Intercept", "ISEL Total Sum")
+
+colorder <- c("est", "se", "p")
+
+tab_model(mod1, title = "Does ISEL predict YSR Depression?", 
+          pred.labels = labels, dv.labels = "YSR Depression",
+          show.icc=FALSE, show.re.var=FALSE, show.se=TRUE, show.df = FALSE, show.r2=TRUE,
+          string.p="P-value", show.ci=FALSE, string.se="Std Error",
+          p.val="kr", col.order=colorder)
+
+rm(mod1)
+```
+
+```{r echo=FALSE, results = 'asis'}
+ggplot(data, aes(x=isel_tot_sumC, y=ysr_dep_totC)) + 
+  geom_point() + theme_gray() +
+  geom_smooth(method=lm) +
+  labs(title = "Does ISEL predict YSR Depression?", x = "ISEL Total", y = "YSR Depression") +
+  theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"))
+```
+
+### YSR Anxiety
+
+```{r echo=FALSE, results = 'asis', include=FALSE}
+data <- merge(ysr, isel, by = "id")
+data$ysr_anx_totC <- data$ysr_anx_tot - mean(data$ysr_anx_tot)
+data$isel_tot_sumC <- data$isel_tot_sum - mean(data$isel_tot_sum)
+mod1 <- lm(ysr_anx_totC ~ isel_tot_sumC, data=data)
+
+labels <- c("Intercept", "ISEL Total Sum")
+
+colorder <- c("est", "se", "p")
+
+tab_model(mod1, title = "Does ISEL predict YSR Anxiety?", 
+          pred.labels = labels, dv.labels = "YSR Anxiety",
+          show.icc=FALSE, show.re.var=FALSE, show.se=TRUE, show.df = FALSE, show.r2=TRUE,
+          string.p="P-value", show.ci=FALSE, string.se="Std Error",
+          p.val="kr", col.order=colorder)
+
+rm(mod1)
+```
+
+```{r echo=FALSE, results = 'asis'}
+ggplot(data, aes(x=isel_tot_sumC, y=ysr_anx_totC)) + 
+  geom_point() + theme_gray() +
+  geom_smooth(method=lm) +
+  labs(title = "Does ISEL predict YSR Anxiety?", x = "ISEL Total", y = "YSR Anxiety") +
+  theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"))
+```
+
+### CDI
+
+```{r echo=FALSE, results = 'asis', include=FALSE}
+data <- merge(cdi, isel, by = "id")
+data$cdi_sumC <- data$cdi_sum - mean(data$cdi_sum)
+data$isel_tot_sumC <- data$isel_tot_sum - mean(data$isel_tot_sum)
+mod1 <- lm(cdi_sumC ~ isel_tot_sumC, data=data)
+
+labels <- c("Intercept", "ISEL Total Sum")
+
+colorder <- c("est", "se", "p")
+
+tab_model(mod1, title = "Does ISEL predict CDI?", 
+          pred.labels = labels, dv.labels = "CDI Total",
+          show.icc=FALSE, show.re.var=FALSE, show.se=TRUE, show.df = FALSE, show.r2=TRUE,
+          string.p="P-value", show.ci=FALSE, string.se="Std Error",
+          p.val="kr", col.order=colorder)
+
+rm(mod1)
+```
+
+```{r echo=FALSE, results = 'asis'}
+ggplot(data, aes(x=isel_tot_sumC, y=cdi_sumC)) + 
+  geom_point() + theme_gray() +
+  geom_smooth(method=lm) +
+  labs(title = "Does ISEL predict CDI?", x = "ISEL Total", y = "CDI") +
+  theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"))
+```
+
+### MFQ Wave 15
+
+```{r echo=FALSE, results = 'asis', include=FALSE}
+data <- merge(mfq, isel, by = "id")
+data <- data[-c(113), ]
+data$mfq_original_sumC <- data$mfq_original_sum - mean(data$mfq_original_sum, na.rm=TRUE)
+data$isel_tot_sumC <- data$isel_tot_sum - mean(data$isel_tot_sum, na.rm=TRUE)
+mod1 <- lm(mfq_original_sumC ~ isel_tot_sumC, data=data)
+
+labels <- c("Intercept", "ISEL Total Sum")
+
+colorder <- c("est", "se", "p")
+
+tab_model(mod1, title = "Does ISEL predict MFQ Wave 15?", 
+          pred.labels = labels, dv.labels = "MFQ Total Wave 15",
+          show.icc=FALSE, show.re.var=FALSE, show.se=TRUE, show.df = FALSE, show.r2=TRUE,
+          string.p="P-value", show.ci=FALSE, string.se="Std Error",
+          p.val="kr", col.order=colorder)
+
+rm(mod1)
+```
+
+```{r echo=FALSE, results = 'asis'}
+ggplot(data, aes(x=isel_tot_sumC, y=mfq_original_sumC)) + 
+  geom_point(na.rm=TRUE) + theme_gray() +
+  geom_smooth(method=lm, na.rm=TRUE) +
+  labs(title = "Does ISEL predict MFQ Wave 15?", x = "ISEL Total", y = "MFQ Wave 15") +
+  theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"))
+```
+
+### MFQ 2yr
+
+```{r echo=FALSE, results = 'asis', include=FALSE}
+data <- merge(mfq, isel, by = "id")
+#data <- data[-c(113), ]
+data$mfq_2yr_sumC <- data$mfq_2yr_sum - mean(data$mfq_2yr_sum, na.rm=TRUE)
+data$isel_tot_sumC <- data$isel_tot_sum - mean(data$isel_tot_sum, na.rm=TRUE)
+mod1 <- lm(mfq_2yr_sumC ~ isel_tot_sumC, data=data)
+
+labels <- c("Intercept", "ISEL Total Sum")
+
+colorder <- c("est", "se", "p")
+
+tab_model(mod1, title = "Does ISEL predict MFQ 2yr?", 
+          pred.labels = labels, dv.labels = "MFQ Total 2yr",
+          show.icc=FALSE, show.re.var=FALSE, show.se=TRUE, show.df = FALSE, show.r2=TRUE,
+          string.p="P-value", show.ci=FALSE, string.se="Std Error",
+          p.val="kr", col.order=colorder)
+
+rm(mod1)
+```
+
+```{r echo=FALSE, results = 'asis'}
+ggplot(data, aes(x=isel_tot_sumC, y=mfq_2yr_sumC)) + 
+  geom_point(na.rm=TRUE) + theme_gray() +
+  geom_smooth(method=lm, na.rm=TRUE) +
+  labs(title = "Does ISEL predict MFQ 2yr?", x = "ISEL Total", y = "MFQ 2yr") +
+  theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"))
+```
+
+It seems that ISEL does not predict things very well. 
