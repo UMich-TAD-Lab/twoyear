@@ -157,3 +157,79 @@ Feel free to try out any stats you want or to visually improve the look of your 
 First, follow the instructions on the Github readme to download the original Wave 15 data for your measure. Once you've done that, read in your data.
 
 ## Load in Wave 15 data
+
+```{r}
+CTQ_original <- read.csv("C:/Users/alexakal/Desktop/CTQ_original.csv")
+names(CTQ_original)[names(CTQ_original) == "i...id"] <- "id"
+```
+
+```{r}
+View(CTQ_original)
+```
+
+## Merge the original and two year datasets
+
+Merging the datasets drops all the IDs in scared_original that aren't present in scared_twoyear. Since we've combined the datasets into a new dataset ("scared"), there is no need to the keep the old datasets (and any objects associated with either of those datasets) in our environment. Additionally, as long as you don't move your data files and you keep all the code above, you can get them right back where they were if you realize that you need them back. 
+
+```{r}
+CTQ <- merge(CTQ_original, CTQchild_2yr, by="id")
+```
+
+```{r}
+rm(CTQchild_2yr)
+rm(CTQ_original)
+```
+
+## Add demographic data
+
+There is a file called "demographic.csv" and it is located in the "Data Cleaning Protocol" on the Fragile Families server (it's at the very bottom). Copy it and paste the copy to your desktop. As of 2/15/19, this file contains gender (F or M), date of birth (in MM/DD/YYYY format), monthly and yearly income (coded on a 0-12 scale where each number represents a range (e.g., for yr_income, 0 corresponds to $4,999 or less), and race. Race is coded in multiple ways. There is a column called "race" where each row has a value such as "Black" or "Missing". "racenum" directly corresponds to this, but has numbers instead of words (i.e. 1 = Black, 2 = White, etc.). There is also a column for each category; so under the "Asian" column, if there is a 1, then that participant identified as Asian, but if there is a 0, then that participant could've identified as Black, White, etc.. The dataset demographic.csv may also require some wrangling, like you may want to create an age variable based on their birthday and the day that you're doing data analysis. Or if you're doing something with yearly income, you may want to exclude all the rows that have "NA" since not all participants wanted to report their income. 
+
+```{r}
+demographic <- read.csv("C:/Users/alexakal/Desktop/demographic.csv")
+CTQ <- merge(CTQ, demographic, by="id")
+rm(demographic)
+```
+
+## Cleaning/managing the combined dataset
+
+Just by looking at my dataset, I can tell that some people decided to entirely skip the SCARED survey during their Wave 15 visit. I can tell this because there's a long row of NA's or 88's. For SCARED, these people include 10134 and 10219, which are rows 51 and 89 respectively. It might be best to remove them. We'll use the same syntax that we used to drop empty rows at the beginning.
+
+```{r}
+CTQ <- CTQ[-c(9, 10, 13, 14, 19, 58, 61, 62, 66, 68, 69, 72, 77, 78, 79, 80, 83, 86, 88, 90, 91, 92, 93, 96, 97, 99, 100, 101, 102, 103, 104, 105, 107, 109, 111, 112, 113, 114, 115, 118, 119, 120, 121, 123, 124, 125, 127, 128, 129, 130, 131, 132, 133, 134, 136, 137, 140, 145, 147, 148, 150, 152, 153, 154, 155, 156, 157, 158, 159, 161, 163, 164, 168, 169, 171, 172, 174, 175, 177, 179, 180, 181, 182, 183, 184, 186, 187, 191, 192, 194, 196, 199, 201, 202, 203, 206, 209, 212, 213, 214, 219, 224, 225, 230, 232, 233, 234, 235, 236, 237, 238), ]
+```
+
+Also, whenever a value is missing or not applicable, we've been coding it as 88 and -99. We should take all the values that equal 88 or -99 and make them NA.
+
+```{r}
+CTQ[CTQ=="88"] <- NA
+```
+
+## Descriptive statistics on the combined dataset
+
+Now we have a dataset that includes the original and two year data, so we can start answering questions: have participants' anxiety gotten worse over two years? Gotten better? Maybe worse with panic disorder but not with social anxiety? 
+
+Feel free to add age or gender to your analyses, but just be careful with how the data is formatted. You might want to re-code gender so instead of it being M/F, it would be 0=Male and 1=Female. Also for age, you might to want make TeenBirthday a numeric variable by subtracting it from today's date.
+
+```{r Basic stuff}
+mean(CTQ$SCARED_C_Sum)
+mean(scared$scared_total_sum)
+
+sd(scared$SCARED_C_Sum)
+sd(scared$scared_total_sum)
+
+hist(scared$SCARED_C_Sum)
+hist(scared$scared_total_sum)
+```
+
+```{r}
+cor.test(scared$SCARED_C_Sum, scared$scared_total_sum) #Is there a correlation between the old and new scores?
+```
+
+```{r}
+t.test(scared$SCARED_C_Sum, scared$scared_total_sum) #Is there a significant difference between these two scores?
+```
+
+```{r}
+plot(scared$SCARED_C_Sum, scared$scared_total_sum)
+```
+
