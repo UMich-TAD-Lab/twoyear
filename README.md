@@ -11,7 +11,7 @@
 | NQ Child | none | &#9744; |
 | SCARED Child | Diane | &#9744; |
 | SRD Child | none | &#9744; |
-| SUB Child | none | 2yr data hasn't been uploaded to Redcap yet |
+| SUB Child | none | &#9744; |
 | CBCL Parent | Julianna | &#9744; |
 | CTS Parent | none | &#9744; |
 | NQ Parent | none | &#9744; |
