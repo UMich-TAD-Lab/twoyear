@@ -2,7 +2,10 @@
 title: "scaredyouth_2yr"
 author: "Diane Choi"
 date: "February 26, 2019"
-output: html_document
+output: 
+  html_document
+  theme: united
+  highlight: tango
 editor_options: 
   chunk_output_type: console
 ---
@@ -20,15 +23,12 @@ library(dplyr)
 library(plyr)
 library(summarytools)
 library(psych)
+library(sjPlot)
+library(kableExtra)
 ```
 
-# Pre-Analysis Cleaning for Two Year Data
-
-## Load in Two Year data
-
-Change the below syntax to fit your computer and where you put your data file, like Desktop or Documents. Replace scared_twoyear with whatever you want to call your dataset, e.g. data or nameofmeasure, just make sure you'll be able to tell that it's the two year data. 
-
-```{r}
+```{r Load in data, include=FALSE}
+#Load in data
 scared_twoyear <- read.csv("C:/Users/dicone/Desktop/SCAREDyouth_2yr.csv")
 ```
 
@@ -52,7 +52,7 @@ scared_twoyear[scared_twoyear == -99] <- NA
 
 This requires a bit of foresight, but eventually you're going to want to compare the two year data with the original data. I know that the original SCARED data follows a 0-1-2 scale, but the two year data uses a 1-2-3 scale, so we're going to want to always alter the two year data to fit the original data. 
 
-```{r}
+```{r Rescaling variables, include=FALSE}
 scared_twoyear$scared1_1_2yr <- car::recode(scared_twoyear$scared1_1_2yr, "1 = 0; 2 = 1; 3 = 2")
 scared_twoyear$scared1_2_2yr <- car::recode(scared_twoyear$scared1_2_2yr, "1 = 0; 2 = 1; 3 = 2")
 scared_twoyear$scared1_3_2yr <- car::recode(scared_twoyear$scared1_3_2yr, "1 = 0; 2 = 1; 3 = 2")
@@ -185,8 +185,23 @@ Now you can start to descriptive statistics. Below is a list of things that you 
 * Kurtosis
 * Skewness
 
+## Subscales
+
+* Panic Disorder
+* School Avoidance
+* bullet points
+
+```{r}
+smalldata <- scared_twoyear[c(42:48)]
+names(smalldata)[names(smalldata) == "scared_total_mean"] <- "Scared Total Mean"
+```
+
 ```{r, results='asis'}
-summarytools::descr(scared_twoyear, style = "rmarkdown", na.rm=TRUE)
+summarytools::descr(smalldata, style = "rmarkdown", na.rm=TRUE)
+```
+
+```{r, results='asis', include=FALSE}
+#summarytools::descr(scared_twoyear, style = "rmarkdown", na.rm=TRUE)
 ```
 
 ```{r}
@@ -196,6 +211,17 @@ plot(scared_twoyear$id, scared_twoyear$scared_total_sum)
 ```{r}
 plot(scared_twoyear$id, scared_twoyear$scared_total_mean)
 ```
+
+```{r}
+color <- "red"
+fill <- "purple"
+ggplot(scared_twoyear, aes(x=id, y=scared_total_mean)) + 
+  geom_point(aes(color=fill, fill=color), shape=23, size=4) +
+  ylab("SCARED Total Mean") +
+  theme(legend.position = "none") +
+  ggtitle("SCARED Total Mean Scatterplot")
+```
+
 
 # Comparing Wave 15 and Two Year data
 
@@ -226,7 +252,7 @@ rm(scared_original)
 
 ## Add demographic data
 
-```{r}
+```{r }
 demographic <- read.csv("C:/Users/dicone/Desktop/demographic.csv")
 scared <- merge(scared, demographic, by="id")
 rm(demographic)
@@ -237,7 +263,7 @@ rm(demographic)
 Just by looking at my dataset, I can tell that some people decided to entirely skip the SCARED survey during their Wave 15 visit. I can tell this because there's a long row of NA's or 88's. For SCARED, these people include 10134 and 10219, which are rows 51 and 89 respectively. It might be best to remove them. We'll use the same syntax that we used to drop empty rows at the beginning.
 
 ```{r}
-scared <- scared[-c(51, 89), ]
+#scared <- scared[-c(51, 89), ]
 ```
 
 ```{r}
@@ -248,7 +274,7 @@ scared[scared=="-99"] <- NA
 ## Descriptive statistics on the combined dataset
 
 ```{r Basic stuff}
-mean(scared$SCARED_C_Sum)
+mean(scared$SCARED_C_Sum, na.rm=TRUE) #this is important
 mean(scared$scared_total_sum)
 
 sd(scared$SCARED_C_Sum)
@@ -262,10 +288,11 @@ hist(scared$scared_total_sum)
 cor.test(scared$SCARED_C_Sum, scared$scared_total_sum) #Is there a correlation between the old and new scores?
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE, error=FALSE}
 t.test(scared$SCARED_C_Sum, scared$scared_total_sum) #Is there a significant difference between these two scores?
 ```
 
-```{r}
+```{r echo=FALSE}
 plot(scared$SCARED_C_Sum, scared$scared_total_sum)
 ```
+
