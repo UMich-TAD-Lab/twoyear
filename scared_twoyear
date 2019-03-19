@@ -1,12 +1,14 @@
 ---
 title: "scaredyouth_2yr"
 author: "Diane Choi"
-date: "February 26, 2019"
-output: 
-  html_document
-  theme: united
-  highlight: tango
-editor_options: 
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: false
+    theme: united
+    highlight: tango
+  pdf_document: default
+editor_options:
   chunk_output_type: console
 ---
 
