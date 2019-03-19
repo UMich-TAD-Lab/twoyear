@@ -12,7 +12,7 @@
 | SCARED Child | Diane | &#9744; |
 | SRD Child | none | &#9744; |
 | SUB Child | none | &#9744; |
-| CBCL Parent | Julianna | &#9744; |
+| CBCL Parent | Julianna | done-ish |
 | CTS Parent | none | &#9744; |
 | NQ Parent | none | &#9744; |
 
@@ -23,6 +23,8 @@
 [The TaDLab's Guide to Making Pretty RMarkdown Documents](https://jrcalabrese.github.io/pretty_r_guide.html)
 
 [The Basics of Data Wrangling](https://jrcalabrese.github.io/data_wrangling.html)
+
+While reviewing the below links, please let me know if you find any part confusing or unclear, or if you have a suggestion (e.g. add a section on how to subset datasets, how to make a color gradient in ggplot2). 
 
 ## How to download two-year data from Redcap
 
