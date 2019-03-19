@@ -54,7 +54,7 @@ head(data)
 plot(data)
 ```
 
-Outside of chunks, you can do many MicrosoftWord-like things, such write plain, *italicized*, **bolded**, ~~deleted~~, and `quoted` text. This is a good opportunity to talk about your code or explain the results of your statistical analysis in plain English. Other features allow you to make tables, create numbered lists, insert images or special characters, include mathematical proofs, and embed links. Additionally, you can also: 
+Outside of chunks, you can do many MicrosoftWord-like things, such write plain, *italicized*, **bolded**, ~~deleted~~, and `quoted` text. This is a good opportunity to talk about your code or explain the results of your statistical analysis in plain English. Other features allow you to make tables, create numbered lists, insert images or special characters, include mathematical proofs, and embed links.
 
 For your reference, [here is a cheatsheet for RMarkdown.](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
 
