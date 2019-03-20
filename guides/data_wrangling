@@ -17,16 +17,27 @@ editor_options:
 
 ```{r include=FALSE}
 library(car)
-library(ggplot2)
-library(MASS)
-library(Hmisc)
-library(tidyr)
 library(tidyverse)
-library(dplyr)
-library(plyr)
-library(summarytools)
 library(psych)
-library(Stat2Data)
+library(stats)
+library(summarytools)
+library(kableExtra)
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+# Organizing package information for table
+packages <- c("car", "tidyverse", "psych", "stats", "summarytools", "kableExtra")
+display <- c("Package","Title", "Maintainer", "Version", "URL")
+table <- matrix(NA, 1, NROW(display), dimnames = list(1, display))
+for(i in 1:NROW(packages)){
+list <- packageDescription(packages[i])
+table <- rbind(table, matrix(unlist(list[c(display)]), 1, NROW(display), byrow = T))
+}
+table[,NROW(display)] <- stringr::str_extract(table[,NROW(display)], ".+,")
+
+# Table of packages
+kable(table[-1,], format = "html", align = "l", caption = "Packages Used") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ## Introduction to Data Wrangling
@@ -40,6 +51,54 @@ This guide will use the dataset `airquality` from the base R package `datasets`.
 ```{r}
 data(airquality)
 head(airquality)
+```
+
+## R shortcuts
+
+There are a number of shortcuts in R that will make your coding more efficient. For your reference [here is a cheatsheet for R shortcuts and other cool things.](https://support.rstudio.com/hc/en-us/articles/200711853-Keyboard-Shortcuts) I listed my most commonly used shortcuts below for Windows:
+
+| Shortcut | Function |
+|:----:|:------:|
+| Ctrl+A |  Select All  |
+| Ctrl+Enter | Run a single line   |
+| Ctrl+Shift+Enter |  Run a single chunk |
+| Ctrl+Shift+R |  Run the entire file  |
+| Ctrl+Shift+I |  Insert a R chunk  |
+
+## Find something
+
+### Find a column based on name
+
+```{r}
+which( colnames(airquality)=="Temp" )
+```
+
+In `airquality`, `Temp` is the fourth column.
+
+### Find a column based on condition
+
+This prints columns (and the columns' contents) that contain the string `Te`, which only applies to `Temp` in this dataset. The select function is part of the `dplyr` package.
+
+```{r}
+head(select(airquality, contains("Te")))
+```
+
+### Find rows based on index number
+
+If you look at the `airquality` dataset (also referred to as a dataframe), you'll see an increasing column of numbers (starting at 1) to the left of the Ozone column. This is called the Index. 
+
+The below syntax prints the contents for row 42.
+
+```{r}
+airquality[42, ]
+```
+
+### Find rows based on condition
+
+The below syntax prints the contents for all rows where Month is equal to 6.
+
+```{r}
+airquality[airquality$Month == 6, ]
 ```
 
 ## Find missing values
@@ -67,15 +126,15 @@ When dealing with missing values, remember that the argument `na.rm=TRUE` is you
 
 ```{r}
 mean(airquality$Ozone)
-
-# See? It doesn't work. You can't find the average for a missing value.
 ```
+
+See? It doesn't work. You can't find the average for a missing value.
 
 ```{r}
 mean(airquality$Ozone, na.rm=TRUE)
-
-# Now it works!
 ```
+
+Now it works!
 
 ## Find outliers
 
@@ -97,18 +156,10 @@ outlier <- psych::outlier(airquality, na.rm=TRUE)
 
 ## Rescaling variables 
 
-We can use a function in the `weathermetrics` to convert the `Temp` variable from Fahrenheit to Celsuis. The below syntax creates a separate variable called `TempC` and adds it back to the dataset. 
-
-```{r}
-library(weathermetrics)
-data(airquality)
-airquality$TempC <- fahrenheit.to.celsius(airquality$Temp, round = 2)
-head(airquality)
-```
-
 Let's imagine that `airquality` has a variable called `Sunny` where 1 meant Not Sunny, 2 meant Somewhat Sunny, and 3 meant Very Sunny. This is a 3-point Likert scale. 
 
 ```{r}
+data(airquality)
 airquality$Sunny <- replicate(1,sample(1:3,153,rep=TRUE))
 head(airquality)
 ```
@@ -116,7 +167,6 @@ head(airquality)
 Now, say we wanted to change this 1-3 scale to a 0-2 scale. This something you might have to do often when managing survey data. 
 
 ```{r}
-library(car)
 airquality$Sunny <- car::recode(airquality$Sunny, "1 = 0; 2 = 1; 3 = 2")
 head(airquality)
 ```
@@ -206,6 +256,57 @@ airquality <- airquality[,-c(6)]
 head(airquality)
 ```
 
+## Subset a dataset
+
+Subsetting means to select specific rows or columns from a dataset. You can use this to make smaller datasets. For example, you may have a dataset of a survey measure, which includes 20+ items and 5 or so subscale sums. You may want to generate a table of descriptive statistics using `summarytools`, but you don't really want to print the mean, median, and standard deviation for the 20+ specific items; you probably just want data for the subscales and total. 
+
+Let's say I want to split up `airquality` into two datasets: one that contains Ozone, Solar.R., and Wind, and another that contains Temp, Month, and Day. Even if I had no packages installed, there are multiple ways I could do this with just base R.
+
+### Subset a dataset based on column name
+
+```{r}
+data(airquality)
+first_vars <- c("Ozone", "Solar.R", "Wind")
+second_vars <- c("Temp", "Month", "Day")
+
+first_data <- airquality[first_vars]
+second_data <- airquality[second_vars]
+
+head(first_data)
+head(second_data)
+```
+
+### Subset a dataset based on column number
+
+Using a colon allows me to specify that I want columns 1 through 3. I could also specify columns 1, 2, and 3 individually, which is useful if I wanted to select nonsequential columns.
+
+```{r}
+first_data <- airquality[c(1:3)]
+first_data <- airquality[c(1,2,3)]
+head(first_data)
+
+second_data <- airquality[c(4:6)]
+second_data <- airquality[c(4,5,6)]
+head(second_data)
+```
+
+### Subset a dataset based on columns that I DON'T want
+
+The two above methods subset datasets based on what I want to be in my new dataset. What if I wanted a new dataset that just excluded Day? The below syntax creates a new dataset called `no_day_data` that includes everything except day.
+
+```{r}
+day <- names(airquality) %in% c("Day")
+no_day_data <- airquality[!day]
+head(no_day_data)
+```
+
+I can do the same thing, except using index numbers instead of column names.
+
+```{r}
+no_day_data_again <- airquality[c(-6)]
+head(no_day_data_again)
+```
+
 ## Merge two datasets
 
 Let's say I had another dataset called `pollution`. Let's also say that both `airquality` and `pollution` had ID numbers.
@@ -235,9 +336,50 @@ airquality <- merge(airquality, pollution, by = "id")
 head(airquality)
 ```
 
+## Using if-then logic
+
+What if we wanted to create a new dataset that only included rows where Wind was greater than 10? Or if I only wanted to included observations where Wind was greater than 10 AND Ozone was less than 30? Or include observations where Wind was greater than 10 OR wind was less than 30?
+
+If-then logic can get a bit complicated quickly when working with R. Two functions that can do this are the `subset` function in base R, the `nrow` function in base R, and the `ifelse` function in the `dplyr` package.
+
+```{r include=FALSE}
+?subset
+?nrow
+?if_else
+```
+
+### Example 1
+
+Let's say I want to make a new dataset where I only wanted to include observations where Wind was greater than 10.
+
+```{r}
+data(airquality)
+windy_data <- subset(airquality, Wind > 10)
+head(windy_data)
+```
+
+### Example 2
+
+Let's say I wanted to count the number of observations where Ozone was greater than 30.
+
+```{r}
+great_ozone <- nrow(airquality[airquality$Ozone > 30, ])
+print(great_ozone)
+```
+
+### Example 3
+
+Let's say I wanted to create a new binary variable and add it to airquality. This new variable will be called "Hot". If Temp is below 70, Hot will be 0; if Temp is 70 or greater, Hot wil be 1. 
+
+```{r}
+airquality$Hot <- NA
+airquality$Hot <- if_else(airquality$Temp < 70, 0, 1)
+head(airquality)
+```
+
 ## Cleaning up your environment
 
-It's important to keep your environment uncluttered while working with data. Try to get rid of unneeded things when you can. I made a bit of a mess when creating the `pollution` dataset. You can remove one object at a time with `rm()`.
+It's important to keep your environment uncluttered while working with data. Try to get rid of unneeded things when you can. I made a bit of a mess when creating the `pollution` dataset and using if-then logic. You can remove one object at a time with `rm()`.
 
 ```{r}
 rm(water_pollution)
@@ -253,6 +395,13 @@ rm(list=setdiff(ls(), "airquality"))
 ## Descriptive statistics
 
 Finally, data cleaning usually includes basic descriptive statistics to see if the data is skewed or if there is a large number of outliers. 
+
+```{r}
+mean(airquality$Ozone)
+sd(airquality$Ozone)
+```
+
+However, instead of typing out everything, we can use the descr function from `summarytools` to make a neat table of our variables.
 
 ```{r results = 'asis'}
 data(airquality)
