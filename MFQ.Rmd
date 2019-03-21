@@ -2,8 +2,12 @@
 title: "MFQ"
 author: "Nisha Bharat"
 date: "February 14, 2019"
-output: html_document
-editor_options: 
+output:
+  html_document:
+    toc: true
+    theme: united
+    highlight: tango
+editor_options:
   chunk_output_type: console
 ---
 
@@ -36,7 +40,7 @@ If you are confused about any functions/commands used below, type question mark 
 
 Change the below syntax to fit your computer and where you put your data file, like Desktop or Documents. Replace scared_twoyear with whatever you want to call your dataset, e.g. data or nameofmeasure, just make sure you'll be able to tell that it's the two year data. 
 
-```{r}
+```{r include=FALSE}
 mfq_twoyear <- read.csv("C:/Users/nishab/Desktop/mfq_twoyear.csv")
 ```
 
@@ -44,7 +48,7 @@ mfq_twoyear <- read.csv("C:/Users/nishab/Desktop/mfq_twoyear.csv")
 
 Replace scared_twoyear with whatever you want to call your dataset and replace scared1_1_2yr with whatever the first item of the dataset. The syntax removes all rows where there is NA for the first item, so theoretically, this should remove everyone who hasn't completed the Qualtrics survey first. This isn't perfect, since some people may have just happened to skip the first item, but this will do for preliminary statistics. 
 
-```{r}
+```{r include=FALSE}
 mfq_twoyear <- mfq_twoyear[!is.na(mfq_twoyear$mfqc1_1_2yr),]
 ```
 
@@ -54,7 +58,7 @@ This requires a bit of foresight, but eventually you're going to want to compare
 
 There is probably an easier way to recode multiple variables at once, instead of recoding each variable at a time, so let me know if you find an alternative!
 
-```{r}
+```{r include=FALSE}
 mfq_twoyear$mfqc1_1_2yr <- car::recode(mfq_twoyear$mfqc1_1_2yr, "1=0; 2=1; 3=2")
 mfq_twoyear$mfqc1_2_2yr <- car::recode(mfq_twoyear$mfqc1_2_2yr, "1=0; 2=1; 3=2")
 mfq_twoyear$mfqc1_3_2yr <- car::recode(mfq_twoyear$mfqc1_3_2yr, "1=0; 2=1; 3=2")
@@ -92,21 +96,21 @@ mfq_twoyear$mfqc6_34_2yr <- car::recode(mfq_twoyear$mfqc6_34_2yr, "1=0; 2=1; 3=2
 
 The below syntax creates two variables and adds them back to the dataset: the mean of all the items and the sum of all the items.
 
-```{r}
+```{r include=FALSE}
 names(mfq_twoyear) #This prints the dataset's variables names so, which makes it so I don't totally have to write out each individual variable name
 
 mfq_vars_dummy <- cbind(mfq_twoyear$mfqc1_1_2yr, mfq_twoyear$mfqc1_2_2yr, mfq_twoyear$mfqc1_3_2yr, mfq_twoyear$mfqc1_4_2yr, mfq_twoyear$mfqc1_5_2yr, mfq_twoyear$mfqc1_6_2yr, mfq_twoyear$mfqc2_7_2yr, mfq_twoyear$mfqc2_8_2yr, mfq_twoyear$mfqc2_9_2yr, mfq_twoyear$mfqc2_10_2yr, mfq_twoyear$mfqc2_11_2yr, mfq_twoyear$mfqc2_12_2yr, mfq_twoyear$mfqc3_13_2yr, mfq_twoyear$mfqc3_14_2yr, mfq_twoyear$mfqc3_15_2yr, mfq_twoyear$mfqc4_20_2yr, mfq_twoyear$mfqc4_21_2yr, mfq_twoyear$mfqc4_22_2yr, mfq_twoyear$mfqc4_23_2yr, mfq_twoyear$mfqc4_24_2yr, mfq_twoyear$mfqc5_25_2yr, mfq_twoyear$mfqc5_26_2yr, mfq_twoyear$mfqc5_27_2yr, mfq_twoyear$mfqc5_28_2yr, mfq_twoyear$mfqc5_29_2yr, mfq_twoyear$mfqc6_30_2yr, mfq_twoyear$mfqc6_31_2yr, mfq_twoyear$mfqc6_32_2yr, mfq_twoyear$mfqc6_33_2yr, mfq_twoyear$mfqc6_34_2yr)
 ```
 
-```{r}
+```{r include=FALSE}
 mfq_twoyear$mfq_total_mean <- rowMeans(mfq_vars_dummy, na.rm=TRUE)
 ```
 
-```{r}
+```{r include=FALSE}
 mfq_twoyear$mfq_total_sum <- rowSums(mfq_vars_dummy, na.rm=TRUE)
 ```
 
-```{r}
+```{r include=FALSE}
 rm(mfq_vars_dummy)
 ```
 
@@ -130,26 +134,37 @@ Now you can start to descriptive statistics. Below is a list of things that you 
 
 Luckily, instead of writing out syntax for each statistic (e.g. mean(), sd(), etc.), there are funcitons that will write out a nice descriptive statistics table.
 
+
 ```{r, results='asis'}
 summarytools::descr(mfq_twoyear, style = "rmarkdown", na.rm=TRUE)
 ```
 
+```{r, results='asis'}
+mfqsmall <- data.frame(mfq_twoyear$mfq_total_sum)
+names(mfqsmall)[names(mfqsmall) == "mfq.mfq_total_sum"] <- "MFQ Total"
+```
+
+```{r, results='asis'}
+summarytools::descr(mfqsmall, style = "rmarkdown", na.rm=TRUE)
+```
+
+
 You can also visualize the data.
 
-```{r}
+```{r, echo=FALSE}
 hist(mfq_twoyear$mfq_total_sum)
 hist(mfq_twoyear$mfq_total_mean)
 ```
 
 Feel free to try out any stats you want or to visually improve the look of your tables or visualizations. Once you've done a bunch of statistics and you want to see how it all looks, click the *Knit* button at the top (next to the ball of yarn) and choose "Knit to HTML". Knitting or clicking "Run All" in the *Run* drop-down menu is a good test to see if there are any errors in your code. 
 
-```{r}
+```{r include=FALSE}
 mfq_twoyear$mfq_youth_paper_2yr <- NULL
 mfq_twoyear$mfqyouth2yr_complete <- NULL
 ```
 
 
-```{r}
+```{r include=FALSE}
 which(mfq_twoyear == -99, arr.ind=TRUE)
 ```
 
@@ -159,7 +174,8 @@ which(mfq_twoyear == -99, arr.ind=TRUE)
 First, follow the instructions on the Github readme to download the original Wave 15 data for your measure. Once you've done that, read in your data.
 
 ## Load in Wave 15 data
-```{r}
+
+```{r Load stuff, include=FALSE}
 mfq_original <- read.csv("C:/Users/nishab/Desktop/mfq_original.csv")
 names(mfq_original)[names(mfq_original) == "ï..id"] <- "id"
 ```
@@ -167,9 +183,12 @@ names(mfq_original)[names(mfq_original) == "ï..id"] <- "id"
 
 Luckily, graduate students have polished most of the original Wave 15 data, so things like total sum/mean variables and subscales already have their own columns. They may go by different names, so be sure to look at the original dataset and its variable names to see what's there.
 
-```{r}
+```{r include=FALSE}
 View(mfq_original)
+```
 
+```{r include=FALSE}
+mfq_original <- mfq_original[!(mfq_original$id==10134),]
 ```
 
 ## Merge the original and two year datasets
@@ -180,7 +199,7 @@ Merging the datasets drops all the IDs in scared_original that aren't present in
 mfq <- merge(mfq_original, mfq_twoyear, by="id")
 ```
 
-```{r}
+```{r include=FALSE}
 rm(mfq_twoyear)
 rm(mfq_original)
 ```
@@ -189,7 +208,7 @@ rm(mfq_original)
 
 There is a file called "demographic.csv" and it is located in the "Data Cleaning Protocol" on the Fragile Families server (it's at the very bottom). Copy it and paste the copy to your desktop. At the moment, this file only includes gender ("F" or "M") and age (as MM/DD/YYYY). Race, ethnicity, SES, and other variables might be added to demographic.csv later. 
 
-```{r}
+```{r include=FALSE}
 demographic <- read.csv("C:/Users/nishab/Desktop/demographic.csv")
 mfq <- merge(mfq, demographic, by="id")
 rm(demographic)
@@ -199,13 +218,13 @@ rm(demographic)
 
 Just by looking at my dataset, you can tell that some people decided to entirely skip the SCARED survey during their Wave 15 visit. I can tell this because there's a long row of NA's or 88's. For SCARED, these people include 10134 and 10219, which are rows 51 and 89 respectively. It might be best to remove them. We'll use the same syntax that we used to drop empty rows at the beginning.
 
-```{r}
+```{r include=FALSE}
 #mfq <- mfq[-c(73), ]
 #mfq <- mfq[-c(113), ]
 which(mfq == 88, arr.ind=TRUE)
 ```
 
-```{r}
+```{r include=FALSE}
 mfq <- mfq[!(mfq$id == "10219"),]
 mfq <- mfq[!(mfq$id == "10023"),]
 ```
@@ -213,7 +232,7 @@ mfq <- mfq[!(mfq$id == "10023"),]
 
 Also, whenever a value is missing or not applicable, we've been coding it as 88 and -99. We should take all the values that equal 88 or -99 and make them NA.
 
-```{r}
+```{r include=FALSE}
 mfq[mfq=="88"] <- NA
 ```
 
@@ -244,18 +263,28 @@ hist(male$mfq_total_sum)
 
 ```
 
-```{r}
+```{r echo=FALSE}
+hist(mfq$MFQ_C_Sum)
+
+ggplot(mfq, aes(mfq_total_sum)) + geom_histogram(binwidth = 10, color="black", fill="blue") +
+  ggtitle("MFQ Wave 15 Histogram") + xlab("MFQ") + ylab("")
+
+ggplot(mfq, aes(MFQ_C_Sum, mfq_total_sum)) + geom_point(fill="blue")
+```
+
+
+```{r echo=FALSE}
 cor.test(mfq$MFQ_C_Sum, mfq$mfq_total_sum) #Is there a correlation between the old and new scores?
 cor.test(female$MFQ_C_Sum, female$mfq_total_sum)
 cor.test(male$MFQ_C_Sum, male$mfq_total_sum)
 ```
 
-```{r}
+```{r echo=FALSE}
 t.test(mfq$MFQ_C_Sum, mfq$mfq_total_sum) #Is there a significant difference between these two scores?
 t.test(female$MFQ_C_Sum, female$mfq_total_sum)
 t.test(male$MFQ_C_Sum, male$mfq_total_sum)
 ```
 
-```{r}
+```{r echo=FALSE}
 plot(mfq$MFQ_C_Sum, mfq$mfq_total_sum)
 ```
