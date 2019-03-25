@@ -135,7 +135,7 @@ Now you can start to descriptive statistics. Below is a list of things that you 
 Luckily, instead of writing out syntax for each statistic (e.g. mean(), sd(), etc.), there are funcitons that will write out a nice descriptive statistics table.
 
 
-```{r, results='asis'}
+```{r, include=FALSE}
 summarytools::descr(mfq_twoyear, style = "rmarkdown", na.rm=TRUE)
 ```
 
@@ -264,12 +264,13 @@ hist(male$mfq_total_sum)
 ```
 
 ```{r echo=FALSE}
-hist(mfq$MFQ_C_Sum)
+ggplot(data=mfq$MFQ_C_Sum, aes(geom_histogram(binwidth = 10, color="black", fill="light blue")) +
+  ggtitle("MFQ Wave 15 Original Histogram") + xlab("MFQ Total Score") + ylab(""),
 
-ggplot(mfq, aes(mfq_total_sum)) + geom_histogram(binwidth = 10, color="black", fill="blue") +
-  ggtitle("MFQ Wave 15 Histogram") + xlab("MFQ") + ylab("")
+ggplot(mfq, aes(mfq_total_sum)) + geom_histogram(binwidth = 10, color="black", fill="light blue") +
+  ggtitle("MFQ Wave 15 Two Year Histogram") + xlab("MFQ Total Score") + ylab(""),
 
-ggplot(mfq, aes(MFQ_C_Sum, mfq_total_sum)) + geom_point(fill="blue")
+ggplot(mfq, aes(MFQ_C_Sum, mfq_total_sum)) + geom_point(fill="blue"),
 ```
 
 
