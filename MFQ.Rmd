@@ -11,8 +11,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-## Load in library
-
 ```{r include=FALSE}
 library(car)
 library(ggplot2)
@@ -151,7 +149,7 @@ summarytools::descr(mfqsmall, style = "rmarkdown", na.rm=TRUE)
 
 You can also visualize the data.
 
-```{r, echo=FALSE}
+```{r, include=FALSE}
 hist(mfq_twoyear$mfq_total_sum)
 hist(mfq_twoyear$mfq_total_mean)
 ```
@@ -190,12 +188,16 @@ View(mfq_original)
 ```{r include=FALSE}
 mfq_original <- mfq_original[!(mfq_original$id==10134),]
 ```
+```{r echo=FALSE}
+mfqsmall_original <- data.frame(mfq_original$MFQ_C_Sum)
+names(mfqsmall_original)[names(mfqsmall_original) == "mfq.MFQ_C_Sum"] <- "MFQ Total"
+```
 
 ## Merge the original and two year datasets
 
 Merging the datasets drops all the IDs in scared_original that aren't present in scared_twoyear. Since we've combined the datasets into a new dataset ("scared"), there is no need to the keep the old datasets (and any objects associated with either of those datasets) in our environment. Additionally, as long as you don't move your data files and you keep all the code above, you can get them right back where they were if you realize that you need them back. 
 
-```{r}
+```{r include=FALSE}
 mfq <- merge(mfq_original, mfq_twoyear, by="id")
 ```
 
@@ -249,9 +251,6 @@ mean(mfq$mfq_total_sum)
 sd(mfq$MFQ_C_Sum)
 sd(mfq$mfq_total_sum)
 
-hist(mfq$MFQ_C_Sum)
-hist(mfq$mfq_total_sum)
-
 female <- mfq[ which(mfq$gender=='F'), ]
 male <- mfq[ which(mfq$gender=='M'), ]
 
@@ -264,13 +263,14 @@ hist(male$mfq_total_sum)
 ```
 
 ```{r echo=FALSE}
-ggplot(data=mfq$MFQ_C_Sum, aes(geom_histogram(binwidth = 10, color="black", fill="light blue")) +
-  ggtitle("MFQ Wave 15 Original Histogram") + xlab("MFQ Total Score") + ylab(""),
+ggplot(mfq, aes(MFQ_C_Sum)) + geom_histogram(binwidth = 10, color="black", fill="light blue") +
+  ggtitle("MFQ Wave 15 Original Histogram") + xlab("MFQ Total Score") + ylab("")
 
 ggplot(mfq, aes(mfq_total_sum)) + geom_histogram(binwidth = 10, color="black", fill="light blue") +
-  ggtitle("MFQ Wave 15 Two Year Histogram") + xlab("MFQ Total Score") + ylab(""),
+  ggtitle("MFQ Wave 15 Two Year Histogram") + xlab("MFQ Total Score") + ylab("")
 
-ggplot(mfq, aes(MFQ_C_Sum, mfq_total_sum)) + geom_point(fill="blue"),
+ggplot(mfq, aes(MFQ_C_Sum, mfq_total_sum)) + geom_point(fill="blue") +
+  ggtitle("MFQ Wave 15 Scatterplot) + xlab("MFQ Original Total Score") + ylab("MFQ Two Year Total Score")
 ```
 
 
@@ -284,8 +284,4 @@ cor.test(male$MFQ_C_Sum, male$mfq_total_sum)
 t.test(mfq$MFQ_C_Sum, mfq$mfq_total_sum) #Is there a significant difference between these two scores?
 t.test(female$MFQ_C_Sum, female$mfq_total_sum)
 t.test(male$MFQ_C_Sum, male$mfq_total_sum)
-```
-
-```{r echo=FALSE}
-plot(mfq$MFQ_C_Sum, mfq$mfq_total_sum)
 ```
