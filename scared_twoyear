@@ -114,7 +114,12 @@ rm(scared_vars)
 
 ## Calculate subscales
 
-SCARED has multiple subscales: social anxiety, general anxiety, panic disorder, school avoidance, and separation anxiety disorder.
+* Panic Disorder
+* General Anxiety
+* Separation Anxiety Disorder
+* Social Anxiety Disorder
+* School Avoidance
+
 ```{r Panic Disorder, include=FALSE}
 panic_disorder <- cbind(scared_twoyear$scared1_1_2yr, scared_twoyear$scared1_6_2yr, scared_twoyear$scared2_9_2yr, scared_twoyear$scared2_12_2yr, scared_twoyear$scared3_15_2yr, scared_twoyear$scared3_18_2yr, scared_twoyear$scared4_19_2yr, scared_twoyear$scared4_23_2yr, scared_twoyear$scared4_24_2yr, scared_twoyear$scared5_27_2yr, scared_twoyear$scared5_30_2yr, scared_twoyear$scared6_34_2yr, scared_twoyear$scared6_38_2yr)
 
@@ -178,12 +183,6 @@ rm(school_avoidance)
 * Kurtosis
 * Skewness
 
-## Subscales
-
-* Panic Disorder
-* School Avoidance
-* bullet points
-
 ```{r}
 smalldata <- scared_twoyear[c(42:48)]
 names(smalldata)[names(smalldata) == "scared_total_mean"] <- "Scared Total Mean"
@@ -198,11 +197,13 @@ summarytools::descr(smalldata, style = "rmarkdown", na.rm=TRUE)
 ```
 
 ```{r}
-plot(scared_twoyear$id, scared_twoyear$scared_total_sum)
-```
-
-```{r}
-plot(scared_twoyear$id, scared_twoyear$scared_total_mean)
+color <- "red"
+fill <- "purple"
+ggplot(scared_twoyear, aes(x=id, y=scared_total_sum)) + 
+  geom_point(aes(color=fill, fill=color), shape=23, size=4) +
+  ylab("SCARED Total Sum") +
+  theme(legend.position = "none") +
+  ggtitle("SCARED Total Sum Scatterplot")
 ```
 
 ```{r}
@@ -214,7 +215,6 @@ ggplot(scared_twoyear, aes(x=id, y=scared_total_mean)) +
   theme(legend.position = "none") +
   ggtitle("SCARED Total Mean Scatterplot")
 ```
-
 
 # Comparing Wave 15 and Two Year data
 
@@ -245,7 +245,7 @@ rm(scared_original)
 
 ## Add demographic data
 
-```{r }
+```{r}
 demographic <- read.csv("C:/Users/dicone/Desktop/demographic.csv")
 scared <- merge(scared, demographic, by="id")
 rm(demographic)
@@ -288,4 +288,3 @@ t.test(scared$SCARED_C_Sum, scared$scared_total_sum) #Is there a significant dif
 ```{r echo=FALSE}
 plot(scared$SCARED_C_Sum, scared$scared_total_sum)
 ```
-
