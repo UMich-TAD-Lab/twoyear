@@ -183,12 +183,42 @@ rm(school_avoidance)
 * Kurtosis
 * Skewness
 
-```{r}
+```{r, include=FALSE}
 smalldata <- scared_twoyear[c(42:48)]
 names(smalldata)[names(smalldata) == "scared_total_mean"] <- "Scared Total Mean"
 ```
 
-```{r, results='asis'}
+```{r, include=FALSE}
+smalldata <- scared_twoyear[c(42:48)]
+names(smalldata)[names(smalldata) == "scared_total_sum"] <- "Scared Total Sum"
+```
+
+```{r, include=FALSE}
+smalldata <- scared_twoyear[c(42:48)]
+names(smalldata)[names(smalldata) == "panic_disorder"] <- "Panic Disorder"
+```
+
+```{r, include=FALSE}
+smalldata <- scared_twoyear[c(42:48)]
+names(smalldata)[names(smalldata) == "generalized_anxiety_disorder"] <- "Generalized Anxiety Disorder"
+```
+
+```{r, include=FALSE}
+smalldata <- scared_twoyear[c(42:48)]
+names(smalldata)[names(smalldata) == "separation_anxiety_disorder"] <- "Separation Anxiety Disorder"
+```
+
+```{r, include=FALSE}
+smalldata <- scared_twoyear[c(42:48)]
+names(smalldata)[names(smalldata) == "social_anxiety_disorder"] <- "Social Anxiety Disorder"
+```
+
+```{r, include=FALSE}
+smalldata <- scared_twoyear[c(42:48)]
+names(smalldata)[names(smalldata) == "school_avoidance"] <- "School Avoidance"
+```
+
+```{r, results='asis', include=FALSE}
 summarytools::descr(smalldata, style = "rmarkdown", na.rm=TRUE)
 ```
 
@@ -196,85 +226,134 @@ summarytools::descr(smalldata, style = "rmarkdown", na.rm=TRUE)
 #summarytools::descr(scared_twoyear, style = "rmarkdown", na.rm=TRUE)
 ```
 
-```{r}
+```{r, echo=FAlSE}
 color <- "red"
 fill <- "purple"
 ggplot(scared_twoyear, aes(x=id, y=scared_total_sum)) + 
-  geom_point(aes(color=fill, fill=color), shape=23, size=4) +
+  geom_point(aes(color=fill, fill=color), shape=21, size=4) +
   ylab("SCARED Total Sum") +
   theme(legend.position = "none") +
   ggtitle("SCARED Total Sum Scatterplot")
 ```
 
-```{r}
+```{r, echo=FALSE}
 color <- "red"
 fill <- "purple"
 ggplot(scared_twoyear, aes(x=id, y=scared_total_mean)) + 
-  geom_point(aes(color=fill, fill=color), shape=23, size=4) +
+  geom_point(aes(color=fill, fill=color), shape=21, size=4) +
   ylab("SCARED Total Mean") +
   theme(legend.position = "none") +
   ggtitle("SCARED Total Mean Scatterplot")
+```
+
+```{r, echo=FALSE}
+color <- "red"
+fill <- "purple"
+ggplot(scared_twoyear, #Dataset
+       aes(x=id, y=panic_disorder)) + #Variables
+  geom_point(aes(color=fill, fill=color), shape=21, size=4) +
+  ylab("SCARED Panic Disorder") +
+  theme(legend.position = "none") +
+  ggtitle("SCARED Panic Disorder Scatterplot")
+```
+
+```{r, echo=FALSE}
+color <- "red"
+fill <- "purple"
+ggplot(scared_twoyear, aes(x=id, y=panic_disorder)) + 
+  geom_point(aes(color=fill, fill=color), shape=21, size=4) +
+  ylab("SCARED Panic Disorder") +
+  theme(legend.position = "none") +
+  ggtitle("SCARED Panic Disorder Scatterplot")
+```
+
+```{r, echo=FALSE}
+color <- "red"
+fill <- "purple"
+ggplot(scared_twoyear, aes(x=id, y=generalized_anxiety_disorder)) + 
+  geom_point(aes(color=fill, fill=color), shape=21, size=4) +
+  ylab("SCARED Generalized Anxiety Disorder") +
+  theme(legend.position = "none") +
+  ggtitle("SCARED Generalized Anxiety Disorder Scatterplot")
+```
+
+```{r, echo=FALSE}
+color <- "red"
+fill <- "purple"
+ggplot(scared_twoyear, aes(x=id, y=separation_anxiety_disorder)) + 
+  geom_point(aes(color=fill, fill=color), shape=21, size=4) +
+  ylab("SCARED Separation Anxiety Disorder") +
+  theme(legend.position = "none") +
+  ggtitle("SCARED Separation Anxiety Disorder Scatterplot")
+```
+
+```{r, echo=FALSE}
+color <- "red"
+fill <- "purple"
+ggplot(scared_twoyear, aes(x=id, y=social_anxiety_disorder)) + 
+  geom_point(aes(color=fill, fill=color), shape=21, size=4) +
+  ylab("SCARED Anxiety Disorder") +
+  theme(legend.position = "none") +
+  ggtitle("SCARED Social Anxiety Disorder Scatterplot")
+```
+
+```{r, echo=FALSE}
+color <- "red"
+fill <- "purple"
+ggplot(scared_twoyear, aes(x=id, y=school_avoidance)) + 
+  geom_point(aes(color=fill, fill=color), shape=21, size=4) +
+  ylab("SCARED School Avoidance") +
+  theme(legend.position = "none") +
+  ggtitle("SCARED School Avoidance Scatterplot")
 ```
 
 # Comparing Wave 15 and Two Year data
 
 ## Load in Wave 15 data
 
-```{r}
+```{r, include=FALSE}
 scared_original <- read.csv("C:/Users/dicone/Desktop/SCARED_original.csv")
 names(scared_original)[names(scared_original) == "ï..id"] <- "id"
 #Don't ask why the id variable looks funny, it just does that sometimes when exporting/importing.
 ```
 
-```{r}
+```{r, include=FALSE}
 View(scared_original)
 ```
 
 ## Merge the original and two year datasets
 
-Merging the datasets drops all the IDs in scared_original that aren't present in scared_twoyear. Since we've combined the datasets into a new dataset ("scared"), there is no need to the keep the old datasets (and any objects associated with either of those datasets) in our environment. 
-
-```{r}
+```{r, include=FALSE}
 scared <- merge(scared_original, scared_twoyear, by="id")
 ```
 
-```{r}
+```{r, include=FALSE}
 rm(scared_twoyear)
 rm(scared_original)
 ```
 
-## Add demographic data
-
-```{r}
+```{r Add demographic data, include=FALSE}
 demographic <- read.csv("C:/Users/dicone/Desktop/demographic.csv")
 scared <- merge(scared, demographic, by="id")
 rm(demographic)
 ```
 
-## Cleaning/managing the combined dataset
-
-Just by looking at my dataset, I can tell that some people decided to entirely skip the SCARED survey during their Wave 15 visit. I can tell this because there's a long row of NA's or 88's. For SCARED, these people include 10134 and 10219, which are rows 51 and 89 respectively. It might be best to remove them. We'll use the same syntax that we used to drop empty rows at the beginning.
-
-```{r}
-#scared <- scared[-c(51, 89), ]
-```
-
-```{r}
+```{r Cleaning/managing the combined dataset, include=FALSE}
 scared[scared=="88"] <- NA
 scared[scared=="-99"] <- NA
 ```
 
 ## Descriptive statistics on the combined dataset
 
-```{r Basic stuff}
+```{r Basic stuff, echo=FALSE}
 mean(scared$SCARED_C_Sum, na.rm=TRUE) #this is important
-mean(scared$scared_total_sum)
+mean(scared$scared_total_sum, na.rm=TRUE)
 
-sd(scared$SCARED_C_Sum)
-sd(scared$scared_total_sum)
+sd(scared$SCARED_C_Sum, na.rm=TRUE)
+sd(scared$scared_total_sum, na.rm=TRUE)
 
-hist(scared$SCARED_C_Sum)
-hist(scared$scared_total_sum)
+hist(scared$SCARED_C_Sum, na.rm=TRUE)
+hist(scared$scared_total_sum, na.rm=TRUE)
 ```
 
 ```{r}
