@@ -101,7 +101,7 @@ scared_twoyear$scared_total_sum <- rowSums(scared_vars, na.rm=TRUE)
 rm(scared_vars)
 ```
 
-# Calculate subscales
+# Subscales
 
 * Panic Disorder
 * Generalized Anxiety Disorder
