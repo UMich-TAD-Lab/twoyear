@@ -24,6 +24,8 @@
 
 [The Basics of Data Wrangling](https://jrcalabrese.github.io/data_wrangling.html)
 
+[A Very Short Review of ggplot2](https://jrcalabrese.github.io/ggplot_intro.html)
+
 While reviewing the below links, please let me know if you find any part confusing or unclear, or if you have a suggestion (e.g. add a section on how to subset datasets, how to make a color gradient in ggplot2). 
 
 ## How to download two-year data from Redcap
