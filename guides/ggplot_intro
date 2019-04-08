@@ -1,7 +1,7 @@
 ---
 title: "A Very Short Review of ggplot2"
 author: "Julianna Calabrese"
-date: "April 2, 2019"
+date: "April 8, 2019"
 output:
   html_document:
     toc: true
@@ -251,7 +251,7 @@ There are still numerous other ways that you could alter the barplot: increase t
 
 ### Example 2: What looks best? 
 
-Let's say I wanted to know more about the students' SAT Math scores. Since SATM is a numeric variable with lots of variable, I can make a new variable that splits it into quartile and places everyone in the the first, second, third, or fourth quartile. This is something that can be done with the with command as a part of the Hmisc package.
+Let's say I wanted to know more about the students' SAT Math scores. Since SATM is a numeric variable with lots of variability, I should make a new variable that splits SATM into quartiles and place everyone in the the first, second, third, or fourth quartile. This is something that can be done with the Hmisc package.
 
 ```{r}
 data(FirstYearGPA)
@@ -260,6 +260,7 @@ FirstYearGPA$math_quartile <- with(FirstYearGPA, cut(SATM,
                                 labels=c("Q1","Q2","Q3","Q4"),
                                 include.lowest=TRUE))
 FirstYearGPA$math_quartile <- as.factor(FirstYearGPA$math_quartile)
+head(FirstYearGPA)
 ```
 
 For math_quartile, Q4 has the best scores and Q1 has the worst scores.
@@ -270,7 +271,9 @@ How would a density plot look?
 ggplot( 
   data=FirstYearGPA, 
   aes(x=GPA)) + 
-  geom_density(aes(group=math_quartile, fill=math_quartile),alpha=0.2) 
+  geom_density(aes(group=math_quartile, fill=math_quartile),alpha=0.2) +
+  scale_fill_discrete(name="Math Quartiles") + # Changes legend title
+  xlab("Firstyear GPA") + ylab("")
 ```
 
 Pretty, but not very effective in conveying information. It overlaps a lot. What about a dotplot?
@@ -278,29 +281,13 @@ Pretty, but not very effective in conveying information. It overlaps a lot. What
 ```{r}
 ggplot( 
   data=FirstYearGPA, 
-  aes(x=math_quartile,y=GPA)) + 
-  geom_dotplot(binaxis='y')
-```
-
-Hmm, maybe if we clean it up a bit?
-
-```{r}
-ggplot( 
-  data=FirstYearGPA, 
   aes(x=math_quartile,y=GPA,fill=math_quartile)) + 
-  geom_dotplot(binaxis='y',stackdir='center') +
+  geom_dotplot(binaxis='y',stackdir='center',dotsize=0.8) +
   theme(legend.position = "none") +
   ylab("Firstyear GPA") + xlab("SATM Quartiles")
 ```
 
-Okay, what about a boxplot? 
-
-```{r}
-ggplot(data=FirstYearGPA, 
-  aes(x=math_quartile, y=GPA))
-```
-
-Let's clean up the boxplot.
+I don't think that looks very nice either. What about a boxplot? 
 
 ```{r}
 ggplot(data=FirstYearGPA, 
@@ -309,3 +296,5 @@ ggplot(data=FirstYearGPA,
   theme(legend.position = "none") +
   ylab("Firstyear GPA") + xlab("SATM Quartiles")
 ```
+
+Now this one is a lot better. We can see that the one student with the highest GPA was in fourth quartile (aka had one of the highest SAT Math scores), but the group with the highest average GPA was actual the third quartile. Additionally, the only GPA outlier (who had a very low firstyear GPA) was in the third quartile too. This boxplot also allows us to see the range of GPAs among the four SATM groups. It's important to test out different visualizations when trying to convey information. While density plots look pretty, sometimes the simplest solution is the best. 
