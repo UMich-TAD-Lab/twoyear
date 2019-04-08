@@ -1,0 +1,311 @@
+---
+title: "A Very Short Review of ggplot2"
+author: "Julianna Calabrese"
+date: "April 2, 2019"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    collapse: subsection
+    theme: united
+    highlight: tango
+  pdf_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r include=FALSE}
+library(car)
+library(Hmisc)
+library(kableExtra)
+library(tidyverse)
+library(reshape2)
+library(plotly)
+library(sjPlot)
+library(Stat2Data)
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+# Organizing package information for table
+packages <- c("car", "Hmisc", "kableExtra", "tidyverse", "reshape2", "plotly", "sjPlot", "Stat2Data")
+display <- c("Package","Title", "Maintainer", "Version", "URL")
+table <- matrix(NA, 1, NROW(display), dimnames = list(1, display))
+for(i in 1:NROW(packages)){
+list <- packageDescription(packages[i])
+table <- rbind(table, matrix(unlist(list[c(display)]), 1, NROW(display), byrow = T))
+}
+table[,NROW(display)] <- stringr::str_extract(table[,NROW(display)], ".+,")
+
+# Table of packages
+kable(table[-1,], format = "html", align = "l", caption = "Packages Used") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+## Introduction
+
+[ggplot2](https://ggplot2.tidyverse.org/) is a package is "a system for declaratively creating graphics". ggplot2 is included in the [tidyverse](https://www.tidyverse.org/) package, which also includes dplyr, tidyr, and tibble.
+
+For reference, here is a [ggplot2 cheatsheet](http://www.rstudio.com/wp-content/uploads/2015/12/ggplot2-cheatsheet-2.0.pdf) and a [quick reference guide](http://r-statistics.co/ggplot2-cheatsheet.html). Also, if you encounter an issue with ggplot2, there is a very likely chance someone encountered the same issue before and posted about it on StackOverflow, so don't be afraid to just Google your error message.
+
+This guide will use the `FirstYearGPA` dataset from Stat2Data. 
+
+## Frequently Asked Questions
+
+### 1. Why should I use ggplot2?
+
+Honestly? Because it looks prettier. It also offers more options than base R plots.
+
+```{r}
+data(FirstYearGPA)
+plot(FirstYearGPA$GPA, FirstYearGPA$HSGPA) # Base R scatterplot
+ggplot(data=FirstYearGPA, aes(x=GPA, y=HSGPA)) + geom_point() # ggplot2 scatterplot
+```
+
+### 2. Why is it called ggplot2? What happened to ggplot1?
+
+[There was a package called ggplot](https://github.com/hadley/ggplot1), which stopped existing in mid 2000s, although it's still kind of around as a historical archive. The "2" in ggplot2 reflects that it was significantly updated.
+
+### 3. Are there alternatives to ggplot2?
+
+Yes, the most obvious being base R plotting. There is also [plotly](https://plotly-r.com/index.html), which has syntax similiar to ggplot2. 
+
+```{r warning=FALSE, message=FALSE}
+plot_ly(data=FirstYearGPA, x = ~GPA, y = ~HSGPA)
+```
+
+There is also [sjPlot](http://www.strengejacke.de/sjPlot/), which is particularly good at making APA-style regression tables, but most of its plot functions are based on ggplot2.
+
+```{r}
+plot_scatter(data=FirstYearGPA, x=GPA, y=HSGPA)
+```
+
+## Syntax
+
+In base R, there are different commands for different visualization types.
+
+```{r fig.keep="none"}
+plot(FirstYearGPA$GPA, FirstYearGPA$HSGPA) # Scatterplot
+
+counts <- table(FirstYearGPA$FirstGen)
+barplot(counts) # Barplot
+
+hist(FirstYearGPA$GPA) # Histogram
+```
+
+In ggplot2, there is one command, ggplot, which can be further specified with additional syntax. Below are breakdowns for different ggplot visualizations. An important part of the syntax is geom, which adds the layer of the actual plot. 
+
+```{r include=FALSE}
+geom <- c("geom_point", "geom_bar", "geom_density", "geom_histogram", "geom_boxplot", "geom_dotplot", "geom_smooth")
+Description <- c("Scatterplot", "Barplot", "Density Plot", "Histogram", "Boxplot", "Dotplot", "Regression Line")
+table <- data.frame(geom, Description)
+rm(geom)
+rm(Description)
+```
+
+```{r echo=FALSE}
+table %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width=F, position = "left")
+rm(table)
+```
+
+```{r geom_point breakdown}
+# Scatterplot aka geom_point
+ggplot( # ggplot command
+  data=FirstYearGPA, # Name of dataset 
+  aes(x=GPA, y=HSGPA)) + # Your x-axis and y-axis
+  geom_point() # Type of plot
+```
+
+```{r geom_bar breakdown}
+# Barplot aka geom_bar
+ggplot( # ggplot command
+  data=FirstYearGPA, # Name of dataset 
+  aes(x=FirstGen)) + # Your x-axis
+  geom_bar() # Type of plot
+```
+
+```{r geom_density breakdown}
+# Density plot aka geom_density
+ggplot( # ggplot command
+  data=FirstYearGPA, # Name of dataset 
+  aes(x=GPA)) + # Your x-axis
+  geom_density() # Type of plot
+```
+
+```{r geom_histogram breakdown}
+# Histogram aka geom_histogram
+ggplot( # ggplot command
+  data=FirstYearGPA, # Name of dataset 
+  aes(x=GPA)) + # Your x-axis
+  geom_histogram(bins=20) # Type of plot
+```
+
+Since the geom part just adds a layer, you can add multiple geoms to one plot. 
+
+```{r}
+# Make a simple linear regression model
+mod <- lm(GPA ~ HSGPA, data=FirstYearGPA)
+```
+
+```{r}
+# Scatterplot aka geom_point
+ggplot( # ggplot command
+  data=FirstYearGPA, # Name of dataset 
+  aes(x=GPA, y=HSGPA)) + # Your x-axis and y-axis
+  geom_point() + # Type of plot 
+  geom_smooth(aes(y=predict(mod))) # Adds a regression line
+```
+
+## Examples
+
+### Example 1: Barplot
+
+I want to make a barplot that shows GPA divided by gender.
+
+```{r include=FALSE}
+data(FirstYearGPA)
+```
+
+```{r}
+ggplot(data=FirstYearGPA, aes(x=GPA, fill=Male)) + # Data, x-axis, fill aesthetic
+  geom_bar() # Barplot
+```
+
+That looks terrible. There's too many variations in GPA. Let's round GPA to the nearest half-point to simplify things.
+
+```{r}
+FirstYearGPA$GPA_round <- round(FirstYearGPA$GPA*2)/2 # Round GPA to two decimal points
+head(FirstYearGPA)
+
+ggplot(data=FirstYearGPA, aes(x=GPA_round, fill=Male)) + # New x-axis
+  geom_bar()
+```
+
+Now we can see that ggplot isn't filling the bars by gender. Let's double-check the class of the variable Male.
+
+```{r}
+class(FirstYearGPA$Male)
+FirstYearGPA$Male <- as.factor(FirstYearGPA$Male)
+class(FirstYearGPA$Male)
+
+ggplot(data=FirstYearGPA, aes(x=GPA_round, fill=Male)) + # Now with altered fill asthetic
+  geom_bar()
+```
+
+That looks better. But by default, ggplot2 is stacking by gender. I want the barplots to be next to each other and divided by gender.
+
+```{r}
+ggplot(data=FirstYearGPA, aes(x=GPA_round, fill=Male)) + 
+  geom_bar(position="dodge") # New barplot position
+```
+
+It's starting to look nice. But there's a few things we can do to improve it:
+
+* Change the legend
+* Rename the x- and y-axis titles
+* Add a big title at the top
+
+Be aware that altering legends in ggplot2 can be a little tricky. In some cases, it may be favorable to just alter the data in the first place. In the FirstYearGPA dataset, gender is defined as "Male": 0 if female, 1 if male. So let's create a new gender variable.
+
+```{r}
+FirstYearGPA$Gender <- if_else(FirstYearGPA$Male == 0, "Female", "Male")
+head(FirstYearGPA)
+
+ggplot(data=FirstYearGPA, aes(x=GPA_round, fill=Gender)) + # New fill aesthetic
+  geom_bar(stat="count", position="dodge")
+```
+
+Now let's add titles.
+
+```{r}
+ggplot(data=FirstYearGPA, aes(x=GPA_round, fill=Gender)) + 
+  geom_bar(stat="count", position="dodge") +
+  xlab("Firstyear GPA") + # x-axis title
+  ylab("Number of Students") + # y-axis title
+  ggtitle("Firstyear GPA by Gender") # Main title
+```
+
+Be aware that by default, ggplot titles at the top are aligned to the left. This was done so it would be easier to add subtitles to plots. You'll have to specify if you want it centered.
+
+```{r}
+ggplot(data=FirstYearGPA, aes(x=GPA_round, fill=Gender)) + 
+  geom_bar(stat="count", position="dodge") +
+  xlab("Firstyear GPA") + 
+  ylab("Number of Students") + 
+  ggtitle("Firstyear GPA by Gender") +
+  theme(plot.title = element_text(hjust = 0.5)) # Change theme to center main title
+```
+
+Now it looks nice. So ultimately, we:
+
+* Rounded our data so a barplot could better visualize it
+* Changed our gender variable from an integer to a factor
+* Specified a dodged barplot (rather than the default stacked)
+* Created a new gender variable to improve the plot legend
+* Added titles
+* Centered the main title
+
+There are still numerous other ways that you could alter the barplot: increase the size of the text, change the color scheme from red/blue to green/purple, change background color, add error bars, etc., although if I demonstrated all these options, the document would never end! 
+
+### Example 2: What looks best? 
+
+Let's say I wanted to know more about the students' SAT Math scores. Since SATM is a numeric variable with lots of variable, I can make a new variable that splits it into quartile and places everyone in the the first, second, third, or fourth quartile. This is something that can be done with the with command as a part of the Hmisc package.
+
+```{r}
+data(FirstYearGPA)
+FirstYearGPA$math_quartile <- with(FirstYearGPA, cut(SATM, 
+                                breaks=quantile(SATM, probs=seq(0,1, by=0.25), na.rm=TRUE),
+                                labels=c("Q1","Q2","Q3","Q4"),
+                                include.lowest=TRUE))
+FirstYearGPA$math_quartile <- as.factor(FirstYearGPA$math_quartile)
+```
+
+For math_quartile, Q4 has the best scores and Q1 has the worst scores.
+
+How would a density plot look?
+
+```{r }
+ggplot( 
+  data=FirstYearGPA, 
+  aes(x=GPA)) + 
+  geom_density(aes(group=math_quartile, fill=math_quartile),alpha=0.2) 
+```
+
+Pretty, but not very effective in conveying information. It overlaps a lot. What about a dotplot?
+
+```{r}
+ggplot( 
+  data=FirstYearGPA, 
+  aes(x=math_quartile,y=GPA)) + 
+  geom_dotplot(binaxis='y')
+```
+
+Hmm, maybe if we clean it up a bit?
+
+```{r}
+ggplot( 
+  data=FirstYearGPA, 
+  aes(x=math_quartile,y=GPA,fill=math_quartile)) + 
+  geom_dotplot(binaxis='y',stackdir='center') +
+  theme(legend.position = "none") +
+  ylab("Firstyear GPA") + xlab("SATM Quartiles")
+```
+
+Okay, what about a boxplot? 
+
+```{r}
+ggplot(data=FirstYearGPA, 
+  aes(x=math_quartile, y=GPA))
+```
+
+Let's clean up the boxplot.
+
+```{r}
+ggplot(data=FirstYearGPA, 
+  aes(x=math_quartile, y=GPA, fill=math_quartile)) + 
+  geom_boxplot(outlier.colour="black", outlier.shape=8, outlier.size=4) +
+  theme(legend.position = "none") +
+  ylab("Firstyear GPA") + xlab("SATM Quartiles")
+```
