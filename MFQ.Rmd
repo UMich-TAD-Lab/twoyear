@@ -84,18 +84,18 @@ mfq_twoyear$mfq_total_sum <- rowSums(mfq_vars_dummy, na.rm=TRUE)
 rm(mfq_vars_dummy)
 ```
 
-# Descriptive statistics for two year MFQ
+# Descriptive statistics for 2 Year MFQ
 
 ```{r, include=FALSE}
 summarytools::descr(mfq_twoyear, style = "rmarkdown", na.rm=TRUE)
 ```
 
-```{r, results='asis'}
+```{r, include=FALSE}
 mfqsmall <- data.frame(mfq_twoyear$mfq_total_sum)
-names(mfqsmall)[names(mfqsmall) == "mfq.mfq_total_sum"] <- "MFQ Total"
+names(mfqsmall)[names(mfqsmall) == "mfq_twoyear.mfq_total_sum"] <- "2 year Total Sum"
 ```
 
-```{r, results='asis'}
+```{r, echo=FALSE, results='asis'}
 summarytools::descr(mfqsmall, style = "rmarkdown", na.rm=TRUE)
 ```
 
@@ -123,10 +123,18 @@ mfq_original <- mfq_original[!(mfq_original$id==10134),]
 
 # Descriptive statistics for Wave 15 MFQ
 
-```{r echo=FALSE}
+```{r echo=FALSE, results='asis'}
 mfqsmall_original <- data.frame(mfq_original$MFQ_C_Sum)
-names(mfqsmall_original)[names(mfqsmall_original) == "mfq.MFQ_C_Sum"] <- "MFQ Total"
+names(mfqsmall_original)[names(mfqsmall_original) == "mfq_original.MFQ_C_Sum"] <- "Wave 15 Total Sum"
 summarytools::descr(mfqsmall_original, style = "rmarkdown", na.rm=TRUE)
+```
+```{r include=FALSE}
+mfq_original$mfq_youth_paper_2yr <- NULL
+mfq_original$mfqyouth2yr_complete <- NULL
+```
+
+```{r include=FALSE}
+which(mfq_original == -99, arr.ind=TRUE)
 ```
 
 ```{r include=FALSE}
@@ -159,23 +167,25 @@ mfq <- mfq[!(mfq$id == "10023"),]
 mfq[mfq=="88"] <- NA
 ```
 
-# Descriptive statistics on the combined dataset
-
-```{r}
+```{r include=FALSE}
 mean(mfq$MFQ_C_Sum, na.rm=TRUE)
 mean(mfq$mfq_total_sum, na.rm=TRUE)
 
 sd(mfq$MFQ_C_Sum, na.rm=TRUE)
 sd(mfq$mfq_total_sum, na.rm=TRUE)
+```
 
+```{r include=FALSE}
+names(mfqsmall)[names(mfqsmall) == "mfq_twoyear.mfq_total_sum"] <- "MFQ Total 2yr"
+summarytools::descr(mfqsmall, style = "rmarkdown", na.rm=TRUE, split.tables=10000)
 ```
 
 ```{r echo=FALSE}
 ggplot(mfq, aes(MFQ_C_Sum)) + geom_histogram(binwidth = 10, color="black", fill="light blue") +
-  ggtitle("MFQ Wave 15 Original Histogram") + xlab("MFQ Total Score") + ylab("")
+  ggtitle("MFQ Wave 15 Histogram") + xlab("MFQ Total Score") + ylab("")
 
 ggplot(mfq, aes(mfq_total_sum)) + geom_histogram(binwidth = 10, color="black", fill="light blue")+
-  ggtitle("MFQ Wave 15 Two Year Histogram") + xlab("MFQ Total Score") + ylab("")
+  ggtitle("MFQ Two Year Histogram") + xlab("MFQ Total Score") + ylab("")
 
 ```
 
@@ -192,13 +202,17 @@ ggplot(mfq, aes(x=MFQ_C_Sum, y=mfq_total_sum, fill=gender)) +
   #theme(legend.position = "none") +
   ggtitle("Wave 15 vs 2yr Scatterplot")
 ```
+
 # Is there a correlation between the old and new scores?
+
 ```{r echo=FALSE}
 cor.test(mfq$MFQ_C_Sum, mfq$mfq_total_sum) 
 cor.test(female$MFQ_C_Sum, female$mfq_total_sum)
 cor.test(male$MFQ_C_Sum, male$mfq_total_sum)
 ```
+
 # Is there a significant difference between these two scores?
+
 ```{r echo=FALSE}
 t.test(mfq$MFQ_C_Sum, mfq$mfq_total_sum) 
 t.test(female$MFQ_C_Sum, female$mfq_total_sum)
