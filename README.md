@@ -5,14 +5,14 @@
 | Measure  | Assignee | Status |
 | --- | --- | --- |
 | APQ Child | Paulina | &#9744; |
-| ALES Child | none | unable to be completed since Wave 15 ALES data has not been cleaned yet |
+| ALES Child | none | NA |
 | CTQ Child | Alexa | &#9744; |
-| MFQ Child | Nisha | &#9744; |
+| MFQ Child | Nisha | &#9745; |
 | NQ Child | none | &#9744; |
-| SCARED Child | Diane | &#9744; |
+| SCARED Child | Diane | &#9745; |
 | SRD Child | none | &#9744; |
 | SUB Child | none | &#9744; |
-| CBCL Parent | Julianna | done-ish |
+| CBCL Parent | Julianna | &#9745; |
 | CTS Parent | none | &#9744; |
 | NQ Parent | none | &#9744; |
 
