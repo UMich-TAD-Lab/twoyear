@@ -4,7 +4,7 @@
 
 | Measure  | Assignee | Status |
 | --- | --- | --- |
-| APQ Child | Paulina | &#9744; |
+| APQ Child | none | &#9744; |
 | ALES Child | none | NA |
 | CTQ Child | Alexa | &#9744; |
 | MFQ Child | Nisha | &#9745; |
